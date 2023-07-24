@@ -1,0 +1,43 @@
+/* Style for the tab buttons */
+.tab-btns {
+    display: flex;
+}
+
+.tab-btn {
+    cursor: pointer;
+    background-color: var(--color-background-weak);
+    color: var(--color-text-weak);
+    border-radius: 5px 5px 0 0;
+}
+
+.tab-btn.active {
+    color: var(--color-text-active);
+    background-color: var(--color-card-background);
+    position: relative;
+    /* To position the indicator relative to the tab button */
+}
+
+/* Style for the active indicator */
+.tab-btn.active::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 90%;
+    height: 2px;
+    /* Adjust the height of the indicator as per your preference */
+    background-color: var(--color-text-active);
+    /* Choose the color you want for the indicator */
+    border-radius: 5px 5px 0 0;
+    /* To match the rounded corners of the tab button */
+}
+
+
+/* Style for the tab content */
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
