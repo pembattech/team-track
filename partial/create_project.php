@@ -3,6 +3,13 @@ session_start();
 
 require_once '../config/connect.php';
 
+function generateRandomColor()
+{
+    $colors = ["#f06a6a", "#ec8d71", "#f1bd6c", "#f8df72", "#aecf55", "#5da283", "#4ecbc4", "#9ee7e3", "#4573d2", "#8d84e8", "#b36bd4", "#f9aaef", "#f26fb2", "#fc979a"];
+    $randomIndex = array_rand($colors);
+    return $colors[$randomIndex];
+}
+
 // Function to sanitize user inputs
 function sanitize_input($input)
 {
@@ -15,14 +22,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $description = sanitize_input($_POST['description']);
     $start_date = sanitize_input($_POST['start_date']);
     $end_date = sanitize_input($_POST['end_date']);
+    $status = "Planning";
+    $background_color = generateRandomColor();
+
 
     // Get the user ID of the logged-in user
     $user_id = $_SESSION['user_id'];
     echo $project_name;
 
     // Insert project into the Projects table
-    $insert_project_query = "INSERT INTO Projects (project_name, description, start_date, end_date)
-                            VALUES ('$project_name', '$description', '$start_date', '$end_date')";
+    $insert_project_query = "INSERT INTO Projects (project_name, description, start_date, end_date, status, background_color)
+                               VALUES ('$project_name', '$description', '$start_date', '$end_date', '$status', '$background_color')";
 
     echo $insert_project_query;
 
