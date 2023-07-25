@@ -6,7 +6,6 @@
             <div class="heading-style">
                 <p>Create a New Project</p>
             </div>
-
             <form action="partial/create_project.php" method="POST">
                 <label for="project_name">Project Name:</label>
                 <input type="text" name="project_name" required><br>

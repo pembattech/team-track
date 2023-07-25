@@ -280,71 +280,73 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['username'])) {
     // User is logged in, redirect to the home page
     header("Location: home.php");
     exit();
-}
-?>
-
-<!-- Display the login/signup form -->
-<div class="form-structor">
-    <!-- Signup Form -->
-    <div class="signup slide-up">
-        <h2 class="form-title" id="signup"><span>or</span>Sign up</h2>
-        <form action="partial/register.php" method="POST">
-            <div class="form-holder">
-                <input name="name" type="text" class="input" placeholder="Name" required />
-                <input name="username" type="text" class="input" placeholder="Username" required />
-                <input name="email" type="email" class="input" placeholder="Email" required />
-                <input name="password" type="password" class="input" placeholder="Password" required />
-                <input name="cpassword" type="password" class="input" placeholder="Confirm Password" required />
-            </div>
-            <button type="submit" class="submit-btn">Sign up</button>
-        </form>
-    </div>
-    <!-- Login Form -->
-    <div class="login">
-        <div class="center">
-            <h2 class="form-title" id="login"><span>or</span>Log in</h2>
-            <form action="partial/login.php" method="POST">
+    
+} else {
+    ?>
+    <div class="form-structor">
+        <!-- Signup Form -->
+        <div class="signup slide-up">
+            <h2 class="form-title" id="signup"><span>or</span>Sign up</h2>
+            <form action="partial/register.php" method="POST">
                 <div class="form-holder">
+                    <input name="name" type="text" class="input" placeholder="Name" required />
                     <input name="username" type="text" class="input" placeholder="Username" required />
+                    <input name="email" type="email" class="input" placeholder="Email" required />
                     <input name="password" type="password" class="input" placeholder="Password" required />
+                    <input name="cpassword" type="password" class="input" placeholder="Confirm Password" required />
                 </div>
-                <button type="submit" class="submit-btn">Log in</button>
+                <button type="submit" class="submit-btn">Sign up</button>
             </form>
         </div>
+        <!-- Login Form -->
+        <div class="login">
+            <div class="center">
+                <h2 class="form-title" id="login"><span>or</span>Log in</h2>
+                <form action="partial/login.php" method="POST">
+                    <div class="form-holder">
+                        <input name="username" type="text" class="input" placeholder="Username" required />
+                        <input name="password" type="password" class="input" placeholder="Password" required />
+                    </div>
+                    <button type="submit" class="submit-btn">Log in</button>
+                </form>
+            </div>
+        </div>
     </div>
-</div>
 
-<!-- The JavaScript script -->
-<script>
-    // Clear the console
-    console.clear();
+    <!-- The JavaScript script -->
+    <script>
+        // Clear the console
+        console.clear();
 
-    // Get the login and signup buttons
-    const loginBtn = document.getElementById('login');
-    const signupBtn = document.getElementById('signup');
+        // Get the login and signup buttons
+        const loginBtn = document.getElementById('login');
+        const signupBtn = document.getElementById('signup');
 
-    // Add click event listeners to the buttons
-    loginBtn.addEventListener('click', (e) => {
-        let parent = e.target.parentNode.parentNode;
-        Array.from(e.target.parentNode.parentNode.classList).find((element) => {
-            if (element !== "slide-up") {
-                parent.classList.add('slide-up')
-            } else {
-                signupBtn.parentNode.classList.add('slide-up')
-                parent.classList.remove('slide-up')
-            }
+        // Add click event listeners to the buttons
+        loginBtn.addEventListener('click', (e) => {
+            let parent = e.target.parentNode.parentNode;
+            Array.from(e.target.parentNode.parentNode.classList).find((element) => {
+                if (element !== "slide-up") {
+                    parent.classList.add('slide-up')
+                } else {
+                    signupBtn.parentNode.classList.add('slide-up')
+                    parent.classList.remove('slide-up')
+                }
+            });
         });
-    });
 
-    signupBtn.addEventListener('click', (e) => {
-        let parent = e.target.parentNode;
-        Array.from(e.target.parentNode.classList).find((element) => {
-            if (element !== "slide-up") {
-                parent.classList.add('slide-up')
-            } else {
-                loginBtn.parentNode.parentNode.classList.add('slide-up')
-                parent.classList.remove('slide-up')
-            }
+        signupBtn.addEventListener('click', (e) => {
+            let parent = e.target.parentNode;
+            Array.from(e.target.parentNode.classList).find((element) => {
+                if (element !== "slide-up") {
+                    parent.classList.add('slide-up')
+                } else {
+                    loginBtn.parentNode.parentNode.classList.add('slide-up')
+                    parent.classList.remove('slide-up')
+                }
+            });
         });
-    });
-</script>
+    </script>
+    <?php
+}
+?>
