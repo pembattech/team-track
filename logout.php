@@ -14,7 +14,7 @@ function logout()
     session_destroy();
 
     // Redirect the user to the login page or any other desired page
-    header("Location: login.php"); // Change 'login.php' to your login page URL
+    header("Location: login_register_form.php"); // Change 'login.php' to your login page URL
     exit; // Ensure that no further code is executed after the redirect
 }
 

@@ -56,7 +56,7 @@
     <div class="main-content">
         <div class="heading-content">
             <div class="heading-style">
-                <p>My Tasks</p>
+                <p>My Twasks</p>
             </div>
 
             <div class="tab-btns">

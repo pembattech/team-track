@@ -44,9 +44,10 @@
         const dateElement = document.getElementById("date");
 
         const greeting = getGreeting();
+
         const formattedDate = formatDate();
 
-        greetingElement.textContent = `${greeting}, User`;
+        greetingElement.textContent = `${greeting}, <?php echo get_user_data($user_id)["username"]; ?>`;
         dateElement.textContent = formattedDate;
     });
 </script>
