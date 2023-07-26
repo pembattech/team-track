@@ -55,13 +55,13 @@
         background-color: var(--color-background-weak);
         color: var(--color-text);
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        border-top: 5px solid #0063A7;
         border-radius: 5px;
         z-index: 9999;
     }
 </style>
 
-<div class="popup_notify" id="popupNotification">
-</div>
+<div class="popup_notify" id="popupNotification"></div>
 
 <?php include 'config/connect.php'; ?>
 <?php include 'partial/utils.php'; ?>
