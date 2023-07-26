@@ -45,7 +45,23 @@
     .popup-menu a:hover {
         background-color: #ddd;
     }
+
+    .popup_notify {
+        display: none;
+        position: fixed;
+        bottom: 5%;
+        left: 0;
+        padding: 20px;
+        background-color: var(--color-background-weak);
+        color: var(--color-text);
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        border-radius: 5px;
+        z-index: 9999;
+    }
 </style>
+
+<div class="popup_notify" id="popupNotification">
+</div>
 
 <?php include 'config/connect.php'; ?>
 <?php include 'partial/utils.php'; ?>

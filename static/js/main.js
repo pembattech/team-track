@@ -79,7 +79,6 @@ window.addEventListener("click", function (event) {
 });
 
 
-
 function toggleCollapse(className) {
     var rows = document.getElementsByClassName(className);
     for (var i = 0; i < rows.length; i++) {

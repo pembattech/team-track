@@ -42,7 +42,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Assign the project to the logged-in user in the ProjectUsers table
         $assign_project_query = "INSERT INTO ProjectUsers (project_id, user_id) VALUES ('$project_id', '$user_id')";
         if ($connection->query($assign_project_query)) {
+            // Set a session variable to indicate successful project creation
+            // Set a session variable to store the dynamic message
+            $_SESSION['project_notification_message'] = " $project_name Project created successfully.";
+
             echo "Project created and assigned to the logged-in user successfully.";
+
+            // Redirect to the user's home or desired page after successfullly creating project
+            header("Location: ../home.php");
         } else {
             echo "Error assigning project: " . $connection->error;
         }
