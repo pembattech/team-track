@@ -96,7 +96,7 @@ p {
     margin-bottom: 8px;
     font-family: inherit;
     font-size: 20px;
-    color: var(--color-icon-active);
+    color: var(--color-text);
 }
 
 .navbar {
@@ -167,7 +167,6 @@ p {
 }
 
 .container {
-    height: calc(100vh - 40px);
     background-color: var(--bg-color);
     /* Subtracting the navbar height */
     display: flex;
@@ -194,16 +193,17 @@ p {
 
 .sidebar li {
     margin-bottom: 15px;
+    padding: 0 5px;
 }
 
 .sidebar li:hover,
 .project-link:hover {
     border-radius: 5px;
-    background-color: var(--color-navigation-sidebar-icon-background)
+    background-color: var(--color-background-weak);
 }
 
 .project-lst {
-    padding-left: 12px;
+    padding: 0 0 0 12px;
     font-family: inherit;
     font-size: 14px;
     margin-bottom: 8px;
@@ -215,6 +215,7 @@ p {
     color: #333;
     display: flex;
     align-items: center;
+    padding-left: 5px;
 }
 
 .project-link .square {
@@ -230,8 +231,9 @@ p {
 }
 
 .main-content {
+    min-height: 88.5vh;
     width: 85%;
-    /* transition: 1s ease; */
+    overflow-y: auto;
     background-color: var(--bg-color);
     padding: 8px 25px;
 }
@@ -265,14 +267,14 @@ p {
 }
 
 #greeting {
-    font-size: 24px;
-    color: var(--color-icon-active);
+    font-size: 32px;
+    color: var(--color-text);
     text-align: center;
 }
 
 #date {
-    font-size: 32px;
-    color: var(--color-icon-active);
+    font-size: 24px;
+    color: var(--color-text);
     font-weight: bold;
     text-align: center;
 }
@@ -306,7 +308,6 @@ p {
 .addtask-btn {
     display: inline-flex;
     background-color: var(--color-home-blue-background);
-    border: 1px solid var(--color-home-blue-background);
     color: var(--color-text);
     font-size: 12px;
     font-weight: 600;
@@ -368,70 +369,9 @@ th.subhead-task {
 
 /* Project */
 
-
-.tabset>input[type="radio"] {
-    position: absolute;
-    left: -200vw;
-}
-
-.tabset .tab-panel {
-    display: none;
-}
-
-.tabset>input:first-child:checked~.tab-panels>.tab-panel:first-child,
-.tabset>input:nth-child(3):checked~.tab-panels>.tab-panel:nth-child(2),
-.tabset>input:nth-child(5):checked~.tab-panels>.tab-panel:nth-child(3),
-.tabset>input:nth-child(7):checked~.tab-panels>.tab-panel:nth-child(4),
-.tabset>input:nth-child(9):checked~.tab-panels>.tab-panel:nth-child(5),
-.tabset>input:nth-child(11):checked~.tab-panels>.tab-panel:nth-child(6) {
-    display: block;
-}
-
-.tabset>label {
-    position: relative;
-    display: inline-block;
-    padding: 10px 15px 14px 0px;
-    border: 1px solid transparent;
-    border-bottom: 0;
-    cursor: pointer;
-    font-size: 14px;
-    color: var(--color-text-disabled);
-}
-
-.tabset>label::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    bottom: 10px;
-    width: 13px;
-    height: 3px;
-    background: var(--color-text-disabled);
-}
-
-input:focus-visible+label {
-    outline: 2px solid var(--color-icon-active);
-    border-radius: 3px;
-}
-
-.tabset>label:hover,
-.tabset>input:focus+label,
-.tabset>input:checked+label {
-    color: var(--color-icon-active);
-}
-
-.tabset>label:hover::after,
-.tabset>input:focus+label::after,
-.tabset>input:checked+label::after {
-    background: var(--color-icon-active);
-}
-
-.tab-panel {
-    margin-top: 10px;
-    border-top: 1px solid var(--color-text-deactivate);
-}
-
-.tabset {
-    max-width: 65em;
+.project-wrapper .project-link .square{
+    width: 30px;
+    height: 30px;
 }
 
 .project-desc-textarea textarea {
@@ -516,7 +456,7 @@ input:focus-visible+label {
     color: var(--color-text);
 }
 
-.dashboard-container {
+.dashboard-section {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr;
 }
@@ -527,7 +467,7 @@ input:focus-visible+label {
     justify-content: center;
     align-items: center;
     margin: 0;
-    background-color: var(--color-card-background);
+    background-color: var(--color-background-active);
     border: 1px solid var(--color-text-deactivate);
     border-radius: 5px;
     width: 230px;

@@ -56,8 +56,12 @@
 
         <!-- The popup menu -->
         <div class="popup-menu" id="myPopup">
-            <a href="#" onclick="editProfile()">Profile</a>
-            <a href="#" onclick="logout()">Logout</a>
+            <a href="#" onclick="editProfile()">
+                <p>Profile</p>
+            </a>
+            <a href="#" onclick="logout()">
+                <p>Logout</p>
+            </a>
         </div>
     </div>
 </div>
@@ -80,3 +84,4 @@
         <?php unset($_SESSION['project_notification_message']); ?>
     }
 </script>
+<script src="static/js/main.js"></script>

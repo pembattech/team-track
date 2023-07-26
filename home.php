@@ -60,7 +60,14 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['username'])) {
 
             const formattedDate = formatDate();
 
-            greetingElement.textContent = `${greeting}, <?php echo get_user_data($user_id)["username"]; ?>`;
+            // Get the user's name fetched from PHP
+            const name = "<?php echo get_user_data($user_id)['name']; ?>";
+            // Split the name by space
+            const nameArray = name.split(" ");
+            // Get the first name
+            const firstName = nameArray[0];
+            // Set the greeting with the first name
+            greetingElement.textContent = `${greeting}, ${firstName}`;
             dateElement.textContent = formattedDate;
         });
     </script>

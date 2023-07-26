@@ -26,11 +26,11 @@
     .popup-menu {
         display: none;
         position: absolute;
-        background-color: #f9f9f9;
+        background-color: var(--sidebar-bgcolor);
         min-width: 120px;
         box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
         z-index: 1;
-        top: 88px;
+        top: 60px;
         border-radius: 5px;
         right: 40px;
     }
@@ -38,12 +38,16 @@
     .popup-menu a {
         display: block;
         padding: 10px;
+        font-size: 16px;
+        font-family: inherit;
         text-decoration: none;
-        color: #333;
+        color: var(--color-text);
+        text-align: center;
     }
 
-    .popup-menu a:hover {
-        background-color: #ddd;
+    .popup-menu a p:hover {
+        border-radius: 5px;
+        background-color: var(--color-background-weak);
     }
 
     .popup_notify {
