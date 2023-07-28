@@ -22,7 +22,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $description = sanitize_input($_POST['description']);
     $start_date = sanitize_input($_POST['start_date']);
     $end_date = sanitize_input($_POST['end_date']);
-    $status = "Planning";
+    $status = "Not Started";
     $background_color = generateRandomColor();
 
 

@@ -1,8 +1,29 @@
+<style>
+    .logo img {
+        width: 60px;
+        height: 60px;
+        border: 1px solid var(--color-border);
+        border-radius: 5px;
+        background-color: var(--color-text);
+    }
+
+    .navbar-right img {
+        height: 40px;
+        width: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+
+    }
+</style>
 <?php include 'base.php'; ?>
-
-
 <div class="navbar">
-    <button class="collapse-toggle-btn">M</button>
+    <div class="logo-container">
+        <a href="home.php">
+            <div class="logo collapse-toggle-btn">
+                <img src="static/image/teamtrack_logo.png" alt="">
+            </div>
+        </a>
+    </div>
 
     <a href="create_project_form.php">
         <div class="create-project-btn popup-btn overlay-border related-btn-img">
@@ -16,6 +37,8 @@
     </div>
     <div class="navbar-right">
         <?php
+        // Start a session to access session variables (if needed)
+        session_start();
         // Check if the user is logged in (assuming you have stored user_id in the session after login)
         if (isset($_SESSION['user_id'])) {
             $user_id = $_SESSION['user_id'];
@@ -39,9 +62,11 @@
             $profile_picture = $user_data['profile_picture'];
             $full_name = $user_data['name'];
 
-            if ($profile_picture !== null) {
+            if ($profile_picture !== null && $profile_picture !== "") {
                 // Display the profile picture if it exists
-                echo '<img src="' . $profile_picture . '" alt="Profile Picture">';
+                echo '<img id="popup-btn" src="' . $profile_picture . '" alt="Profile Picture">';
+                // echo '<div class="profile-picture" id="popup-btn>';
+                // echo '</div>';
             } else {
                 // Display the initials of the full name as the profile picture
                 $name_parts = explode(' ', $full_name);
