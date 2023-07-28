@@ -1,6 +1,7 @@
 :root {
     --bg-color: #1e1f21;
     --sidebar-bgcolor: #2e2e30;
+    --overlay-bgcolor: #2e2e30b9;
     --navbar-bgcolor: var(--sidebar-bgcolor);
     --color-text: #f5f4f3;
     --color-text-active: #f5f4f3;
@@ -156,7 +157,7 @@ p {
 }
 
 .create-project-btn:hover {
-    background-color: var(--color-navigation-sidebar-icon-background);
+    background-color: var(--color-background-weak);
 }
 
 .svg-img img {
@@ -233,7 +234,7 @@ p {
 .main-content {
     min-height: 88.5vh;
     width: 85%;
-    overflow-y: auto;
+    overflow-y: hidden;
     background-color: var(--bg-color);
     padding: 8px 25px;
 }
@@ -305,23 +306,6 @@ p {
 }
 
 /* My Tasks */
-.addtask-btn {
-    display: inline-flex;
-    background-color: var(--color-home-blue-background);
-    color: var(--color-text);
-    font-size: 12px;
-    font-weight: 600;
-    font-family: inherit;
-    padding: 0 10px;
-    margin-bottom: 10px;
-}
-
-.addtask-btn .plus {
-    font-weight: bolder;
-    font-size: 16px;
-    margin-right: 2px;
-}
-
 .mytasks-heading {
     font-size: 12px;
     font-family: inherit;
@@ -329,6 +313,7 @@ p {
 }
 
 .tasks table {
+    margin-top: 50px;
     width: 100%;
     border-collapse: collapse;
     margin-right: 50px;
@@ -385,7 +370,7 @@ th.subhead-task {
 }
 
 .project-desc-textarea textarea:hover {
-    border: 1px solid var(--color-text-deactivate);
+    border: 1px solid var(--color-border);
     border-radius: 5px;
 }
 
@@ -394,53 +379,27 @@ th.subhead-task {
     border-radius: 5px;
 }
 
-.user-role-container {
+.user-role-container .user-content {
     display: flex;
     flex-direction: row;
-    flex-wrap: wrap;
-    gap: 50px;
+    gap: 10px;
+    padding: 5px 15px 0;
 }
 
-.add-member p {
-    margin-top: 5px;
+.user-role-container .user-content:hover {
+    background-color: var(--color-background-hover);
+    border-radius: 5px;
+}
+
+
+.add-member {
+    align-items: center;
     cursor: pointer;
-    color: var(--color-text-disabled);
-}
-
-.border-around-plus {
-    border: 2px dotted var(--color-text-disabled);
-    border-radius: 50%;
-    display: inline-block;
-    padding: 5px;
-    width: 20px;
-    height: 20px;
-    text-align: center;
-    font-weight: 600;
-    font-size: 16px;
-    line-height: 20px;
-    margin-right: 5px;
-}
-
-.add-member p:hover,
-.add-member span:hover {
-    border-color: var(--color-text);
     color: var(--color-text);
 }
 
-.user-role {
-    display: flex;
-    align-items: center;
-}
-
-.profile-picture {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-right: 10px;
-}
-
-.profile-info p {
+.profile-info {
+    margin-top: -5px;
     cursor: pointer;
     font-size: 16px;
     color: var(--color-text);
@@ -452,9 +411,6 @@ th.subhead-task {
     font-size: 12px;
 }
 
-.profile-info .user-role:hover {
-    color: var(--color-text);
-}
 
 .dashboard-section {
     display: grid;

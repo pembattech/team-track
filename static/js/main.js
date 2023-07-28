@@ -56,7 +56,7 @@ function logout() {
 function editProfile() {
     // Add your profile edit code here
     // For example, redirecting the user to the profile edit page
-    window.location.href = "profile_edit.php";
+    window.location.href = "profile.php";
     hidePopup();
 }
 

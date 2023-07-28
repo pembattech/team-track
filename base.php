@@ -1,3 +1,4 @@
+<link rel="icon" type="image/x-icon" href="static/image/teamtrack_logo.png">
 <link rel="stylesheet" href="static/css/styles.css">
 <link rel="stylesheet" href="static/css/tab-style.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">

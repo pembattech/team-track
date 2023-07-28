@@ -19,7 +19,7 @@
     // Check if the 'project_id' parameter is present in the URL
     if (isset($_GET['project_id'])) {
         $project_id = $_GET['project_id'];
-        $user_id = $_SESSION['user_id'];
+        echo $project_id;
 
         // Query to fetch project details from the 'Projects' table
         $sql_project = "SELECT * FROM Projects WHERE project_id = $project_id";
@@ -67,162 +67,6 @@
     }
     ?>
 
-    <style>
-        .invite-btn {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .invite-popup {
-            display: none;
-            background-color: var(--overlay-bgcolor);
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        .invite-popup-content {
-            background-color: var(--color-background-weak);
-            color: var(--color-text);
-            max-width: 400px;
-            margin: 100px auto;
-            padding: 10px 20px;
-            border-radius: 4px;
-        }
-
-        .invite-popup-close {
-            font-size: 30px;
-            float: right;
-            cursor: pointer;
-        }
-
-        .invite-popup .form-group {
-            margin-bottom: 15px;
-            font-size: 14px;
-        }
-
-        .invite-popup label {
-            font-size: 14px;
-            margin-bottom: 5px;
-        }
-
-        .invite-popup input[type="email"],
-        .invite-popup textarea {
-            width: 100%;
-            border: 1px solid #ccc;
-            padding: 8px 5px;
-            border-radius: 4px;
-            background-color: var(--color-background-weak);
-            color: var(--color-text);
-        }
-
-        .invite-popup .invite-submit-btn {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        /* Styling for the user-role-container */
-        .user-role-container {
-            display: flex;
-            flex-direction: row;
-            flex-wrap: wrap;
-            gap: 25px;
-        }
-
-        .profile-picture {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-
-        /* Styling for the "+" sign */
-        .border-around-plus {
-            border: 1px solid #ccc;
-            padding: 2px 6px;
-            margin-right: 5px;
-        }
-
-        .addtask-btn {
-            outline: 0;
-            padding: 3px;
-            border: 1px solid var(--color-border);
-            border-radius: 5px;
-            color: var(--color-text-weak);
-            background-color: var(--color-background-weak);
-        }
-
-        .addtask-btn:hover {
-            background-color: var(--color-background-hover);
-            color: var(--color-text);
-        }
-
-        .addtask-popup {
-            display: none;
-            background-color: var(--overlay-bgcolor);
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        .addtask-popup-content {
-            background-color: var(--color-background-weak);
-            color: var(--color-text);
-            max-width: 400px;
-            margin: 100px auto;
-            padding: 10px 20px;
-            border-radius: 4px;
-        }
-
-        .addtask-popup-close {
-            font-size: 30px;
-            float: right;
-            cursor: pointer;
-        }
-
-        .addtask-popup .form-group {
-            margin-bottom: 15px;
-            font-size: 14px;
-        }
-
-        .addtask-popup label {
-            font-size: 14px;
-            margin-bottom: 5px;
-        }
-
-        .addtask-popup textarea {
-            width: 100%;
-            border: 1px solid #ccc;
-            padding: 8px 5px;
-            border-radius: 4px;
-            background-color: var(--color-background-weak);
-            color: var(--color-text);
-        }
-
-        .addtask-popup .editprofile-submit-btn {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-    </style>
-
     <div class='main-content'>
         <div class='heading-content'>
             <div class='heading-style'>
@@ -269,16 +113,15 @@
                         <p>Project roles</p>
                     </div>
                     <?php
-                    // Assuming $result_users is the mysqli result containing user data
                     if (mysqli_num_rows($result_users) > 0) {
                         echo "<div class='user-role-container'>";
-                        echo "<div class='user-content add-member' onclick='addmember_popup_toggle()'>";
+                        echo "<div class='add-member'>";
                         echo "<p><span class='border-around-plus'>+</span> Add member</p>";
                         echo "</div>";
 
                         // Loop through the remaining users associated with the project
                         while ($user = mysqli_fetch_assoc($result_users)) {
-                            echo "<div class='user-content'>";
+                            echo "<div class='user-role'>";
                             echo "<img class='profile-picture' src='./static/image/test.JPG' alt='Profile Picture'>";
                             echo "<div class='profile-info'>";
                             echo "<p class='user-name'>" . $user['username'] . "</p>";
@@ -288,30 +131,10 @@
                         }
 
                         echo "</div>";
+                    } else {
+                        echo "<p>No users associated with this project.</p>";
                     }
                     ?>
-
-                    <div class="invite-popup" id="invite-popup">
-                        <div class="invite-popup-content">
-                            <span class="invite-popup-close" onclick="addmember_popup_toggle()">&times;</span>
-                            <p class="heading-style">Share '
-                                <?php echo $project['project_name'] ?>'
-                            </p>
-
-                            <form>
-                                <div class="form-group">
-                                    <p>Invite with email</p>
-                                    <input type="email" iwd="email" name="email" placeholder="Add members by email...">
-                                </div>
-                                <div class="form-group">
-                                    <label for="message">Message (optional)</label>
-                                    <textarea id="message" name="message" rows="4"
-                                        placeholder="Add a message"></textarea>
-                                </div>
-                                <button type="submit" class="invite-submit-btn">Send Invite</button>
-                            </form>
-                        </div>
-                    </div>
 
                 </div>
 
@@ -319,45 +142,11 @@
         </div>
         <div class="tab-content div-space-top" id="tab2">
             <div class="tasks-section">
-                <!-- <div class="addtask-popup" onclick="addtask_popup_toggle()">
-                    <div class="heading-nav-content addtask-btn overlay-border">
-                            <span class="plus">+</span>
-                            <span>Add Task</span>
-                    </div>
-                </div> -->
-
-                <button class="addtask-btn" onclick="addtask_popup_toggle()">+ Add Task</button>
-
-                <div class="addtask-popup" id="addtask-popup">
-                    <div class="addtask-popup-content">
-                        <form action="partial/addtask.php" method="post" enctype="multipart/form-data">
-                            <span class="addtask-popup-close" onclick="addtask_popup_toggle()">&times;</span>
-                            <p class="heading-style">Add Task</p>
-                            <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
-                            <div class="form-group">
-                                <label for="taskname">Task Name</label>
-                                <input type="text" name="taskname">
-                            </div>
-                            <div class="form-group">
-                                <label for="assignee">Assignee</label>
-                                <input type="text" name="assignee">
-                            </div>
-                            <!-- <div class="form-group">
-                                <label for="duedate">Due Date</label>
-                                <input type="text" name="duedate">
-                            </div> -->
-                            <div class="form-group">
-                                <label for="priority">Priority</label>
-                                <input type="text" name="priority">
-                            </div>
-                            <div class="form-group">
-                                <label for="status">Status</label>
-                                <input type="text" name="status">
-                            </div>
-                            <button type="submit" name="submit" class="editprofile-submit-btn">Submit</button>
-                        </form>
-                    </div>
+                <div class="heading-nav-content addtask-btn overlay-border">
+                    <span class="plus">+</span>
+                    <span>Add Task</span>
                 </div>
+
 
                 <!-- Draggable Tasks Lists -->
                 <div class="tasks div-space-top">
@@ -485,15 +274,3 @@
     </div>
 
 </div>
-<script>
-    function addmember_popup_toggle() {
-        const popup = document.getElementById('invite-popup');
-        popup.style.display = (popup.style.display === 'block') ? 'none' : 'block';
-    }
-</script>
-<script>
-    function addtask_popup_toggle() {
-        const popup = document.getElementById('addtask-popup');
-        popup.style.display = (popup.style.display === 'block') ? 'none' : 'block';
-    }
-</script>

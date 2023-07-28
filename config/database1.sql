@@ -8,7 +8,8 @@ CREATE TABLE Users (
     password VARCHAR(255),
     profile_picture VARCHAR(255),
     role VARCHAR(50),
-    background_color VARCHAR(7)
+    background_color VARCHAR(7),
+    about VARCHAR(1000)
 );
 
 CREATE TABLE Projects (
