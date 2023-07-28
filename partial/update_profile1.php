@@ -45,11 +45,11 @@
                 // Execute the query
                 if ($connection->query($update_profile_query) === TRUE) {
                     echo "Profile information updated successfully!";
-                    $_SESSION['project_notification_message'] = "Profile information update successfully.";
+                    $_SESSION['notification_message'] = "Profile information update successfully.";
 
                 } else {
                     echo "Error updating profile information: " . $connection->error;
-                    $_SESSION['project_notification_message'] = "Error updating profile information.";
+                    $_SESSION['notification_message'] = "Error updating profile information.";
                     echo "Sorry, there was an error uploading your file.";
                 }
 
@@ -62,11 +62,11 @@
             // Execute the query
             if ($connection->query($update_profile_query) === TRUE) {
                 echo "Profile information updated successfully!";
-                $_SESSION['project_notification_message'] = "Profile information update successfully.";
+                $_SESSION['notification_message'] = "Profile information update successfully.";
 
             } else {
                 echo "Error updating profile information: " . $connection->error;
-                $_SESSION['project_notification_message'] = "Error updating profile information.";
+                $_SESSION['notification_message'] = "Error updating profile information.";
             }
         }
 

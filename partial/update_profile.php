@@ -31,10 +31,10 @@ if (isset($_POST["submit"])) {
 
             if ($connection->query($update_profile_query) === TRUE) {
                 echo "Profile information updated successfully!";
-                $_SESSION['project_notification_message'] = "Profile information updated successfully.";
+                $_SESSION['notification_message'] = "Profile information updated successfully.";
             } else {
                 echo "Error updating profile information: " . $connection->error;
-                $_SESSION['project_notification_message'] = "Error updating profile information.";
+                $_SESSION['notification_message'] = "Error updating profile information.";
             }
         } else {
             echo "Sorry, there was an error uploading your file.";
@@ -45,10 +45,10 @@ if (isset($_POST["submit"])) {
 
         if ($connection->query($update_profile_query) === TRUE) {
             echo "Profile information updated successfully!";
-            $_SESSION['project_notification_message'] = "Profile information updated successfully.";
+            $_SESSION['notification_message'] = "Profile information updated successfully.";
         } else {
             echo "Error updating profile information: " . $connection->error;
-            $_SESSION['project_notification_message'] = "Error updating profile information.";
+            $_SESSION['notification_message'] = "Error updating profile information.";
         }
     }
 

@@ -44,7 +44,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($connection->query($assign_project_query)) {
             // Set a session variable to indicate successful project creation
             // Set a session variable to store the dynamic message
-            $_SESSION['project_notification_message'] = " $project_name Project created successfully.";
+            $_SESSION['notification_message'] = " $project_name Project created successfully.";
 
             echo "Project created and assigned to the logged-in user successfully.";
 
