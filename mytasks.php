@@ -1,3 +1,5 @@
+<title>Tasks - TeamTrack</title>
+
 <style>
     .incomplete-tasks-table {
         border-collapse: collapse;

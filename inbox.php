@@ -1,3 +1,5 @@
+<title>Inbox - TeamTrack</title>
+
 <?php include 'partial/navbar.php'; ?>
 
 <div class="container">

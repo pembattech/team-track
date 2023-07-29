@@ -1,3 +1,4 @@
+<title>Home - TeamTrack</title>
 <?php
 // Start the session to access session data
 session_start();

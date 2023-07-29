@@ -1,3 +1,5 @@
+<title>Login/Registration - TeamTrack</title>
+
 <style>
     @import url("https://fonts.googleapis.com/css?family=Fira+Sans");
 

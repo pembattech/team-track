@@ -1,3 +1,5 @@
+<title>Project - TeamTrack</title>
+
 <?php include 'partial/navbar.php'; ?>
 <div class="container project-wrapper">
     <?php include 'partial/sidebar.php'; ?>
@@ -248,7 +250,7 @@
         </div>
         <div class="bottom-line"></div>
 
-        <div class="tab-content div-space-top" id="tab1">
+        <div class="tab-content div-space-top active" id="tab1">
             <div class="overview-section">
                 <div class="heading-style">
                     <p>Project description</p>

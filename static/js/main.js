@@ -15,22 +15,22 @@ function openTab(event, tabId) {
     document.getElementById(tabId).style.display = 'block';
     event.currentTarget.classList.add('active');
 
-    // Store the active tab in localStorage
-    localStorage.setItem('activeTab', tabId);
+    // // Store the active tab in localStorage
+    // localStorage.setItem('activeTab', tabId);
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-    // Retrieve the active tab from localStorage
-    const activeTab = localStorage.getItem('activeTab');
+// document.addEventListener("DOMContentLoaded", function () {
+//     // Retrieve the active tab from localStorage
+//     const activeTab = localStorage.getItem('activeTab');
 
-    // If there is an active tab stored, open it
-    if (activeTab) {
-        const tabButton = document.querySelector(`[onclick="openTab(event, '${activeTab}')"]`);
-        if (tabButton) {
-            tabButton.click();
-        }
-    }
-});
+//     // If there is an active tab stored, open it
+//     if (activeTab) {
+//         const tabButton = document.querySelector(`[onclick="openTab(event, '${activeTab}')"]`);
+//         if (tabButton) {
+//             tabButton.click();
+//         }
+//     }
+// });
 
 // Function to show the popup menu
 function showPopup() {

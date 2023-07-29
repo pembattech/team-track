@@ -14,6 +14,11 @@
         font-size: 100px;
     }
 
+    .form-group .profile-picture img {
+        width: 150px;
+        height: 150px;
+    }
+
     .user-personal-info {
         margin: 50px 0 0 20px;
         justify-content: center;
@@ -48,6 +53,7 @@
         background-color: var(--sidebar-bgcolor);
         border: 1px solid var(--color-border);
         border-radius: 5px;
+        block
     }
 
     .user-other-info .user-about .heading-style,
@@ -60,8 +66,43 @@
         width: 100%;
     }
 
-    .editprofile-popup {
+    .edit-profile-btn {
+        outline: 0;
+        padding: 3px;
+        border: 1px solid var(--color-border);
+        border-radius: 5px;
+        color: var(--color-text-weak);
+        background-color: var(--color-background-weak);
+    }
+
+    .edit-profile-btn:hover {
+        background-color: var(--color-background-hover);
+        color: var(--color-text);
+    }
+
+    input.d-none {
+        display: none;
+    }
+
+    .change-pic-lbl {
         display: block;
+        cursor: pointer;
+        padding: 10px;
+        margin-top: 10px;
+        width: 37%;
+        border: 1px solid var(--color-border);
+        border-radius: 5px;
+        color: var(--color-text-weak);
+        background-color: var(--color-background-weak);
+    }
+
+    .change-pic-lbl:hover {
+        background-color: var(--color-background-hover);
+        color: var(--color-text);
+    }
+
+    .editprofile-popup {
+        display: none;
         background-color: var(--overlay-bgcolor);
         position: fixed;
         top: 0;
@@ -77,8 +118,6 @@
         margin: 100px auto;
         padding: 10px 20px;
         border-radius: 4px;
-        overflow-y: auto;
-        overflow-x: auto;
     }
 
     .editprofile-popup-close {
@@ -118,39 +157,37 @@
 </style>
 <div class="container userprofile-wrapper">
     <?php include 'partial/sidebar.php'; ?>
-    <?php
-    // Start a session to access session variables (if needed)
-    session_start();
+    <div class='main-content'>
+        <?php
+        // Start a session to access session variables (if needed)
+        session_start();
 
-    // Check if the user ID is set in the session
-    if (isset($_SESSION['user_id'])) {
-        // Get the user ID of the logged-in user
-        $user_id = $_SESSION['user_id'];
+        // Check if the user ID is set in the session
+        if (isset($_SESSION['user_id'])) {
+            // Get the user ID of the logged-in user
+            $user_id = $_SESSION['user_id'];
 
-        echo $user_id;
+            // Function to get all incomplete tasks assigned to the logged-in user
+            function get_incomplete_tasks_for_user($user_id)
+            {
+                global $connection;
 
-        // Function to get all incomplete tasks assigned to the logged-in user
-        function get_incomplete_tasks_for_user($user_id)
-        {
-            global $connection;
-
-            $sql = "SELECT Tasks.*, Projects.project_name, Users.username 
+                $sql = "SELECT Tasks.*, Projects.project_name, Users.username 
                     FROM Tasks
                     INNER JOIN Projects ON Tasks.project_id = Projects.project_id
                     INNER JOIN Users ON Tasks.user_id = Users.user_id
                     WHERE Tasks.status != 'Completed' AND Tasks.user_id = $user_id
                     ORDER BY Tasks.start_date DESC";
 
-            $result = mysqli_query($connection, $sql);
-            return $result;
+                $result = mysqli_query($connection, $sql);
+                return $result;
+            }
+
+            // Get all incomplete tasks for the logged-in user
+            $incomplete_tasks = get_incomplete_tasks_for_user($user_id);
         }
+        ?>
 
-        // Get all incomplete tasks for the logged-in user
-        $incomplete_tasks = get_incomplete_tasks_for_user($user_id);
-    }
-    ?>
-
-    <div class='main-content'>
 
         <div class="userinfo-profilepic">
 
@@ -173,23 +210,28 @@
             </div>
             <div class="editprofile-popup" id="editprofile-popup">
                 <div class="editprofile-popup-content">
-                    <span class="editprofile-popup-close" onclick="editprofile_popup_toggle()">&times;</span>
-                    <p class="heading-style">Edit Profile</p>
+                    <form action="partial/update_profile.php" method="post" enctype="multipart/form-data">
+                        <span class="editprofile-popup-close" onclick="editprofile_popup_toggle()">&times;</span>
+                        <p class="heading-style">Edit Profile</p>
 
-                    <form>
                         <div class="form-group">
                             <div class="profile-picture">
                                 <img src="https://bootdey.com/img/Content/avatar/avatar7.png" id="prof-pic"
-                                    alt="profile-pic" class="rounded-circle border p-2" width="150">
+                                    alt="profile-pic" width="150">
                                 <label class="change-pic-lbl text-primary" for="file">Change Profile Photo</label>
-                                <input class="d-none" id="file" type="file" onchange="loadImgFile(event)" />
+                                <input class="d-none" id="file" name="new-profilepic" type="file"
+                                    onchange="loadImgFile(event)" />
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="about">About</label>
-                            <textarea id="about" name="about" rows="4" placeholder="Please provide a brief introduction about yourself."></textarea>
+                            <textarea id="about" name="about" rows="4"
+                                placeholder="Please provide a brief introduction about yourself."><?php if (get_user_data($user_id)['about'] !== null && get_user_data($user_id)['about'] !== "") {
+                                    echo get_user_data($user_id)['about'];
+                                }
+                                ?></textarea>
                         </div>
-                        <button type="submit" class="editprofile-submit-btn">Submit</button>
+                        <button type="submit" name="submit" class="editprofile-submit-btn">Submit</button>
                     </form>
                 </div>
             </div>
@@ -243,8 +285,14 @@
                     </div>
                 </div>
                 <div class="bottom-line"></div>
-
-                <p>hello this is me</p>`
+                <div class="about">
+                    <p>
+                        <?php if (get_user_data($user_id)['about'] !== null && get_user_data($user_id)['about'] !== "") {
+                            echo get_user_data($user_id)['about'];
+                        }
+                        ?>
+                    </p>
+                </div>
             </div>
         </div>
     </div>

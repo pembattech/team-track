@@ -1,9 +1,12 @@
+<title>TeamTrack</title>
 <link rel="icon" type="image/x-icon" href="static/image/teamtrack_logo.png">
+<link rel="shortcut icon" href="static/image/teamtrack_logo.png" type="image/x-icon">
 <link rel="stylesheet" href="static/css/styles.css">
 <link rel="stylesheet" href="static/css/tab-style.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+
 
 <style>
     #popup-btn {

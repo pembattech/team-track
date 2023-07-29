@@ -27,4 +27,22 @@ function get_user_data($user_id)
     }
 }
 
+// Function to get project data from the database
+function get_project_data($project_id)
+{
+    global $connection;
+
+    $project_id = sanitize_input($project_id);
+
+    $sql = "SELECT * FROM Projects WHERE project_id = '$project_id'";
+    $result = mysqli_query($connection, $sql);
+
+    if (mysqli_num_rows($result) > 0) {
+        $project_data = mysqli_fetch_assoc($result);
+        return $project_data;
+    } else {
+        return null;
+    }
+}
+
 ?>
