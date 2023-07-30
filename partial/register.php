@@ -2,6 +2,9 @@
 
 require_once '../config/connect.php';
 
+// Start the session
+session_start();
+
 // Function to sanitize user inputs
 function sanitize_input($input)
 {
@@ -21,26 +24,35 @@ function generateRandomColor()
 function register_user($name, $username, $email, $password)
 {
     global $connection;
-    
+
+
     // Sanitize user inputs to prevent SQL injection
     $name = sanitize_input(($name));
     $username = sanitize_input($username);
     $email = sanitize_input($email);
-    
+
+
+    echo $name, $username, $email, $password;
+
+
     // Hash the password before storing it in the database
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-    
+    echo $hashed_password;
+
 
     $background_color = generateRandomColor();
+    echo $background_color;
 
 
     // Insert the new user into the 'Users' table
     $sql_register_user = "INSERT INTO Users (name, username, email, password, background_color) VALUES ('$name', '$username', '$email', '$hashed_password', '$background_color')";
-
+    echo $sql_register_user;
 
     if (mysqli_query($connection, $sql_register_user)) {
+        echo "Hello";
         return "Registration successful";
     } else {
+        echo "Bye";
         return "Registration failed";
     }
 }
@@ -51,13 +63,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $username = $_POST["username"];
     $email = $_POST["email"];
     $password = $_POST["password"];
-    $cpassword = $_POST["cpassword"];
+
 
 
     $registration_result = register_user($name, $username, $email, $password);
 
     // Redirect the user after registration
-    header("Location: ../login_register_form.php?message=" . urlencode($registration_result));
+    header("Location: ../login_form.php?message=" . urlencode($registration_result));
     exit();
+
 }
 ?>

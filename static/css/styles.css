@@ -354,7 +354,7 @@ th.subhead-task {
 
 /* Project */
 
-.project-wrapper .project-link .square{
+.project-wrapper .project-link .square {
     width: 30px;
     height: 30px;
 }
@@ -452,7 +452,6 @@ th.subhead-task {
 }
 
 /* create project form */
-
 .text-input {
     position: relative;
     margin-top: 30px;
@@ -474,7 +473,9 @@ th.subhead-task {
     background-color: #5e9de6;
 }
 
-.text-input input[type=text] {
+.text-input input[type=text],
+.text-input input[type=email],
+.text-input input[type=password] {
     display: inline-block;
     width: 500px;
     height: 40px;
@@ -486,7 +487,9 @@ th.subhead-task {
     transition: all 0.1s ease-out;
 }
 
-.text-input input[type=text]+label {
+.text-input input[type=text]+label,
+.text-input input[type=email]+label,
+.text-input input[type=password]+label {
     position: absolute;
     top: 0;
     left: 0;
@@ -502,7 +505,9 @@ th.subhead-task {
     transition-delay: 0.2s;
 }
 
-.text-input input[type=text]:focus+label {
+.text-input input[type=text]:focus+label,
+.text-input input[type=email]:focus+label,
+.text-input input[type=password]:focus+label {
     transform: translateY(-80%) translateX(0%);
     border-radius: 3px;
     transition: all 0.1s ease-out;
@@ -510,7 +515,9 @@ th.subhead-task {
     background: inherit;
 }
 
-.text-input input[type=text]:focus {
+.text-input input[type=text]:focus,
+.text-input input[type=email]:focus,
+.text-input input[type=password]:focus {
     padding: 10px;
     transition: all 0.3s ease-out;
     transition-delay: 0.2s;

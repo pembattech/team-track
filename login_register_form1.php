@@ -282,7 +282,7 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['username'])) {
     // User is logged in, redirect to the home page
     header("Location: home.php");
     exit();
-    
+
 } else {
     ?>
     <div class="form-structor">
@@ -292,7 +292,7 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['username'])) {
             <form action="partial/register.php" method="POST">
                 <div class="form-holder">
                     <input name="name" type="text" class="input" placeholder="Name" required />
-                    <input name="username" type="text" class="input" placeholder="Username" required />
+                    <input name="username" id="username" type="text" class="input" placeholder="Username" required />
                     <input name="email" type="email" class="input" placeholder="Email" required />
                     <input name="password" type="password" class="input" placeholder="Password" required />
                     <input name="cpassword" type="password" class="input" placeholder="Confirm Password" required />
@@ -348,6 +348,30 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['username'])) {
                 }
             });
         });
+    </script>
+    <script>
+        $(document).ready(function () {
+            $('#username').on('input', function () {
+                var username = $(this).val();
+                $.ajax({
+                    type: 'GET',
+                    url: 'check_username.php',
+                    data: { username: username },
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.taken) {
+                            $('#availability').text('Username is already taken. Please choose another one.');
+                        } else {
+                            $('#availability').text('Username is available.');
+                        }
+                    },
+                    error: function (error) {
+                        console.error(error);
+                    }
+                });
+            });
+        });
+
     </script>
     <?php
 }
