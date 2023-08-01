@@ -1,3 +1,4 @@
+<?php include 'access_denied.php'; ?>
 <title>Project - TeamTrack</title>
 
 <?php include 'partial/navbar.php'; ?>

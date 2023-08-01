@@ -69,6 +69,91 @@
         border-radius: 5px;
         z-index: 9999;
     }
+
+    .loginregister-form-container .heading-style {
+        margin: 0;
+        padding: 0 20px;
+    }
+
+    .loginregister-form-container {
+        position: relative;
+        margin: 50px auto;
+        padding: 15px;
+        background: var(--color-background-weak);
+        width: 350px;
+        border: 0;
+        border-radius: 5px;
+        box-shadow: 3px 3px 10px #333;
+        color: var(--color-text);
+    }
+
+    .LR-form {
+        padding: 25px;
+    }
+
+
+    .LR-form input[type="text"],
+    .LR-form input[type="text"],
+    .LR-form input[type="email"],
+    .LR-form input[type="password"] {
+        outline: 0;
+        color: var(--color-text);
+        background-color: var(--sidebar-bgcolor);
+        border: 1px solid var(--color-border);
+        border-radius: 5px;
+        width: 100%;
+        padding: 20px;
+        margin-bottom: 25px;
+        height: 40px;
+        -moz-outline-style: none;
+    }
+
+    .LR-form input[type="text"]:focus,
+    .LR-form input[type="text"]:focus,
+    .LR-form input[type="email"]:focus,
+    .LR-form input[type="password"]:focus {
+        border: 1px solid var(--color-text);
+    }
+
+    .LR-form p.status {
+        margin: 0;
+        padding: 0;
+        color: green;
+        font-size: 12px;
+        /* Change the color to your preferred status color */
+    }
+
+    .LR-form input[type="text"].available,
+    .LR-form input[type="email"].available {
+        border-color: green;
+        /* Change to your preferred green color */
+    }
+
+    .LR-form input[type="text"].taken,
+    .LR-form input[type="email"].taken {
+        border-color: red;
+        /* Change to your preferred green color */
+    }
+
+
+    .LR-form input[type="submit"]:disabled {
+        color: var(--color-text-weak);
+        background-color: var(--color-background-weak);
+    }
+
+    .LR-form input[type="submit"] {
+        outline: 0;
+        padding: 3px;
+        border: 1px solid var(--color-border);
+        border-radius: 5px;
+        background-color: var(--color-background-hover);
+        color: var(--color-text);
+    }
+
+    .LR-form input[type="submit"]:enabled:hover {
+        background-color: var(--color-background-weak);
+
+    }
 </style>
 
 <div class="popup_notify" id="popupNotification"></div>

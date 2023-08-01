@@ -1,3 +1,5 @@
+<?php include 'access_denied.php'; ?>
+
 <title>Inbox - TeamTrack</title>
 
 <?php include 'partial/navbar.php'; ?>
@@ -24,7 +26,7 @@
         <div class="tab-content active" id="tab1">
             <div class="send-msg-content div-space-top">
                 <div class="send-message-btn related-btn-img overlay-border">
-                  `  <img src="./static/image/sms.svg" alt="">
+                    <img src="./static/image/sms.svg" alt="">
                     <p>Send message</p>
                 </div>
             </div>
@@ -36,4 +38,3 @@
         </div>
     </div>
 </div>
-

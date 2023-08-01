@@ -83,6 +83,25 @@ p {
     border-bottom: 1px solid var(--color-border);
 }
 
+.access-denied-container {
+    color: var(--color-text);
+}
+
+.access-denied-container a {
+    text-decoration: underline;
+    font-size: 20px;
+    font-weight: 900;
+}
+
+.access-denied-container #countdown {
+    display: inline;
+    text-decoration: underline;
+}
+
+.access-denied-container .countdown {
+    display: inline;
+}
+
 .between-verticle-line li:not(:last-child)::after {
     content: "";
     position: absolute;
@@ -313,7 +332,6 @@ p {
 }
 
 .tasks table {
-    margin-top: 50px;
     width: 100%;
     border-collapse: collapse;
     margin-right: 50px;

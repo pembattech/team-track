@@ -2,6 +2,8 @@
 
 require_once '../config/connect.php';
 
+session_start();
+
 // Function to sanitize user inputs
 function sanitize_input($input)
 {
@@ -27,7 +29,6 @@ function login_user($username, $password)
         // Verify the password
         if (password_verify($password, $user['password'])) {
             // Password is correct, store user details in the session
-            session_start();
             $_SESSION['user_id'] = $user['user_id'];
             $_SESSION['username'] = $user['username'];
 
@@ -46,11 +47,25 @@ function login_user($username, $password)
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $username = $_POST["username"];
     $password = $_POST["password"];
-
-    echo $username, $password;
-
+    
     // Call the function to login the user
     $login_result = login_user($username, $password);
+
+        // // Perform validation
+        // $errors = array();
+
+        // if (empty($username)) {
+        //     $errors[] = "Username is required.";
+        // }
+    
+        // if (empty($password)) {
+        //     $errors[] = "Password is required.";
+        // }
+    
+        // // If there are no errors, you can proceed with login logic
+        // if (empty($errors)) {
+        // }
+
 }
 ?>
 

@@ -1,3 +1,5 @@
+<?php include 'access_denied.php'; ?>
+
 <title>Tasks - TeamTrack</title>
 
 <style>

@@ -1,4 +1,5 @@
 <title>Home - TeamTrack</title>
+
 <?php
 // Start the session to access session data
 session_start();
@@ -75,16 +76,16 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['username'])) {
 
     <?php
 } else {
-    if (isset($_SESSION['user_id']) && isset($_SESSION['username'])) {
-        // User is logged in, retrieve session data
-        $user_id = $_SESSION['user_id'];
-        $username = $_SESSION['username'];
-        header("Location: home.php");
+    // if (isset($_SESSION['user_id']) && isset($_SESSION['username'])) {
+    //     // User is logged in, retrieve session data
+    //     $user_id = $_SESSION['user_id'];
+    //     $username = $_SESSION['username'];
+    //     header("Location: home.php");
 
-    } else {
+    // } else {
         // Redirect to the login page or perform other actions for non-logged-in users
         header("Location: login_form.php");
         exit();
-    }
+    // }
 }
 ?>

@@ -1,3 +1,5 @@
+<?php include 'access_denied.php'; ?>
+
 <title>Profile - TeamTrack</title>
 
 <?php include 'partial/navbar.php'; ?>
@@ -478,7 +480,7 @@
         const popup = document.getElementById('editprofile-popup');
         popup.style.display = (popup.style.display === 'block') ? 'none' : 'block';
     }
-</script>                                                                         
+</script>
 <script>
     function editproject_popup_toggle(projectId) {
         const popup = document.getElementById('editproject-popup');
