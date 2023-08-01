@@ -1,4 +1,4 @@
-<?php include 'access_denied.php'; ?>
+<!-- <?php include 'access_denied.php'; ?> -->
 <title>Project - TeamTrack</title>
 
 <?php include 'partial/navbar.php'; ?>
@@ -28,10 +28,13 @@
         $sql_project = "SELECT * FROM Projects WHERE project_id = $project_id";
         $result_project = mysqli_query($connection, $sql_project);
 
-        // Query to fetch users associated with the project from the 'ProjectUsers' table
-        $sql_users = "SELECT Users.* FROM Users
-                      INNER JOIN ProjectUsers ON Users.user_id = ProjectUsers.user_id
-                      WHERE ProjectUsers.project_id = $project_id";
+        // Query to fetch project owner's details from the 'Users' table
+        $sql_owner = "SELECT Users.*, ProjectUsers.project_owner, ProjectUsers.user_role FROM Users INNER JOIN ProjectUsers ON Users.user_id = ProjectUsers.user_id WHERE ProjectUsers.project_id = $project_id AND ProjectUsers.project_owner = 1";
+        $result_owner = mysqli_query($connection, $sql_owner);
+        $project_owner = mysqli_fetch_assoc($result_owner);
+
+        // Query to fetch other users associated with the project from the 'ProjectUsers' table (excluding the owner)
+        $sql_users = "SELECT Users.*, ProjectUsers.project_owner, ProjectUsers.user_role FROM Users INNER JOIN ProjectUsers ON Users.user_id = ProjectUsers.user_id WHERE ProjectUsers.project_id = $project_id AND ProjectUsers.project_owner = 0";
         $result_users = mysqli_query($connection, $sql_users);
 
         // Get tasks for different sections
@@ -63,6 +66,8 @@
         $result_overdue_tasks = mysqli_query($connection, $sql_overdue_tasks);
         $row_overdue_tasks = mysqli_fetch_assoc($result_overdue_tasks);
         $overdue_tasks = $row_overdue_tasks['overdue_tasks'];
+
+        echo $user['project_owner'];
 
 
     } else {
@@ -271,232 +276,249 @@
                     <div class="heading-style">
                         <p>Project roles</p>
                     </div>
-                    <?php
-                    // Assuming $result_users is the mysqli result containing user data
-                    if (mysqli_num_rows($result_users) > 0) {
-                        echo "<div class='user-role-container'>";
-                        echo "<div class='user-content add-member' onclick='addmember_popup_toggle()'>";
-                        echo "<p><span class='border-around-plus'>+</span> Add member</p>";
-                        echo "</div>";
-
-                        // Loop through the remaining users associated with the project
-                        while ($user = mysqli_fetch_assoc($result_users)) {
+                    <div class='user-role-container'>
+                        <div class='user-content add-member' onclick='addmember_popup_toggle()'>
+                            <p><span class='border-around-plus'>+</span> Add member</p>
+                        </div>
+                        <?php
+                        // Display project owner's details first
+                        if ($project_owner) {
                             echo "<div class='user-content'>";
                             echo "<img class='profile-picture' src='./static/image/test.JPG' alt='Profile Picture'>";
                             echo "<div class='profile-info'>";
-                            echo "<p class='user-name'>" . $user['username'] . "</p>";
-                            echo "<p class='user-role'>+ Add role</p>";
+                            echo "<p class='user-name'>" . $project_owner['username'] . "</p>";
+                            echo "<p class='user-role'>Project owner</p>";
                             echo "</div>";
                             echo "</div>";
                         }
 
-                        echo "</div>";
-                    }
-                    ?>
+                        // Display other users associated with the project
+                        if (mysqli_num_rows($result_users) > 0) {
+                            echo "<div class='user-role-container'>";
+                            // Loop through the remaining users associated with the project
+                            while ($user = mysqli_fetch_assoc($result_users)) {
+                                echo "<div class='user-content'>";
+                                echo "<img class='profile-picture' src='./static/image/test.JPG' alt='Profile Picture'>";
+                                echo "<div class='profile-info'>";
+                                echo "<p class='user-name'>" . $user['username'] . "</p>";
+                                if ($user['user_role']) {
+                                    $user_role = $user['user_role'];
+                                    echo "<p class='user-role'>$user_role</p>";
+                                } else {
+                                    echo "<p class='user-role'>+ Add role</p>";
+                                }
+                                echo "</div>";
+                                echo "</div>";
+                            }
 
-                    <div class="invite-popup" id="invite-popup">
-                        <div class="invite-popup-content">
-                            <span class="invite-popup-close" onclick="addmember_popup_toggle()">&times;</span>
-                            <p class="heading-style">Share '
-                                <?php echo $project['project_name'] ?>'
-                            </p>
+                            echo "</div>";
+                        }
+                        ?>
 
-                            <form>
-                                <div class="form-group">
-                                    <p>Invite with email</p>
-                                    <input type="email" iwd="email" name="email" placeholder="Add members by email...">
-                                </div>
-                                <div class="form-group">
-                                    <label for="message">Message (optional)</label>
-                                    <textarea id="message" name="message" rows="4"
-                                        placeholder="Add a message"></textarea>
-                                </div>
-                                <button type="submit" class="invite-submit-btn">Send Invite</button>
-                            </form>
+                        <div class="invite-popup" id="invite-popup">
+                            <div class="invite-popup-content">
+                                <span class="invite-popup-close" onclick="addmember_popup_toggle()">&times;</span>
+                                <p class="heading-style">Share '
+                                    <?php echo $project['project_name'] ?>'
+                                </p>
+
+                                <form>
+                                    <div class="form-group">
+                                        <p>Invite with email</p>
+                                        <input type="email" iwd="email" name="email"
+                                            placeholder="Add members by email...">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="message">Message (optional)</label>
+                                        <textarea id="message" name="message" rows="4"
+                                            placeholder="Add a message"></textarea>
+                                    </div>
+                                    <button type="submit" class="invite-submit-btn">Send Invite</button>
+                                </form>
+                            </div>
                         </div>
+
                     </div>
 
                 </div>
-
             </div>
-        </div>
-        <div class="tab-content div-space-top" id="tab2">
-            <div class="tasks-section">
-                <!-- <div class="addtask-popup" onclick="addtask_popup_toggle()">
+            <div class="tab-content div-space-top" id="tab2">
+                <div class="tasks-section">
+                    <!-- <div class="addtask-popup" onclick="addtask_popup_toggle()">
                     <div class="heading-nav-content addtask-btn overlay-border">
                             <span class="plus">+</span>
                             <span>Add Task</span>
                     </div>
                 </div> -->
 
-                <button class="addtask-btn" onclick="addtask_popup_toggle()">+ Add Task</button>
+                    <button class="addtask-btn" onclick="addtask_popup_toggle()">+ Add Task</button>
 
-                <div class="addtask-popup" id="addtask-popup">
-                    <div class="addtask-popup-content">
-                        <form action="partial/addtask.php" method="post" enctype="multipart/form-data">
-                            <span class="addtask-popup-close" onclick="addtask_popup_toggle()">&times;</span>
-                            <p class="heading-style">Add Task</p>
-                            <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
-                            <div class="form-group">
-                                <label for="taskname">Task Name</label>
-                                <input type="text" name="taskname">
-                            </div>
-                            <div class="form-group">
-                                <label for="assignee">Assignee</label>
-                                <input type="text" name="assignee">
-                            </div>
-                            <!-- <div class="form-group">
+                    <div class="addtask-popup" id="addtask-popup">
+                        <div class="addtask-popup-content">
+                            <form action="partial/addtask.php" method="post" enctype="multipart/form-data">
+                                <span class="addtask-popup-close" onclick="addtask_popup_toggle()">&times;</span>
+                                <p class="heading-style">Add Task</p>
+                                <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
+                                <div class="form-group">
+                                    <label for="taskname">Task Name</label>
+                                    <input type="text" name="taskname">
+                                </div>
+                                <div class="form-group">
+                                    <label for="assignee">Assignee</label>
+                                    <input type="text" name="assignee">
+                                </div>
+                                <!-- <div class="form-group">
                                 <label for="duedate">Due Date</label>
                                 <input type="text" name="duedate">
                             </div> -->
-                            <div class="form-group">
-                                <label for="priority">Priority</label>
-                                <input type="text" name="priority">
-                            </div>
-                            <div class="form-group">
-                                <label for="status">Status</label>
-                                <input type="text" name="status">
-                            </div>
-                            <button type="submit" name="submit" class="editprofile-submit-btn">Submit</button>
-                        </form>
+                                <div class="form-group">
+                                    <label for="priority">Priority</label>
+                                    <input type="text" name="priority">
+                                </div>
+                                <div class="form-group">
+                                    <label for="status">Status</label>
+                                    <input type="text" name="status">
+                                </div>
+                                <button type="submit" name="submit" class="editprofile-submit-btn">Submit</button>
+                            </form>
+                        </div>
                     </div>
-                </div>
 
-                <!-- Draggable Tasks Lists -->
-                <div class="tasks div-space-top">
-                    <table>
-                        <thead>
+                    <!-- Draggable Tasks Lists -->
+                    <div class="tasks div-space-top">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th class="mytasks-heading">Task Name</th>
+                                    <th class="mytasks-heading">Assignee</th>
+                                    <th class="mytasks-heading">Due Date</th>
+                                    <th class="mytasks-heading">Priority</th>
+                                    <th class="mytasks-heading">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- To Do -->
+                                <tr>
+                                    <td colspan="5" class="collapsible task-section">To Do</td>
+                                </tr>
+                            <tbody class="sortable" id="To Do">
+                                <?php
+                                while ($task = mysqli_fetch_assoc($todo_tasks)) {
+                                    echo '<tr class="task" data-task-id="' . $task['task_id'] . '">';
+                                    echo '<td class="task-name">' . $task['task_name'] . '</td>';
+                                    echo '<td>' . $task['user_id'] . '</td>';
+                                    echo '<td>' . $task['end_date'] . '</td>';
+                                    echo '<td>' . $task['priority'] . '</td>';
+                                    echo '<td>' . $task['status'] . '</td>';
+                                    echo '</tr>';
+                                }
+                                ?>
+                            </tbody>
+                            <!-- Doing -->
                             <tr>
-                                <th class="mytasks-heading">Task Name</th>
-                                <th class="mytasks-heading">Assignee</th>
-                                <th class="mytasks-heading">Due Date</th>
-                                <th class="mytasks-heading">Priority</th>
-                                <th class="mytasks-heading">Status</th>
+                                <td colspan="5" class="collapsible task-section">Doing</td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            <!-- To Do -->
+                            <tbody class="sortable" id="Doing">
+                                <?php
+                                while ($task = mysqli_fetch_assoc($doing_tasks)) {
+                                    echo '<tr class="task" data-task-id="' . $task['task_id'] . '">';
+                                    echo '<td class="task-name">' . $task['task_name'] . '</td>';
+                                    echo '<td>' . $task['user_id'] . '</td>';
+                                    echo '<td>' . $task['end_date'] . '</td>';
+                                    echo '<td>' . $task['priority'] . '</td>';
+                                    echo '<td>' . $task['status'] . '</td>';
+                                    echo '</tr>';
+                                }
+                                ?>
+                            </tbody>
+                            <!-- Done -->
                             <tr>
-                                <td colspan="5" class="collapsible task-section">To Do</td>
+                                <td colspan="5" class="collapsible task-section">Done</td>
                             </tr>
-                        <tbody class="sortable" id="To Do">
-                            <?php
-                            while ($task = mysqli_fetch_assoc($todo_tasks)) {
-                                echo '<tr class="task" data-task-id="' . $task['task_id'] . '">';
-                                echo '<td class="task-name">' . $task['task_name'] . '</td>';
-                                echo '<td>' . $task['user_id'] . '</td>';
-                                echo '<td>' . $task['end_date'] . '</td>';
-                                echo '<td>' . $task['priority'] . '</td>';
-                                echo '<td>' . $task['status'] . '</td>';
-                                echo '</tr>';
-                            }
-                            ?>
-                        </tbody>
-                        <!-- Doing -->
-                        <tr>
-                            <td colspan="5" class="collapsible task-section">Doing</td>
-                        </tr>
-                        <tbody class="sortable" id="Doing">
-                            <?php
-                            while ($task = mysqli_fetch_assoc($doing_tasks)) {
-                                echo '<tr class="task" data-task-id="' . $task['task_id'] . '">';
-                                echo '<td class="task-name">' . $task['task_name'] . '</td>';
-                                echo '<td>' . $task['user_id'] . '</td>';
-                                echo '<td>' . $task['end_date'] . '</td>';
-                                echo '<td>' . $task['priority'] . '</td>';
-                                echo '<td>' . $task['status'] . '</td>';
-                                echo '</tr>';
-                            }
-                            ?>
-                        </tbody>
-                        <!-- Done -->
-                        <tr>
-                            <td colspan="5" class="collapsible task-section">Done</td>
-                        </tr>
-                        <tbody class="sortable" id="Done">
-                            <?php
-                            while ($task = mysqli_fetch_assoc($done_tasks)) {
-                                echo '<tr class="task" data-task-id="' . $task['task_id'] . '">';
-                                echo '<td class="task-name">' . $task['task_name'] . '</td>';
-                                echo '<td>' . $task['user_id'] . '</td>';
-                                echo '<td>' . $task['end_date'] . '</td>';
-                                echo '<td>' . $task['priority'] . '</td>';
-                                echo '<td>' . $task['status'] . '</td>';
-                                echo '</tr>';
-                            }
-                            ?>
-                        </tbody>
-                    </table>
+                            <tbody class="sortable" id="Done">
+                                <?php
+                                while ($task = mysqli_fetch_assoc($done_tasks)) {
+                                    echo '<tr class="task" data-task-id="' . $task['task_id'] . '">';
+                                    echo '<td class="task-name">' . $task['task_name'] . '</td>';
+                                    echo '<td>' . $task['user_id'] . '</td>';
+                                    echo '<td>' . $task['end_date'] . '</td>';
+                                    echo '<td>' . $task['priority'] . '</td>';
+                                    echo '<td>' . $task['status'] . '</td>';
+                                    echo '</tr>';
+                                }
+                                ?>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="tab-content div-space-top" id="tab3">
-            <div class="dashboard-section">
-                <div class="dashboard-item complete">
-                    <div class="complete-title">
-                        <p class="heading">Complete Tasks</p>
+            <div class="tab-content div-space-top" id="tab3">
+                <div class="dashboard-section">
+                    <div class="dashboard-item complete">
+                        <div class="complete-title">
+                            <p class="heading">Complete Tasks</p>
+                        </div>
+                        <div class="count">
+                            <span>
+                                <?php echo $completed_tasks ?>
+                            </span>
+                        </div>
                     </div>
-                    <div class="count">
-                        <span>
-                            <?php echo $completed_tasks ?>
-                        </span>
+                    <div class="dashboard-item incomplete">
+                        <div class="incomplete-title">
+                            <p class="heading">Incomplete Tasks</p>
+                        </div>
+                        <div class="count">
+                            <span>
+                                <?php echo $incomplete_tasks ?>
+                            </span>
+                        </div>
                     </div>
-                </div>
-                <div class="dashboard-item incomplete">
-                    <div class="incomplete-title">
-                        <p class="heading">Incomplete Tasks</p>
-                    </div>
-                    <div class="count">
-                        <span>
-                            <?php echo $incomplete_tasks ?>
-                        </span>
-                    </div>
-                </div>
-                <div class="dashboard-item overdue-tasks">
-                    <div class="overdue-title">
-                        <p class="heading">Overdue Tasks</p>
-                    </div>
-                    <div class="count">
-                        <span>
-                            <?php echo $overdue_tasks ?>
-                        </span>
-                    </div>
+                    <div class="dashboard-item overdue-tasks">
+                        <div class="overdue-title">
+                            <p class="heading">Overdue Tasks</p>
+                        </div>
+                        <div class="count">
+                            <span>
+                                <?php echo $overdue_tasks ?>
+                            </span>
+                        </div>
 
-                </div>
-                <div class="dashboard-item total-tasks">
-                    <div class="total-title">
-                        <p class="heading">Total Tasks</p>
                     </div>
-                    <div class="count">
-                        <span>
-                            <?php echo $total_tasks ?>
-                        </span>
-                    </div>
+                    <div class="dashboard-item total-tasks">
+                        <div class="total-title">
+                            <p class="heading">Total Tasks</p>
+                        </div>
+                        <div class="count">
+                            <span>
+                                <?php echo $total_tasks ?>
+                            </span>
+                        </div>
 
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="tab-content div-space-top" id="tab4">
-            <h3>Tab 2 Content</h3>
-            <p>This is the content of Tab 2.</p>
-        </div>
-        <div class="tab-content div-space-top" id="tab5">
-            <h3>Tab 2 Content</h3>
-            <p>This is the content of Tab 2.</p>
+            <div class="tab-content div-space-top" id="tab4">
+                <h3>Tab 2 Content</h3>
+                <p>This is the content of Tab 2.</p>
+            </div>
+            <div class="tab-content div-space-top" id="tab5">
+                <h3>Tab 2 Content</h3>
+                <p>This is the content of Tab 2.</p>
+            </div>
+
         </div>
 
     </div>
-
-</div>
-<script>
-    function addmember_popup_toggle() {
-        const popup = document.getElementById('invite-popup');
-        popup.style.display = (popup.style.display === 'block') ? 'none' : 'block';
-    }
-</script>
-<script>
-    function addtask_popup_toggle() {
-        const popup = document.getElementById('addtask-popup');
-        popup.style.display = (popup.style.display === 'block') ? 'none' : 'block';
-    }
-</script>
+    <script>
+        function addmember_popup_toggle() {
+            const popup = document.getElementById('invite-popup');
+            popup.style.display = (popup.style.display === 'block') ? 'none' : 'block';
+        }
+    </script>
+    <script>
+        function addtask_popup_toggle() {
+            const popup = document.getElementById('addtask-popup');
+            popup.style.display = (popup.style.display === 'block') ? 'none' : 'block';
+        }
+    </script>

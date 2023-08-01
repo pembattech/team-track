@@ -1,9 +1,8 @@
-<?php include 'access_denied.php'; ?>
-
 <title>Inbox - TeamTrack</title>
 
-<?php include 'partial/navbar.php'; ?>
+<?php include 'access_denied.php'; ?>
 
+<?php include 'partial/navbar.php'; ?>
 <div class="container">
     <?php include 'partial/sidebar.php'; ?>
 

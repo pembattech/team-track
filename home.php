@@ -14,7 +14,6 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['username'])) {
     ?>
 
     <?php include 'partial/navbar.php'; ?>
-
     <div class="container">
         <?php include 'partial/sidebar.php'; ?>
 
@@ -83,9 +82,9 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['username'])) {
     //     header("Location: home.php");
 
     // } else {
-        // Redirect to the login page or perform other actions for non-logged-in users
-        header("Location: login_form.php");
-        exit();
+    // Redirect to the login page or perform other actions for non-logged-in users
+    header("Location: login_form.php");
+    exit();
     // }
 }
 ?>

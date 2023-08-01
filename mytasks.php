@@ -1,4 +1,4 @@
-<?php include 'access_denied.php'; ?>
+<!-- <?php include 'access_denied.php'; ?> -->
 
 <title>Tasks - TeamTrack</title>
 
@@ -65,10 +65,9 @@
 
             <div class="tab-btns">
                 <!-- Tab Buttons -->
-                <div class="heading-nav between-verticle-line tab-btn active" onclick="openTab(event, 'tab1')">Activity
+                <div class="heading-nav between-verticle-line tab-btn active" onclick="openTab(event, 'tab1')">List
                 </div>
-                <div class="heading-nav between-verticle-line tab-btn" onclick="openTab(event, 'tab2')">
-                    Message I've sent</div>
+                <div class="heading-nav between-verticle-line tab-btn" onclick="openTab(event, 'tab2')">Files</div>
             </div>
         </div>
         <div class="bottom-line"></div>

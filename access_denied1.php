@@ -1,13 +1,17 @@
-<?php include 'config/connect.php'; ?>
+<?php include 'base.php'; ?>
 
 <title>Access Denied</title>
+
 <?php
 // Start the session to access session data
 session_start();
+
 // Check if the user is logged in
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['username'])) {
+    echo $_SESSION['user_id'];
     ?>
-    <div class="access-denied-container">
+    <!-- // User is not logged in, display the message and prevent further execution -->
+    <!-- <div class="access-denied-container">
         <h1>Access Denied</h1>
         <div class="access-denied-content">
             <p>This page is exclusively accessible to logged-in users.</p>
@@ -16,7 +20,7 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['username'])) {
             <p>Alternatively, you can manually proceed to the login page by clicking on the "Login" link: <a
                     href="login_form.php">Login</a></p>
         </div>
-    </div>
+    </div> -->
     <script>
         // Function to update the countdown timer and redirect after 5 seconds
         function updateTimer() {
@@ -40,4 +44,8 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['username'])) {
     exit();
 }
 
+// If the user is logged in, continue loading the protected page content
+// Redirect to the login page or perform other actions for non-logged-in users
+header("Location: home.php");
+exit();
 ?>

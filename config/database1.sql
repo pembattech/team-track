@@ -7,7 +7,6 @@ CREATE TABLE Users (
     email VARCHAR(255),
     password VARCHAR(255),
     profile_picture VARCHAR(255),
-    role VARCHAR(50),
     background_color VARCHAR(7),
     about VARCHAR(1000)
 );
@@ -25,6 +24,8 @@ CREATE TABLE Projects (
 CREATE TABLE ProjectUsers (
     project_id INT,
     user_id INT,
+    project_owner INT DEFAULT 0;
+    user_role VARCHAR(50),
     PRIMARY KEY (project_id, user_id),
     FOREIGN KEY (project_id) REFERENCES Projects(project_id),
     FOREIGN KEY (user_id) REFERENCES Users(user_id)

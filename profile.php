@@ -1,4 +1,4 @@
-<?php include 'access_denied.php'; ?>
+<!-- <?php include 'access_denied.php'; ?> -->
 
 <title>Profile - TeamTrack</title>
 
