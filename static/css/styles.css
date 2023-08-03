@@ -3,6 +3,7 @@
     --sidebar-bgcolor: #2e2e30;
     --overlay-bgcolor: #2e2e30b9;
     --navbar-bgcolor: var(--sidebar-bgcolor);
+    --danger-color: rgb(220, 38, 38);
     --color-text: #f5f4f3;
     --color-text-active: #f5f4f3;
     --color-text-disabled: #6a696a;
@@ -46,6 +47,10 @@ li {
 
 p {
     color: var(--color-text)
+}
+
+.indicate-danger p, button.indicate-danger {
+    color: var(--danger-color);
 }
 
 .related-btn-img {
@@ -402,6 +407,7 @@ th.subhead-task {
     flex-direction: row;
     gap: 10px;
     padding: 5px 15px 0;
+    width: 170px;
 }
 
 .user-role-container .user-content:hover {

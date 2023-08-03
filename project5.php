@@ -357,7 +357,7 @@
                             echo "<div class='user-role-container'>";
                             // Loop through the remaining users associated with the project
                             while ($user = mysqli_fetch_assoc($result_users)) {
-                                echo "<div class='user-content' data-user-id='" . $user['user_id'] . "' data-user-role='" . $user['user_role'] . "' id='role_popup-btn'>";
+                                echo "<div class='user-content' data-user-id='" . $user['user_id'] . "' id='role_popup-btn'>";
                                 echo "<img class='profile-picture' src='./static/image/test.JPG' alt='Profile Picture'>";
                                 echo "<div class='profile-info'>";
                                 echo "<p class='user-name'>" . $user['username'] . "</p>";
@@ -370,6 +370,7 @@
                                 echo "</div>";
                                 echo "</div>";
                             }
+
                             echo "</div>";
                         }
                         ?>
@@ -388,7 +389,7 @@
                                         <div class="input-container">
                                             <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
                                             <input type="hidden" name="user_id" value="">
-                                            <input type="text" name="user-role">
+                                            <input type="text" name="user-role" value="<?php echo isset($user['user_role']) ? $user['user_role'] : ''; ?>" placeholder="Specify " . $user['username'] . "'s role in this project:">           
                                             <button type="submit" name="update_userrole"
                                                 class="relative-button">Done</button>
                                         </div>
@@ -398,8 +399,7 @@
                                         class="remove-user-from-proj">
                                         <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
                                         <input type="hidden" name="user_id" value="">
-                                        <button type="submit" class="indicate-danger" name="remove_user">Remove
-                                            User</button>
+                                        <button type="submit" class="indicate-danger" name="remove_user">Remove User</button>
                                     </form>
                                 </li>
                             </ul>
@@ -607,7 +607,6 @@
     }
 </script>
 <script>
-
     // Add a single event listener to the parent element (.user-role-container)
     document.querySelector(".user-role-container").addEventListener("click", function (event) {
         var clickedElement = event.target.closest(".user-content");
@@ -615,28 +614,16 @@
             return; // Clicked outside .user-content, do nothing
         }
 
-        // Retrieve the user_id and username from the clicked user-content element
+        // Retrieve the user_id from the clicked user-content element
         var userId = clickedElement.getAttribute("data-user-id");
-        var username = clickedElement.querySelector(".user-name").textContent;
 
-        // Use the user_id to set the value of the user_id input in the form for both remove and update user role forms
+        // Use the user_id to set the value of the user_id input in the form
         var removeUserForm = document.querySelector(".remove-user-from-proj");
         var update_userrole = document.querySelector(".update_userrole");
         var userIdInput = removeUserForm.querySelector("input[name='user_id']");
         var userIdInput1 = update_userrole.querySelector("input[name='user_id']");
         userIdInput.value = userId;
         userIdInput1.value = userId;
-
-        // Use the username to update the placeholder text for the user-role input in the form
-        var userRoleInput = update_userrole.querySelector("input[name='user-role']");
-        var userRoleValue = clickedElement.getAttribute("data-user-role");
-        console.log(userRoleValue);
-
-        if (userRoleValue !== null && userRoleValue !== "") {
-            userRoleInput.value = userRoleValue;
-        } else {
-            userRoleInput.placeholder = "Specify " + username + "'s role in this project";
-        }
 
         // Stop the click event from propagating to the document body
         event.stopPropagation();
@@ -654,7 +641,6 @@
             userrole_showPopup();
         }
     });
-
 
 
     // Function to show the popup menu

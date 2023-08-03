@@ -1,4 +1,5 @@
 <style>
+
     .logo img {
         width: 60px;
         height: 60px;
@@ -84,7 +85,7 @@
             <a href="#" onclick="editProfile()">
                 <p>Profile</p>
             </a>
-            <a href="#" onclick="logout()">
+            <a href="#" onclick="logout()" class="indicate-danger">
                 <p>Logout</p>
             </a>
         </div>
