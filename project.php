@@ -415,7 +415,7 @@
                                 <form>
                                     <div class="form-group">
                                         <p>Invite with email</p>
-                                        <input type="email" iwd="email" name="email"
+                                        <input type="email" id="email" name="email"
                                             placeholder="Add members by email...">
                                     </div>
                                     <div class="form-group">
