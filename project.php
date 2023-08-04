@@ -1,6 +1,91 @@
 <!-- <?php include 'access_denied.php'; ?> -->
-<title>Project - TeamTrack</title>
 
+<title>Project - TeamTrack</title>
+<style>
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th,
+    td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+
+    th {
+        cursor: pointer;
+    }
+
+    .collapsible {
+        border: 1px solid #ddd;
+        margin-bottom: 10px;
+    }
+
+    .collapsible h2 {
+        margin: 0;
+        padding: 10px;
+        cursor: pointer;
+    }
+
+    /* .collapsible h2.active {
+        background-color: #ddd;
+    } */
+
+    .collapsible table {
+        display: none;
+    }
+
+    .collapsible table.show {
+        display: table;
+    }
+
+    /* Styles for the slide-in popup */
+    .task-popup {
+        position: fixed;
+        top: 139;
+        right: -440px;
+        width: 400px;
+        height: 100%;
+        background-color: var(--sidebar-bgcolor);
+        color: var(--color-text);
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        transition: right 0.3s ease-in-out;
+    }
+
+    #editTaskForm input[type="text"],
+    #editTaskForm textarea,
+    #editTaskForm input[type="date"],
+    #editTaskForm select {
+        border: 0;
+        background-color: var(--color-background-weak);
+    }
+
+    button#submitButton,
+    button#deleteButton,
+    button#closeButton {
+        outline: 0;
+        padding: 3px;
+        border: 1px solid var(--color-border);
+        border-radius: 5px;
+        color: var(--color-text-weak);
+        background-color: var(--color-background-weak);
+    }
+
+    button#submitButton:hover,
+    button#deleteButton:hover,
+    button#closeButton:hover {
+        background-color: var(--color-background-hover);
+        color: var(--color-text);
+    }
+
+    /* Show the slide-in popup */
+    .task-popup.active {
+        right: 0;
+    }
+</style>
 <?php include 'partial/navbar.php'; ?>
 
 <style>
@@ -60,6 +145,18 @@
         border: none;
         border-radius: 4px;
         cursor: pointer;
+    }
+
+    /* Styling for completed tasks */
+    .task.complete {
+        text-decoration: line-through;
+        color: #999;
+    }
+
+    /* Styling for sortable tasks */
+    .sortable {
+        border: 1px solid #ccc;
+        padding: 10px;
     }
 </style>
 <div class="container project-wrapper">
@@ -465,73 +562,162 @@
                         </form>
                     </div>
                 </div>
+                <div class="lst-of-tasks div-space-top">
+                    <?php
 
-                <!-- Draggable Tasks Lists -->
-                <div class="tasks div-space-top">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th class="mytasks-heading">Task Name</th>
-                                <th class="mytasks-heading">Assignee</th>
-                                <th class="mytasks-heading">Due Date</th>
-                                <th class="mytasks-heading">Priority</th>
-                                <th class="mytasks-heading">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- To Do -->
-                            <tr>
-                                <td colspan="5" class="collapsible task-section">To Do</td>
-                            </tr>
-                        <tbody class="sortable" id="To Do">
-                            <?php
-                            while ($task = mysqli_fetch_assoc($todo_tasks)) {
-                                echo '<tr class="task" data-task-id="' . $task['task_id'] . '">';
-                                echo '<td class="task-name">' . $task['task_name'] . '</td>';
-                                echo '<td>' . $task['user_id'] . '</td>';
-                                echo '<td>' . $task['end_date'] . '</td>';
-                                echo '<td>' . $task['priority'] . '</td>';
-                                echo '<td>' . $task['status'] . '</td>';
-                                echo '</tr>';
+                    // Check if the 'project_id' parameter is present in the URL
+                    if (isset($_GET['project_id']) && is_numeric($_GET['project_id'])) {
+                        $project_id = $_GET['project_id'];
+
+                        // Prepare and execute the SQL query using a prepared statement
+                        $stmt = $connection->prepare("SELECT * FROM Tasks WHERE project_id = ?");
+                        $stmt->bind_param("i", $project_id);
+                        $stmt->execute();
+                        $result = $stmt->get_result();
+
+                        // Store tasks grouped by section
+                        $tasksBySection = array(
+                            "To Do" => array(),
+                            "Doing" => array(),
+                            "Done" => array()
+                        );
+
+                        if ($result->num_rows > 0) {
+                            while ($row = $result->fetch_assoc()) {
+                                $section = $row['section'];
+                                if (!isset($tasksBySection[$section])) {
+                                    $tasksBySection[$section] = array();
+                                }
+                                $tasksBySection[$section][] = $row;
                             }
-                            ?>
-                        </tbody>
-                        <!-- Doing -->
-                        <tr>
-                            <td colspan="5" class="collapsible task-section">Doing</td>
-                        </tr>
-                        <tbody class="sortable" id="Doing">
-                            <?php
-                            while ($task = mysqli_fetch_assoc($doing_tasks)) {
-                                echo '<tr class="task" data-task-id="' . $task['task_id'] . '">';
-                                echo '<td class="task-name">' . $task['task_name'] . '</td>';
-                                echo '<td>' . $task['user_id'] . '</td>';
-                                echo '<td>' . $task['end_date'] . '</td>';
-                                echo '<td>' . $task['priority'] . '</td>';
-                                echo '<td>' . $task['status'] . '</td>';
-                                echo '</tr>';
-                            }
-                            ?>
-                        </tbody>
-                        <!-- Done -->
-                        <tr>
-                            <td colspan="5" class="collapsible task-section">Done</td>
-                        </tr>
-                        <tbody class="sortable" id="Done">
-                            <?php
-                            while ($task = mysqli_fetch_assoc($done_tasks)) {
-                                echo '<tr class="task" data-task-id="' . $task['task_id'] . '">';
-                                echo '<td class="task-name">' . $task['task_name'] . '</td>';
-                                echo '<td>' . $task['user_id'] . '</td>';
-                                echo '<td>' . $task['end_date'] . '</td>';
-                                echo '<td>' . $task['priority'] . '</td>';
-                                echo '<td>' . $task['status'] . '</td>';
-                                echo '</tr>';
-                            }
-                            ?>
-                        </tbody>
-                    </table>
+                        }
+
+                        $stmt->close();
+                    }
+
+                    $connection->close();
+
+                    // Function to update the task's status based on the completion status
+                    function getTaskStatusClass($status)
+                    {
+                        if ($status === 'Done') {
+                            return 'completed';
+                        } else {
+                            return 'incomplete';
+                        }
+                    }
+                    ?>
+                    <?php if (isset($tasksBySection)): ?>
+                        <?php if (!empty($tasksBySection)): ?>
+                            <?php foreach ($tasksBySection as $section => $tasks): ?>
+                                <div class="collapsible">
+                                    <table class="sortable" data-section="<?php echo $section; ?>">
+                                        <thead>
+                                            <tr>
+                                                <th>Task Name</th>
+                                                <th>Task Description</th>
+                                                <th>Start Date</th>
+                                                <th>End Date</th>
+                                                <th>Status</th>
+                                                <th>Priority</th>
+                                            </tr>
+                                        </thead>
+                                        <h2>
+                                            <?php echo $section; ?>
+                                        </h2>
+                                        <tbody>
+                                            <?php foreach ($tasks as $task): ?>
+                                                <tr data-task-id="<?php echo $task['task_id']; ?>">
+                                                    <!-- class="<?php echo getTaskStatusClass($task['status']); ?>"> -->
+                                                    <td>
+                                                        <?php echo $task['task_name']; ?>
+                                                    </td>
+                                                    <td>
+                                                        <?php echo $task['task_description']; ?>
+                                                    </td>
+                                                    <td>
+                                                        <?php echo $task['start_date']; ?>
+                                                    </td>
+                                                    <td>
+                                                        <?php echo $task['end_date']; ?>
+                                                    </td>
+                                                    <td>
+                                                        <?php echo $task['status']; ?>
+                                                    </td>
+                                                    <td>
+                                                        <?php echo $task['priority']; ?>
+                                                    </td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <p>No tasks assigned to this project.</p>
+                        <?php endif; ?>
+                    <?php endif; ?>
                 </div>
+
+                <!-- Slide-in popup to display task description -->
+                <div class="task-popup" id="taskPopup">
+                    <div class="heading-content">
+                        <div class="heading-style">
+                            <p>Edit Task</p>
+                        </div>
+                        <div class="bottom-line"></div>
+                        <div class="div-space-top"></div>
+                        <button type="button" id="closeButton">Close</button>
+                        <button type="button" id="deleteButton">Delete Task</button>
+                        <div class="div-space-top"></div>
+                    </div>
+                    <div class="bottom-line"></div>
+                    <div class="div-space-top"></div>
+                    <form id="editTaskForm">
+                        <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
+                        <input type="hidden" id="editTaskId" name="task_id">
+                        <label for="editTaskName">Task Name:</label>
+                        <input type="text" id="editTaskName" name="task_name" required>
+                        <br>
+
+                        <label for="editTaskDescription">Task Description:</label>
+                        <textarea id="editTaskDescription" name="task_description" required></textarea>
+                        <br>
+
+                        <label for="editStartDate">Start Date:</label>
+                        <input type="date" id="editStartDate" name="start_date" required>
+                        <br>
+
+                        <label for="editEndDate">End Date:</label>
+                        <input type="date" id="editEndDate" name="end_date" required>
+                        <br>
+
+                        <label for="editStatus">Status:</label>
+                        <select id="editStatus" name="status" required>
+                            <option value="At risk">At risk</option>
+                            <option value="Off Track">Off track</option>
+                            <option value="On Track">On track</option>
+                            <option value="On Hold">On Hold</option>
+                            <option value="Cancelled">Cancelled</option>
+                            <option value="Blocked">Blocked</option>
+                            <option value="Waiting for Approval">Waiting for Approval</option>
+                            <option value="In Review">In Review</option>
+                        </select>
+                        <br>
+
+                        <label for="editPriority">Priority:</label>
+                        <select id="editPriority" name="priority" required>
+                            <option value="Low">Low</option>
+                            <option value="Medium">Medium</option>
+                            <option value="High">High</option>
+                        </select>
+                        <br>
+
+                        <button type="submit" id="submitButton">Save Changes</button>
+                    </form>
+                </div>
+
+                <!-- PEMBA -->
             </div>
         </div>
         <div class="tab-content div-space-top" id="tab3">
@@ -666,4 +852,252 @@
         var popup = document.getElementById("userrole_popup");
         popup.style.display = "none";
     }
+</script>
+
+<!-- <script>
+    // Add a single event listener to the parent element (.sortable) to handle the click event on the "Mark as Complete" button
+    document.querySelector(".sortable").addEventListener("click", function (event) {
+        var clickedElement = event.target.closest(".complete-task-btn");
+        if (!clickedElement) {
+            return; // Clicked outside .complete-task-btn, do nothing
+        }
+
+        // Retrieve the task_id from the clicked button
+        var taskId = clickedElement.getAttribute("data-task-id");
+
+        // Send an AJAX request to update the task status in the database
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    // If the update was successful, refresh the page or update the task list to reflect the change
+                    // You can reload the page or update the task list without a page reload using JavaScript
+                    // For example:
+                    // 1. Remove the completed task row from the "To Do" section
+                    clickedElement.closest(".task").remove();
+                    // 2. Move the completed task row to the "Done" section
+                    var doneSection = document.getElementById("Done");
+                    doneSection.appendChild(clickedElement.closest(".task"));
+                } else {
+                    // Handle the case where the update failed
+                    console.log("Failed to mark the task as complete.");
+                }
+            }
+        };
+
+        xhr.open("POST", "partial/mark_task_complete.php", true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.send("task_id=" + encodeURIComponent(taskId));
+    });
+</script> -->
+
+<!-- <script>
+    // Add a single event listener to the parent element (.sortable) to handle the click event on the checkbox
+    document.querySelector(".sortable").addEventListener("click", function (event) {
+        var clickedElement = event.target;
+        if (!clickedElement.classList.contains("task-checkbox")) {
+            return; // Clicked outside the checkbox, do nothing
+        }
+
+        // Retrieve the task_id from the clicked checkbox
+        var taskId = clickedElement.getAttribute("data-task-id");
+
+        // Send an AJAX request to update the task status in the database
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    // If the update was successful, remove the completed task row from the "To Do" section
+                    clickedElement.closest(".task").remove();
+
+                    // You can also move the completed task row to the "Done" section if desired
+                    // For example:
+                    // var doneSection = document.getElementById("Done");
+                    // doneSection.appendChild(clickedElement.closest(".task"));
+                } else {
+                    // Handle the case where the update failed
+                    console.log("Failed to mark the task as complete.");
+                }
+            }
+        };
+
+        xhr.open("POST", "partial/mark_task_complete.php", true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.send("task_id=" + encodeURIComponent(taskId));
+    });
+</script> -->
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script>
+    // JavaScript for collapsible sections
+    $(document).ready(function () {
+        $('.collapsible h2').click(function () {
+            $(this).toggleClass('active');
+            $(this).next('table').toggleClass('show');
+        });
+    });
+
+    // JavaScript for sorting between sections
+    $(document).ready(function () {
+        // Initialize sortable for each section table
+        $('.sortable').sortable({
+            connectWith: '.sortable', // Enable sorting between sections
+            placeholder: 'ui-state-highlight', // Style for the placeholder during drag-and-drop
+            items: 'tr', // Limit sorting to rows only within the current section
+            update: function (event, ui) {
+                // Get the dragged task's ID
+                const taskId = ui.item.attr('data-task-id');
+                // Get the destination section's ID
+                const sectionId = ui.item.closest('.collapsible').find('h2').text().trim();
+                // Update the task's section in the database using an AJAX request
+                $.ajax({
+                    url: 'update_task_section.php', // Replace with the URL to your update task section PHP file
+                    method: 'POST',
+                    data: {
+                        task_id: taskId,
+                        section: sectionId
+                    },
+                    success: function (response) {
+                        // Handle the response if needed
+                        console.log('Task section updated successfully.');
+                    },
+                    error: function (xhr, status, error) {
+                        // Handle the error if needed
+                        console.error('Error updating task section:', error);
+                    }
+                });
+            }
+        });
+    });
+
+    // Call the fetchTasks function on page load
+    $(document).ready(function () {
+        fetchTasks();
+    });
+
+    // Variable to store the current task ID
+    let currentTaskId;
+
+    // JavaScript for handling task click and displaying popup
+    $(document).ready(function () {
+        $('.sortable tr').click(function () {
+            // Get the task details from the clicked row
+            const taskId = $(this).attr('data-task-id');
+            const taskName = $(this).find('td:nth-child(1)').text();
+            const taskDescription = $(this).find('td:nth-child(2)').text();
+            const startDate = $(this).find('td:nth-child(3)').text();
+            const endDate = $(this).find('td:nth-child(4)').text();
+            const status = $(this).find('td:nth-child(5)').text();
+            const priority = $(this).find('td:nth-child(6)').text();
+
+            // Set the task details in the edit popup form
+            $('#editTaskId').val(taskId);
+            $('#editTaskName').val(taskName);
+            $('#editTaskDescription').val(taskDescription);
+            $('#editStartDate').val(startDate);
+            $('#editEndDate').val(endDate);
+            $('#editStatus').val(status);
+            $('#editPriority').val(priority);
+
+
+            // Store the task ID in the variable
+            currentTaskId = taskId;
+
+            // Show the popup with animation
+            $('#taskPopup').addClass('active');
+
+            // Fetch task details and populate the edit form
+            fetchTaskDetails(taskId);
+        });
+
+        // Submit the edited task details when the form is submitted
+        $('#editTaskForm').submit(function (event) {
+            event.preventDefault();
+
+            // Get the form data
+            const formData = $(this).serialize();
+
+            // Send an AJAX request to update the task details
+            $.ajax({
+                url: 'update_task.php', // Replace with the URL to your update task PHP file
+                method: 'POST',
+                data: formData,
+                success: function (response) {
+                    // Handle the response if needed
+                    console.log('Task updated successfully.');
+                    // Hide the edit popup with animation
+                    $('#taskPopup').removeClass('active');
+                    // Fetch tasks again to update the list
+                    fetchTasks();
+                },
+                error: function (xhr, status, error) {
+                    // Handle the error if needed
+                    console.error('Error updating task:', error);
+                }
+            });
+        });
+
+        // Close the popup when the close button is clicked
+        $('#closeButton').click(function () {
+            // Hide the popup with animation
+            $('#taskPopup').removeClass('active');
+        });
+
+        // Delete the task when the delete button is clicked
+        $('#deleteButton').click(function () {
+            // Get the task ID from the variable
+            const taskId = currentTaskId;
+
+            // Send an AJAX request to delete the task
+            $.ajax({
+                url: 'delete_task.php', // Replace with the URL to your delete task PHP file
+                method: 'POST',
+                data: {
+                    task_id: taskId
+                },
+                success: function (response) {
+                    // Handle the response if needed
+                    console.log('Task deleted successfully.');
+                    // Hide the popup with animation
+                    $('#taskPopup').removeClass('active');
+                    // Fetch tasks again to update the list
+                    // fetchTasks();
+                },
+                error: function (xhr, status, error) {
+                    // Handle the error if needed
+                    console.error('Error deleting task:', error);
+                }
+            });
+        });
+
+    });
+
+    // Function to fetch task details using AJAX
+    function fetchTaskDetails(taskId) {
+        $.ajax({
+            url: 'fetch_task_details.php', // Replace with the URL to your fetch task details PHP file
+            method: 'GET',
+            data: { task_id: taskId },
+            dataType: 'json',
+            success: function (response) {
+                // Populate the form fields with the fetched task details
+                $('#editTaskId').val(response.task_id);
+                $('#editTaskName').val(response.task_name);
+                $('#editTaskDescription').val(response.task_description);
+                $('#editStartDate').val(response.start_date);
+                $('#editEndDate').val(response.end_date);
+                $('#editStatus').val(response.status);
+                $('#editPriority').val(response.priority);
+            },
+            error: function (xhr, status, error) {
+                // Handle the error if needed
+                console.error('Error fetching task details:', error);
+            }
+        });
+    }
+
+
+
 </script>

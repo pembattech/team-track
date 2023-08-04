@@ -36,14 +36,16 @@ CREATE TABLE Tasks (
     project_id INT,
     user_id INT,
     task_name VARCHAR(255),
+    assignee INT,
     task_description VARCHAR(1000),
     start_date DATE,
     end_date DATE,
     status VARCHAR(50),
     section VARCHAR(50),
-    priority INT,
+    priority VARCHAR(50),
     FOREIGN KEY (project_id) REFERENCES Projects(project_id),
     FOREIGN KEY (user_id) REFERENCES Users(user_id)
+    FOREIGN KEY (assignee) REFERENCES Users(user_id);
 );
 
 CREATE TABLE Messages (

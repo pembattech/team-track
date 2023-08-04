@@ -47,7 +47,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Set a session variable to store the dynamic message
         $_SESSION['notification_message'] = "$project_name Project update successfully.";
         echo "Project update and assigned to the logged-in user successfully.";
-        
+
         // // Redirect to the user's home or desired page after successfullly creating project
         // header("Location: ../profile.php");
     } else {
@@ -58,4 +58,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 } else {
     $_SESSION['notification_message'] = "Error updating $project_name Project.";
 }
+header("Location: ../project.php?project_id=$project_id");
+
 ?>

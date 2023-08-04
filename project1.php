@@ -8,7 +8,7 @@
         display: none;
         position: absolute;
         background-color: var(--sidebar-bgcolor);
-        min-width: 120px;
+        width: 250px;
         box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
         z-index: 9;
         border: 1px solid var(--color-border);
@@ -25,6 +25,10 @@
         color: var(--color-text);
     }
 
+    .role_popup-menu .heading-style {
+        font-size: 14px;
+    }
+
     .role_popup-menu li:hover {
         border-radius: 5px;
         background-color: var(--color-background-weak);
@@ -35,7 +39,39 @@
         outline: none;
         border: none;
         background-color: inherit;
-        color: var(--color-text);
+        font-size: 14px;
+    }
+
+    .input-container {
+        display: flex;
+        align-items: center;
+    }
+
+    .input-container input[type="text"] {
+        flex: 1;
+        width: 100px;
+
+    }
+
+    .relative-button {
+        background-color: #4CAF50;
+        color: white;
+        padding: 2px 4px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    /* Styling for completed tasks */
+    .task.complete {
+        text-decoration: line-through;
+        color: #999;
+    }
+
+    /* Styling for sortable tasks */
+    .sortable {
+        border: 1px solid #ccc;
+        padding: 10px;
     }
 </style>
 <div class="container project-wrapper">
@@ -333,7 +369,7 @@
                             echo "<div class='user-role-container'>";
                             // Loop through the remaining users associated with the project
                             while ($user = mysqli_fetch_assoc($result_users)) {
-                                echo "<div class='user-content' data-user-id='" . $user['user_id'] . "' id='role_popup-btn'>";
+                                echo "<div class='user-content' data-user-id='" . $user['user_id'] . "' data-user-role='" . $user['user_role'] . "' id='role_popup-btn'>";
                                 echo "<img class='profile-picture' src='./static/image/test.JPG' alt='Profile Picture'>";
                                 echo "<div class='profile-info'>";
                                 echo "<p class='user-name'>" . $user['username'] . "</p>";
@@ -346,7 +382,6 @@
                                 echo "</div>";
                                 echo "</div>";
                             }
-
                             echo "</div>";
                         }
                         ?>
@@ -355,15 +390,29 @@
                         <div class="role_popup-menu" id="userrole_popup">
                             <ul>
                                 <!-- TODO if the role is already assigned then change role otherwise add role. -->
-                                <li>Change role</li>
+                                <li>
+                                    <form method="post" action="partial/update_userrole.php" class="update_userrole">
+                                        <!-- <div class='heading-content'>
+                                            <div class='heading-style'>
+                                                <p>Add Role</p>
+                                            </div>
+                                        </div> -->
+                                        <div class="input-container">
+                                            <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
+                                            <input type="hidden" name="user_id" value="">
+                                            <input type="text" name="user-role">
+                                            <button type="submit" name="update_userrole"
+                                                class="relative-button">Done</button>
+                                        </div>
+                                    </form>
                                 <li>
                                     <form method="post" action="partial/remove_user_from_project.php"
                                         class="remove-user-from-proj">
                                         <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
                                         <input type="hidden" name="user_id" value="">
-                                        <button type="submit" name="remove_user">Remove User</button>
+                                        <button type="submit" class="indicate-danger" name="remove_user">Remove
+                                            User</button>
                                     </form>
-
                                 </li>
                             </ul>
                         </div>
@@ -378,7 +427,7 @@
                                 <form>
                                     <div class="form-group">
                                         <p>Invite with email</p>
-                                        <input type="email" iwd="email" name="email"
+                                        <input type="email" id="email" name="email"
                                             placeholder="Add members by email...">
                                     </div>
                                     <div class="form-group">
@@ -390,9 +439,7 @@
                                 </form>
                             </div>
                         </div>
-
                     </div>
-
                 </div>
             </div>
         </div>
@@ -452,7 +499,10 @@
                             <?php
                             while ($task = mysqli_fetch_assoc($todo_tasks)) {
                                 echo '<tr class="task" data-task-id="' . $task['task_id'] . '">';
-                                echo '<td class="task-name">' . $task['task_name'] . '</td>';
+                                echo '<td class="task-name">';
+                                echo '<input type="radio" name="task_status" value="' . $task['task_id'] . '">'; // Radio button
+                                echo $task['task_name'];
+                                echo '</td>';
                                 echo '<td>' . $task['user_id'] . '</td>';
                                 echo '<td>' . $task['end_date'] . '</td>';
                                 echo '<td>' . $task['priority'] . '</td>';
@@ -461,15 +511,21 @@
                             }
                             ?>
                         </tbody>
+
+
+
                         <!-- Doing -->
                         <tr>
                             <td colspan="5" class="collapsible task-section">Doing</td>
                         </tr>
                         <tbody class="sortable" id="Doing">
                             <?php
-                            while ($task = mysqli_fetch_assoc($doing_tasks)) {
+                            while ($task = mysqli_fetch_assoc($todo_tasks)) {
                                 echo '<tr class="task" data-task-id="' . $task['task_id'] . '">';
-                                echo '<td class="task-name">' . $task['task_name'] . '</td>';
+                                echo '<td class="task-name">';
+                                echo '<input type="radio" name="task_status" value="' . $task['task_id'] . '">'; // Radio button
+                                echo $task['task_name'];
+                                echo '</td>';
                                 echo '<td>' . $task['user_id'] . '</td>';
                                 echo '<td>' . $task['end_date'] . '</td>';
                                 echo '<td>' . $task['priority'] . '</td>';
@@ -484,9 +540,12 @@
                         </tr>
                         <tbody class="sortable" id="Done">
                             <?php
-                            while ($task = mysqli_fetch_assoc($done_tasks)) {
+                            while ($task = mysqli_fetch_assoc($todo_tasks)) {
                                 echo '<tr class="task" data-task-id="' . $task['task_id'] . '">';
-                                echo '<td class="task-name">' . $task['task_name'] . '</td>';
+                                echo '<td class="task-name">';
+                                echo '<input type="radio" name="task_status" value="' . $task['task_id'] . '">'; // Radio button
+                                echo $task['task_name'];
+                                echo '</td>';
                                 echo '<td>' . $task['user_id'] . '</td>';
                                 echo '<td>' . $task['end_date'] . '</td>';
                                 echo '<td>' . $task['priority'] . '</td>';
@@ -570,6 +629,7 @@
     }
 </script>
 <script>
+
     // Add a single event listener to the parent element (.user-role-container)
     document.querySelector(".user-role-container").addEventListener("click", function (event) {
         var clickedElement = event.target.closest(".user-content");
@@ -577,13 +637,28 @@
             return; // Clicked outside .user-content, do nothing
         }
 
-        // Retrieve the user_id from the clicked user-content element
+        // Retrieve the user_id and username from the clicked user-content element
         var userId = clickedElement.getAttribute("data-user-id");
+        var username = clickedElement.querySelector(".user-name").textContent;
 
-        // Use the user_id to set the value of the user_id input in the form
+        // Use the user_id to set the value of the user_id input in the form for both remove and update user role forms
         var removeUserForm = document.querySelector(".remove-user-from-proj");
+        var update_userrole = document.querySelector(".update_userrole");
         var userIdInput = removeUserForm.querySelector("input[name='user_id']");
+        var userIdInput1 = update_userrole.querySelector("input[name='user_id']");
         userIdInput.value = userId;
+        userIdInput1.value = userId;
+
+        // Use the username to update the placeholder text for the user-role input in the form
+        var userRoleInput = update_userrole.querySelector("input[name='user-role']");
+        var userRoleValue = clickedElement.getAttribute("data-user-role");
+        console.log(userRoleValue);
+
+        if (userRoleValue !== null && userRoleValue !== "") {
+            userRoleInput.value = userRoleValue;
+        } else {
+            userRoleInput.placeholder = "Specify " + username + "'s role in this project";
+        }
 
         // Stop the click event from propagating to the document body
         event.stopPropagation();
@@ -603,6 +678,7 @@
     });
 
 
+
     // Function to show the popup menu
     function userrole_showPopup() {
         var popup = document.getElementById("userrole_popup");
@@ -614,4 +690,133 @@
         var popup = document.getElementById("userrole_popup");
         popup.style.display = "none";
     }
+</script>
+
+<!-- <script>
+    // Add a single event listener to the parent element (.sortable) to handle the click event on the "Mark as Complete" button
+    document.querySelector(".sortable").addEventListener("click", function (event) {
+        var clickedElement = event.target.closest(".complete-task-btn");
+        if (!clickedElement) {
+            return; // Clicked outside .complete-task-btn, do nothing
+        }
+
+        // Retrieve the task_id from the clicked button
+        var taskId = clickedElement.getAttribute("data-task-id");
+
+        // Send an AJAX request to update the task status in the database
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    // If the update was successful, refresh the page or update the task list to reflect the change
+                    // You can reload the page or update the task list without a page reload using JavaScript
+                    // For example:
+                    // 1. Remove the completed task row from the "To Do" section
+                    clickedElement.closest(".task").remove();
+                    // 2. Move the completed task row to the "Done" section
+                    var doneSection = document.getElementById("Done");
+                    doneSection.appendChild(clickedElement.closest(".task"));
+                } else {
+                    // Handle the case where the update failed
+                    console.log("Failed to mark the task as complete.");
+                }
+            }
+        };
+
+        xhr.open("POST", "partial/mark_task_complete.php", true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.send("task_id=" + encodeURIComponent(taskId));
+    });
+</script> -->
+
+<!-- <script>
+    // Add a single event listener to the parent element (.sortable) to handle the click event on the checkbox
+    document.querySelector(".sortable").addEventListener("click", function (event) {
+        var clickedElement = event.target;
+        if (!clickedElement.classList.contains("task-checkbox")) {
+            return; // Clicked outside the checkbox, do nothing
+        }
+
+        // Retrieve the task_id from the clicked checkbox
+        var taskId = clickedElement.getAttribute("data-task-id");
+
+        // Send an AJAX request to update the task status in the database
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    // If the update was successful, remove the completed task row from the "To Do" section
+                    clickedElement.closest(".task").remove();
+
+                    // You can also move the completed task row to the "Done" section if desired
+                    // For example:
+                    // var doneSection = document.getElementById("Done");
+                    // doneSection.appendChild(clickedElement.closest(".task"));
+                } else {
+                    // Handle the case where the update failed
+                    console.log("Failed to mark the task as complete.");
+                }
+            }
+        };
+
+        xhr.open("POST", "partial/mark_task_complete.php", true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.send("task_id=" + encodeURIComponent(taskId));
+    });
+</script> -->
+<script>
+    // Function to initialize sortable and handle AJAX for task completion
+    function initializeSortable() {
+        // Initialize sortable for tasks within each section
+        const sortableSections = document.querySelectorAll(".sortable");
+        sortableSections.forEach((section) => {
+            new Sortable(section, {
+                group: 'shared',
+                animation: 150,
+                onEnd: function (evt) {
+                    const taskId = evt.item.dataset.taskId;
+                    const newSection = evt.to.id;
+                    // Send AJAX request to update the task section in the database
+                    // For simplicity, I'm not making an actual AJAX request here
+                    // Instead, I'm just updating the task section on the front-end
+                    const task = document.querySelector(`[data-task-id="${taskId}"]`);
+                    task.querySelector(".status").textContent = newSection;
+                    // You can make an actual AJAX request to update the task section in the database
+                }
+            });
+        });
+
+        // Handle task completion using AJAX
+        const radioButtons = document.querySelectorAll('input[type="radio"][name="task_status"]');
+        radioButtons.forEach((radio) => {
+            radio.addEventListener("change", function () {
+                const taskId = this.value;
+                // Send AJAX request to update the task status in the database
+                const formData = new FormData();
+                formData.append('task_id', taskId);
+                formData.append('new_section', 'Completed'); // Assuming you want to move completed tasks to the 'Completed' section
+
+                fetch('ajax_handle.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            const task = document.querySelector(`[data-task-id="${taskId}"]`);
+                            task.querySelector(".status").textContent = "Completed";
+                        } else {
+                            console.error("Error updating task status:", data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error updating task status:", error);
+                    });
+            });
+        });
+    }
+
+    // Call the function when the page is loaded
+    window.addEventListener("DOMContentLoaded", initializeSortable);
+
 </script>

@@ -1,0 +1,42 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    cursor: pointer;
+}
+
+.collapsible {
+    border: 1px solid #ddd;
+    margin-bottom: 10px;
+}
+
+.collapsible h2 {
+    margin: 0;
+    padding: 10px;
+    background-color: #f1f1f1;
+    cursor: pointer;
+}
+
+.collapsible h2.active {
+    background-color: #ddd;
+}
+
+.collapsible table {
+    display: none;
+}
+
+.collapsible table.show {
+    display: table;
+}
