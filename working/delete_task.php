@@ -9,7 +9,7 @@ ini_set('display_errors', 1);
 $servername = "localhost";
 $username = "root";
 $password = "";
-$dbname = "teamtrack";
+$dbname = "test";
 
 // Check if the task_id parameter is present in the POST request
 if (isset($_POST['task_id']) && is_numeric($_POST['task_id'])) {

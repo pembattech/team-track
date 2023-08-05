@@ -1,24 +1,13 @@
 <?php
-// Database connection parameters
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "teamtrack";
+require_once '../../config/connect.php';
 
-// Create connection
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
 
 // Check if the 'task_id' parameter is present in the GET request
 if (isset($_GET['task_id']) && is_numeric($_GET['task_id'])) {
     $task_id = $_GET['task_id'];
 
     // Prepare and execute the SQL query using a prepared statement
-    $stmt = $conn->prepare("SELECT * FROM Tasks WHERE task_id = ?");
+    $stmt = $connection->prepare("SELECT * FROM Tasks WHERE task_id = ?");
     $stmt->bind_param("i", $task_id);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -42,6 +31,6 @@ if (isset($_GET['task_id']) && is_numeric($_GET['task_id'])) {
     echo json_encode(array('error' => 'Invalid request.'));
 }
 
-$conn->close();
+$connection->close();
 ?>
 

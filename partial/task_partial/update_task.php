@@ -3,19 +3,8 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Database connection parameters
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "teamtrack";
+require_once '../../config/connect.php';
 
-// Create connection
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
 
 // Check if the form data has been submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -33,7 +22,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $priority = $_POST["priority"];
 
     // Prepare and execute the SQL query using a prepared statement
-    $stmt = $conn->prepare("UPDATE Tasks SET task_name = ?, task_description = ?, start_date = ?, end_date = ?, status = ?, priority = ? WHERE task_id = ?");
+    $stmt = $connection->prepare("UPDATE Tasks SET task_name = ?, task_description = ?, start_date = ?, end_date = ?, status = ?, priority = ? WHERE task_id = ?");
     $stmt->bind_param("ssssssi", $task_name, $task_description, $start_date, $end_date, $status, $priority, $task_id);
     $stmt->execute();
 
@@ -48,10 +37,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $stmt->close();
 
-    // header("Location: project.php?project_id=$project_id");
-
 }
 
-$conn->close();
+$connection->close();
 ?>
 

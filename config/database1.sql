@@ -24,7 +24,7 @@ CREATE TABLE Projects (
 CREATE TABLE ProjectUsers (
     project_id INT,
     user_id INT,
-    project_owner INT DEFAULT 0;
+    project_owner INT DEFAULT 0,
     user_role VARCHAR(50),
     PRIMARY KEY (project_id, user_id),
     FOREIGN KEY (project_id) REFERENCES Projects(project_id),
@@ -44,8 +44,8 @@ CREATE TABLE Tasks (
     section VARCHAR(50),
     priority VARCHAR(50),
     FOREIGN KEY (project_id) REFERENCES Projects(project_id),
-    FOREIGN KEY (user_id) REFERENCES Users(user_id)
-    FOREIGN KEY (assignee) REFERENCES Users(user_id);
+    FOREIGN KEY (user_id) REFERENCES Users(user_id),
+    FOREIGN KEY (assignee) REFERENCES Users(user_id)
 );
 
 CREATE TABLE Messages (

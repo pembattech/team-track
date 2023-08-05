@@ -1,40 +1,55 @@
-CREATE DATABASE teamtrack;
+-- Create the database and tables
+CREATE DATABASE IF NOT EXISTS teamtrack;
 
-CREATE TABLE Users (
+CREATE TABLE IF NOT EXISTS Users (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(255),
+    name VARCHAR(255),
     email VARCHAR(255),
     password VARCHAR(255),
     profile_picture VARCHAR(255),
-    role VARCHAR(50)
+    background_color VARCHAR(7),
+    about VARCHAR(1000)
 );
 
-CREATE TABLE Projects (
+CREATE TABLE IF NOT EXISTS Projects (
     project_id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT,
     project_name VARCHAR(255),
     description VARCHAR(1000),
     start_date DATE,
     end_date DATE,
     status VARCHAR(50),
-    FOREIGN KEY (user_id) REFERENCES Users(user_id)
+    background_color VARCHAR(7)
 );
 
-CREATE TABLE Tasks (
-    task_id INT AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS ProjectUsers (
+    projectuser_id INT AUTO_INCREMENT PRIMARY KEY,
     project_id INT,
     user_id INT,
-    task_name VARCHAR(255),
-    task_description VARCHAR(1000),
-    start_date DATE,
-    end_date DATE,
-    status VARCHAR(50),
-    priority INT,
+    is_projectowner INT DEFAULT 0,
+    user_role VARCHAR(50),
     FOREIGN KEY (project_id) REFERENCES Projects(project_id),
     FOREIGN KEY (user_id) REFERENCES Users(user_id)
 );
 
-CREATE TABLE Messages (
+CREATE TABLE IF NOT EXISTS Tasks (
+    task_id INT AUTO_INCREMENT PRIMARY KEY,
+    project_id INT,
+    user_id INT,
+    task_name VARCHAR(255),
+    assignee INT,
+    task_description VARCHAR(1000),
+    start_date DATE,
+    end_date DATE,
+    status VARCHAR(50),
+    section VARCHAR(50),
+    priority VARCHAR(50),
+    FOREIGN KEY (project_id) REFERENCES Projects(project_id),
+    FOREIGN KEY (user_id) REFERENCES Users(user_id),
+    FOREIGN KEY (assignee) REFERENCES Users(user_id)
+);
+
+CREATE TABLE IF NOT EXISTS Messages (
     message_id INT AUTO_INCREMENT PRIMARY KEY,
     task_id INT,
     user_id INT,
@@ -43,3 +58,4 @@ CREATE TABLE Messages (
     FOREIGN KEY (task_id) REFERENCES Tasks(task_id),
     FOREIGN KEY (user_id) REFERENCES Users(user_id)
 );
+

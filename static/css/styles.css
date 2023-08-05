@@ -51,7 +51,8 @@ p {
     color: var(--color-text)
 }
 
-.indicate-danger p, button.indicate-danger {
+.indicate-danger p,
+button.indicate-danger {
     color: var(--danger-color);
 }
 
@@ -417,6 +418,159 @@ th.subhead-task {
     border-radius: 5px;
 }
 
+.invite-btn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.invite-popup {
+    display: none;
+    background-color: var(--overlay-bgcolor);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.invite-popup-content {
+    background-color: var(--color-background-weak);
+    color: var(--color-text);
+    max-width: 400px;
+    margin: 100px auto;
+    padding: 10px 20px;
+    border-radius: 4px;
+}
+
+.invite-popup-close {
+    font-size: 30px;
+    float: right;
+    cursor: pointer;
+}
+
+.invite-popup .form-group {
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+.invite-popup label {
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.invite-popup input[type="email"],
+.invite-popup textarea {
+    width: 100%;
+    border: 1px solid #ccc;
+    padding: 8px 5px;
+    border-radius: 4px;
+    background-color: var(--color-background-weak);
+    color: var(--color-text);
+}
+
+.invite-popup .invite-submit-btn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+/* Styling for the user-role-container */
+.user-role-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.profile-picture {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* Styling for the "+" sign */
+.border-around-plus {
+    border: 1px solid #ccc;
+    padding: 2px 6px;
+    margin-right: 5px;
+}
+
+.addtask-btn {
+    outline: 0;
+    padding: 3px;
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+    color: var(--color-text-weak);
+    background-color: var(--color-background-weak);
+}
+
+.addtask-btn:hover {
+    background-color: var(--color-background-hover);
+    color: var(--color-text);
+}
+
+.addtask-popup {
+    display: none;
+    background-color: var(--overlay-bgcolor);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.addtask-popup-content {
+    background-color: var(--color-background-weak);
+    color: var(--color-text);
+    max-width: 400px;
+    margin: 100px auto;
+    padding: 10px 20px;
+    border-radius: 4px;
+}
+
+.addtask-popup-close {
+    font-size: 30px;
+    float: right;
+    cursor: pointer;
+}
+
+.addtask-popup .form-group {
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+.addtask-popup label {
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.addtask-popup textarea {
+    width: 100%;
+    border: 1px solid #ccc;
+    padding: 8px 5px;
+    border-radius: 4px;
+    background-color: var(--color-background-weak);
+    color: var(--color-text);
+}
+
+.addtask-popup .editprofile-submit-btn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
 
 .add-member {
     align-items: center;
@@ -711,4 +865,158 @@ th.subhead-task {
 .ui-datepicker-unselectable .ui-state-default {
     color: rgba(255, 255, 255, 0.2);
     pointer-events: none;
+}
+
+.role_popup-menu {
+    display: none;
+    position: absolute;
+    background-color: var(--sidebar-bgcolor);
+    width: 250px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 9;
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+}
+
+/* .role_popup-menu a { */
+.role_popup-menu li {
+    display: block;
+    padding: 5px;
+    font-size: 14px;
+    font-family: inherit;
+    text-decoration: none;
+    color: var(--color-text);
+}
+
+.role_popup-menu .heading-style {
+    font-size: 14px;
+}
+
+.role_popup-menu li:hover {
+    border-radius: 5px;
+    background-color: var(--color-background-weak);
+}
+
+.remove-user-from-proj button {
+    appearance: none;
+    outline: none;
+    border: none;
+    background-color: inherit;
+    font-size: 14px;
+}
+
+.input-container {
+    display: flex;
+    align-items: center;
+}
+
+.input-container input[type="text"] {
+    flex: 1;
+    width: 100px;
+
+}
+
+.relative-button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 2px 4px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* Styling for completed tasks */
+.task.complete {
+    text-decoration: line-through;
+    color: #999;
+}
+
+/* Styling for sortable tasks */
+.sortable {
+    border: 1px solid #ccc;
+    padding: 10px;
+}
+
+/* table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th,
+    td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+
+    th {
+        cursor: pointer;
+    } */
+
+.collapsible {
+    border: 1px solid #ddd;
+    margin-bottom: 10px;
+}
+
+.collapsible h2 {
+    margin: 0;
+    padding: 10px;
+    cursor: pointer;
+}
+
+/* .collapsible h2.active {
+        background-color: #ddd;
+    } */
+
+.collapsible table {
+    display: none;
+}
+
+.collapsible table.show {
+    display: table;
+}
+
+/* Styles for the slide-in popup */
+.task-popup {
+    position: fixed;
+    top: 139;
+    right: -440px;
+    width: 400px;
+    height: 100%;
+    background-color: var(--sidebar-bgcolor);
+    color: var(--color-text);
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    transition: right 0.3s ease-in-out;
+}
+
+#editTaskForm input[type="text"],
+#editTaskForm textarea,
+#editTaskForm input[type="date"],
+#editTaskForm select {
+    border: 0;
+    background-color: var(--color-background-weak);
+}
+
+button#submitButton,
+button#deleteButton,
+button#closeButton {
+    outline: 0;
+    padding: 3px;
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+    color: var(--color-text-weak);
+    background-color: var(--color-background-weak);
+}
+
+button#submitButton:hover,
+button#deleteButton:hover,
+button#closeButton:hover {
+    background-color: var(--color-background-hover);
+    color: var(--color-text);
+}
+
+/* Show the slide-in popup */
+.task-popup.active {
+    right: 0;
 }
