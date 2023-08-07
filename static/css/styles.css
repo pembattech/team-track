@@ -55,6 +55,10 @@ table {
     border-collapse: collapse;
 }
 
+.form-group label {
+    color: var(--color-text);
+}
+
 .indicate-danger p,
 button.indicate-danger {
     color: var(--danger-color);
@@ -112,6 +116,20 @@ button.indicate-danger {
 
 .access-denied-container .countdown {
     display: inline;
+}
+
+.btn-style {
+    outline: 0;
+    padding: 3px 8px;
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+    color: var(--color-text-weak);
+    background-color: var(--color-background-weak);
+}
+
+.btn-style:hover {
+    background-color: var(--color-background-hover);
+    color: var(--color-text);
 }
 
 .between-verticle-line li:not(:last-child)::after {
@@ -205,6 +223,8 @@ button.indicate-danger {
     transition: 1s ease;
 }
 
+/* sidebar */
+
 .sidebar {
     padding: 1rem;
     width: 15%;
@@ -226,6 +246,7 @@ button.indicate-danger {
 .sidebar li {
     margin-bottom: 15px;
     padding: 0 5px;
+    color: var(--color-text);
 }
 
 .sidebar li:hover,
@@ -257,9 +278,40 @@ button.indicate-danger {
     margin-right: 10px;
 }
 
+.collapsible-header {
+    cursor: pointer;
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--color-text);
+}
+
+.collapsible-icon {
+    display: inline-block;
+    transition: transform 0.2s ease-out;
+}
+
+.collapsible-header.open .collapsible-icon {
+    transform: rotate(180deg);
+}
+
+.project-scroll-container {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+/* Hide the vertical scrollbar when not needed */
+.project-scroll-container::-webkit-scrollbar {
+    width: 5px;
+}
+
+.project-scroll-container::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 2.5px;
+}
+
 .heading {
     font-size: 14px;
-    color: var(--color-text)
+    color: var(--color-text);
 }
 
 .main-content {
@@ -459,6 +511,7 @@ th.subhead-task {
 .invite-popup .form-group {
     margin-bottom: 15px;
     font-size: 14px;
+    color: var(--color-text);
 }
 
 .invite-popup label {
@@ -506,20 +559,6 @@ th.subhead-task {
     border: 1px solid #ccc;
     padding: 2px 6px;
     margin-right: 5px;
-}
-
-.addtask-btn {
-    outline: 0;
-    padding: 3px;
-    border: 1px solid var(--color-border);
-    border-radius: 5px;
-    color: var(--color-text-weak);
-    background-color: var(--color-background-weak);
-}
-
-.addtask-btn:hover {
-    background-color: var(--color-background-hover);
-    color: var(--color-text);
 }
 
 .addtask-popup {
@@ -576,7 +615,8 @@ th.subhead-task {
     font-size: 16px;
 }
 
-.add-member {
+.add-member,
+.add-member span {
     align-items: center;
     cursor: pointer;
     color: var(--color-text);

@@ -69,3 +69,35 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 }
 ?>
 
+
+
+
+// // login.php
+<!-- // 
+// if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+//     $response = array();
+// 
+//     // Validate username and password (you can add more validation as needed)
+//     $username = isset($_POST['username']) ? trim($_POST['username']) : '';
+//     $password = isset($_POST['password']) ? $_POST['password'] : '';
+// 
+//     if (empty($username)) {
+//         $response['status'] = 'error';
+//         $response['message'] = 'Username is required.';
+//     } elseif (empty($password)) {
+//         $response['status'] = 'error';
+//         $response['message'] = 'Password is required.';
+//     } elseif ($username !== 'your_username' || $password !== 'your_password') {
+//         // Replace 'your_username' and 'your_password' with your actual valid credentials.
+//         $response['status'] = 'error';
+//         $response['message'] = 'Invalid username or password.';
+//     } else {
+//         // Authentication successful
+//         $response['status'] = 'success';
+//         $response['message'] = 'Login successful.';
+//     }
+// 
+//     // Send the response back to the client as JSON
+//     header('Content-Type: application/json');
+//     echo json_encode($response);
+// } -->

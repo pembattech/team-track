@@ -1,36 +1,3 @@
-<style>
-    .collapsible-header {
-        cursor: pointer;
-        font-size: 14px;
-        font-family: inherit;
-        color: var(--color-text);
-    }
-
-    .collapsible-icon {
-        display: inline-block;
-        transition: transform 0.2s ease-out;
-    }
-
-    .collapsible-header.open .collapsible-icon {
-        transform: rotate(180deg);
-    }
-
-    .project-scroll-container {
-        max-height: 300px;
-        overflow-y: auto;
-    }
-
-    /* Hide the vertical scrollbar when not needed */
-    .project-scroll-container::-webkit-scrollbar {
-        width: 5px;
-    }
-
-    .project-scroll-container::-webkit-scrollbar-thumb {
-        background-color: #888;
-        border-radius: 2.5px;
-    }
-</style>
-
 <div class="sidebar">
     <ul class="bottom-line">
         <a href="home.php">
