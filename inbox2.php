@@ -30,12 +30,12 @@
                 </div>
             </div>
 
-            <div class="bottom-line"></div>
-
             <style>
                 .inbox-container {
                     display: grid;
                     grid-template-columns: 1fr 1fr;
+                    gap: 20px;
+                    padding: 20px;
                 }
 
                 .inbox-left-side {
@@ -56,7 +56,7 @@
                 }
 
                 .message-list tbody tr:hover {
-                    background-color: var(--sidebar-bgcolor);
+                    background-color: #f2f2f2;
                     cursor: pointer;
                 }
 
@@ -82,30 +82,28 @@
                 .inbox-right-side p:last-child {
                     margin-bottom: 0;
                 }
-
-                .unread {
-                    font-weight: bold;
-                }
-
-                .open-message {
-                    background-color: var(--sidebar-bgcolor);
-                }
             </style>
 
-            <div class="inbox-container div-space-top">
+            <div class="inbox-container">
                 <div class="inbox-left-side">
                     <div class="message-list">
 
                     </div>
 
                     <table border="1" class="message-list">
-
+                        <thead>
+                            <tr>
+                                <th>Message</th>
+                                <th>Timestamp</th>
+                            </tr>
+                        </thead>
                         <tbody>
                             <!-- Message rows will be populated here dynamically -->
                         </tbody>
                     </table>
                 </div>
                 <div class="inbox-right-side" id="messageInbox-Container">
+                    <p>helo</p>
                     <!-- Selected message content will be displayed here -->
                 </div>
             </div>
@@ -123,16 +121,11 @@
 
                                 if (response.length > 0) {
                                     $.each(response, function (index, message) {
-                                        const messageStyleClass = message.is_read == 0 ? "message-text unread" : "message-text";
-                                        console.log(messageStyleClass);
                                         const row = `
-                                        <tr data-message-id="${message.message_id}">
-                                            <td>
-                                            <p class="messsage-project-name">${message.project_name}</p>
-                                            <p class="message-timestamp">${message.timestamp}</p>
-                                            <p class="${messageStyleClass}">${message.text}</p>
-                                            </td>
-                                        </tr>`;
+                            <tr data-message-id="${message.message_id}">
+                                <td>${message.text}</td>
+                                <td>${message.timestamp}</td>
+                            </tr>`;
                                         $('.message-list tbody').append(row);
                                     });
                                 } else {
@@ -154,12 +147,6 @@
                             data: { message_id: messageId },
                             success: function (response) {
                                 $('#messageInbox-Container').html(response);
-
-                                // Remove the 'open-message' class from all message rows
-                                $('.message-list tbody tr').removeClass('open-message');
-
-                                // Add the 'open-message' class to the clicked message row
-                                $('.message-list tbody tr[data-message-id="' + messageId + '"]').addClass('open-message');
                             },
                             error: function (xhr, status, error) {
                                 console.error('Error fetching message content:', error);
@@ -192,6 +179,8 @@
                         markAsRead(messageId);
                     });
                 });
+
+
             </script>
         </div>
 

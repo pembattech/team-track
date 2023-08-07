@@ -30,12 +30,12 @@
                 </div>
             </div>
 
-            <div class="bottom-line"></div>
-
             <style>
                 .inbox-container {
                     display: grid;
                     grid-template-columns: 1fr 1fr;
+                    gap: 20px;
+                    padding: 20px;
                 }
 
                 .inbox-left-side {
@@ -56,16 +56,18 @@
                 }
 
                 .message-list tbody tr:hover {
-                    background-color: var(--sidebar-bgcolor);
+                    background-color: #f2f2f2;
                     cursor: pointer;
                 }
 
                 .inbox-right-side {
+                    position: fixed;
                     top: 0;
-                    color: red;
                     right: 0;
                     bottom: 0;
                     overflow: auto;
+                    width: 40%;
+                    /* display: relative; */
                     border: 1px solid #ccc;
                     padding: 20px;
                 }
@@ -82,24 +84,21 @@
                 .inbox-right-side p:last-child {
                     margin-bottom: 0;
                 }
-
-                .unread {
-                    font-weight: bold;
-                }
-
-                .open-message {
-                    background-color: var(--sidebar-bgcolor);
-                }
             </style>
 
-            <div class="inbox-container div-space-top">
+            <div class="inbox-container">
                 <div class="inbox-left-side">
-                    <div class="message-list">
-
-                    </div>
-
+                    <h2>All Messages</h2>
                     <table border="1" class="message-list">
-
+                        <thead>
+                            <tr>
+                                <th>Message ID</th>
+                                <th>Project ID</th>
+                                <th>Recipient ID</th>
+                                <th>Message</th>
+                                <th>Read</th>
+                            </tr>
+                        </thead>
                         <tbody>
                             <!-- Message rows will be populated here dynamically -->
                         </tbody>
@@ -109,6 +108,11 @@
                     <!-- Selected message content will be displayed here -->
                 </div>
             </div>
+            <!-- <h2>Number as Power Example</h2>
+            <p>
+                The number 2 raised to the power of 3 is written as 2<sup>3</sup>.
+            </p> -->
+
 
             <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
             <script>
@@ -123,16 +127,14 @@
 
                                 if (response.length > 0) {
                                     $.each(response, function (index, message) {
-                                        const messageStyleClass = message.is_read == 0 ? "message-text unread" : "message-text";
-                                        console.log(messageStyleClass);
                                         const row = `
-                                        <tr data-message-id="${message.message_id}">
-                                            <td>
-                                            <p class="messsage-project-name">${message.project_name}</p>
-                                            <p class="message-timestamp">${message.timestamp}</p>
-                                            <p class="${messageStyleClass}">${message.text}</p>
-                                            </td>
-                                        </tr>`;
+                            <tr data-message-id="${message.message_id}">
+                                <td>${message.message_id}</td>
+                                <td>${message.task_id}</td>
+                                <td>${message.recipient_id}</td>
+                                <td>${message.message}</td>
+                                <td>${message.is_read}</td>
+                            </tr>`;
                                         $('.message-list tbody').append(row);
                                     });
                                 } else {
@@ -153,13 +155,7 @@
                             method: 'POST',
                             data: { message_id: messageId },
                             success: function (response) {
-                                $('#messageInbox-Container').html(response);
-
-                                // Remove the 'open-message' class from all message rows
-                                $('.message-list tbody tr').removeClass('open-message');
-
-                                // Add the 'open-message' class to the clicked message row
-                                $('.message-list tbody tr[data-message-id="' + messageId + '"]').addClass('open-message');
+                                $('#messageContainer').html(response);
                             },
                             error: function (xhr, status, error) {
                                 console.error('Error fetching message content:', error);
@@ -192,6 +188,8 @@
                         markAsRead(messageId);
                     });
                 });
+
+
             </script>
         </div>
 

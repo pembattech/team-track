@@ -52,10 +52,13 @@ CREATE TABLE IF NOT EXISTS Tasks (
 CREATE TABLE IF NOT EXISTS Messages (
     message_id INT AUTO_INCREMENT PRIMARY KEY,
     task_id INT,
-    user_id INT,
+    sender_id INT,
     text VARCHAR(1000),
     timestamp TIMESTAMP,
+    recipient_id INT,
+    is_read INT DEFAULT 0;
     FOREIGN KEY (task_id) REFERENCES Tasks(task_id),
-    FOREIGN KEY (user_id) REFERENCES Users(user_id)
+    FOREIGN KEY (sender_id) REFERENCES Users(user_id)
+    FOREIGN KEY (recipient_id) REFERENCES Users(user_id);
 );
 

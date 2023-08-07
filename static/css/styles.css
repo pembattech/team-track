@@ -51,6 +51,10 @@ p {
     color: var(--color-text)
 }
 
+table {
+    border-collapse: collapse;
+}
+
 .indicate-danger p,
 button.indicate-danger {
     color: var(--danger-color);
