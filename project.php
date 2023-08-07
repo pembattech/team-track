@@ -2,6 +2,10 @@
 
 <title>Project - TeamTrack</title>
 <style>
+    .error-message {
+        color: red;
+    }
+
     table {
         border-collapse: collapse;
         width: 100%;
@@ -135,7 +139,6 @@
     .input-container input[type="text"] {
         flex: 1;
         width: 100px;
-
     }
 
     .relative-button {
@@ -147,13 +150,6 @@
         cursor: pointer;
     }
 
-    /* Styling for completed tasks */
-    .task.complete {
-        text-decoration: line-through;
-        color: #999;
-    }
-
-    /* Styling for sortable tasks */
     .sortable {
         border: 1px solid #ccc;
         padding: 10px;
@@ -525,31 +521,20 @@
 
                 <div class="addtask-popup" id="addtask-popup">
                     <div class="addtask-popup-content">
-                        <form action="partial/addtask.php" method="post" enctype="multipart/form-data">
+                        <form action="partial/addtask.php" method="post" enctype="multipart/form-data"
+                            onsubmit="return task_validateForm()">
                             <span class="addtask-popup-close" onclick="addtask_popup_toggle()">&times;</span>
                             <p class="heading-style">Add Task</p>
+                            <div class="bottom-line"></div>
+                            <div class="div-space-top"></div>
                             <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
                             <div class="form-group">
                                 <label for="taskname">Task Name</label>
-                                <input type="text" name="taskname">
+                                <input type="text" name="taskname" id="taskname">
+                                <span id="taskname-error" class="error-message"></span>
                             </div>
-                            <div class="form-group">
-                                <label for="assignee">Assignee</label>
-                                <input type="text" name="assignee">
-                            </div>
-                            <!-- <div class="form-group">
-                                <label for="duedate">Due Date</label>
-                                <input type="text" name="duedate">
-                            </div> -->
-                            <div class="form-group">
-                                <label for="priority">Priority</label>
-                                <input type="text" name="priority">
-                            </div>
-                            <div class="form-group">
-                                <label for="status">Status</label>
-                                <input type="text" name="status">
-                            </div>
-                            <button type="submit" name="submit" class="editprofile-submit-btn">Submit</button>
+                            <button type="submit" name="submit" class="btn-style">Submit</button>
+                            <!-- <button type="submit" name="submit" class="editprofile-submit-btn">Submit</button> -->
                         </form>
                     </div>
                 </div>
@@ -1073,5 +1058,40 @@
                 console.error('Error fetching task details:', error);
             }
         });
+    }
+</script>
+<script>
+    function task_validateForm() {
+        // Get form input values
+        var taskname = document.getElementById('taskname').value;
+
+        // Reset previous error messages
+        document.getElementById('taskname-error').textContent = '';
+
+        // Validate Task Name
+        if (taskname === '') {
+            $("#taskname-error").text("Task name is required.");
+            return false;
+        }
+
+        $ajax({
+            type: "POST",
+            url: "partial/addtask.php",
+            data: {
+                taskname:taskname
+            },
+            dataType: "json",
+            success: function(response) {
+                if (response.status === "error") {
+                    $("#taskname-error").text(response.message)
+                }
+            },
+            error: function(xhr, status, error) {
+                console.log(error);
+            }
+        });
+
+        // Prevent the default form submission
+        return false;
     }
 </script>

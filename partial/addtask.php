@@ -12,31 +12,40 @@ function sanitize_input($input)
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $response = array();
     $project_id = sanitize_input($_POST['project_id']);
     $taskname = sanitize_input($_POST['taskname']);
-    $assignee = sanitize_input($_POST['assignee']);
-    // $end_date = sanitize_input($_POST['duedate']);
-    $priority = sanitize_input($_POST['priority']);
-    $status = sanitize_input($_POST['status']);
+    $status = "New";
     $user_id = $_SESSION['user_id'];
     $section = "To Do";
 
-    echo $taskname, $assignee, $duedate, $priority, $status, $user_id;
-    echo $project_id;
-
-    $insert_project_query = "INSERT INTO Tasks (project_id, user_id, task_name, status, section, priority) VALUES ('$project_id', '$user_id', '$taskname', '$status', '$section', '$priority')";
-
-    echo $insert_project_query;
-
-    if ($connection->query($insert_project_query) === TRUE) {
-        echo "New task added successfully!";
-        $_SESSION['notification_message'] = "New task added successfully!";
+    // Check if the 'taskname' field is present and not empty
+    if (empty($_POST['taskname'])) {
+        $response['status'] = 'error';
+        $response['message'] = 'Task Name is required ';
     } else {
-        echo "Error adding new task: " . $connection->error;
-        $_SESSION['notification_message'] = "Error adding new task.";
-    }
+        $response['status'] = 'success';
+        $response['message'] = 'Task added successfully.';
+        $insert_project_query = "INSERT INTO Tasks (project_id, user_id, task_name, status, section) VALUES ('$project_id', '$user_id', '$taskname', '$status', '$section')";
 
-    header("Location: ../project.php?project_id=$project_id");
+        if ($connection->query($insert_project_query) === TRUE) {
+            echo "New task added successfully!";
+            $response['status'] = 'success';
+            $response['message'] = 'Task added successfully.';
+            $_SESSION['notification_message'] = "New task added successfully!";
+
+            // Send the response back to the client as JSON
+            header('Content-Type: application/json');
+            echo json_encode($response);
+        } else {
+            echo "Error adding new task: " . $connection->error;
+            $response['status'] = 'error';
+            $_SESSION['notification_message'] = "Error adding new task.";
+        }
+
+        header("Location: ../project.php?project_id=$project_id");
+
+    }
 
 }
 ?>
