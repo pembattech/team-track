@@ -35,6 +35,7 @@
         background-color: var(--sidebar-bgcolor);
         min-width: 120px;
         box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+        border: 1px solid var(--color-border);
         z-index: 9;
         top: 60px;
         border-radius: 5px;

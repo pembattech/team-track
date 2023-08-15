@@ -59,7 +59,7 @@ table {
     color: var(--color-text);
 }
 
-.indicate-danger p,
+.indicate-danger p, .indicate-danger li,
 button.indicate-danger {
     color: var(--danger-color);
 }

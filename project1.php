@@ -70,6 +70,11 @@ ini_set('display_errors', 1);
         font-size: 12px;
         color: var(--color-text-weak);
     }
+
+    .userrole-popup-container .error-message {
+        font-size: 13px;
+        font-family: inherit;
+    }
 </style>
 <title>Project - TeamTrack</title>
 <div class="container project-wrapper">
@@ -215,11 +220,11 @@ ini_set('display_errors', 1);
 
                         <div class="userrole-popup-container" id="userRolePopup">
                             <span class="userole-close-popup" id="closeUserRolePopup">&times;</span>
-
                             <div class="userrole-popup-content">
                                 <ul>
                                     <li>
                                         <form id="userRoleForm" method="post" class="update_userrole">
+                                            <div id="error-message" class="error-message"></div>
                                             <div class="input-container">
                                                 <input type="hidden" name="project_id"
                                                     value="<?php echo $project_id; ?>">
@@ -231,8 +236,7 @@ ini_set('display_errors', 1);
                                             </div>
                                         </form>
                                     <li>
-                                        <form method="post" action="partial/remove_user_from_project.php"
-                                            class="remove-user-from-proj">
+                                        <form id="removeUserForm" class="remove-user-from-proj">
                                             <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
                                             <input type="hidden" name="user_id" value="">
                                             <button type="submit" class="indicate-danger" name="remove_user">Remove
@@ -881,7 +885,7 @@ ini_set('display_errors', 1);
                 console.log(project_owner_value != userId);
 
                 // Make an AJAX request to check if the user is a project owner
-                fetch('check_project_owner.php', {
+                fetch('partial/project_partial/check_project_owner.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'
@@ -891,7 +895,7 @@ ini_set('display_errors', 1);
                     .then(data => {
                         if (data.is_owner) {
                             // Make an AJAX request to fetch user role
-                            fetch('get_user_role.php', {
+                            fetch('partial/project_partial/get_user_role.php', {
                                 method: 'POST',
                                 body: new URLSearchParams({ user_id: userId }),
                                 headers: {
@@ -964,16 +968,25 @@ ini_set('display_errors', 1);
 
         const userRoleInput = document.getElementById('userRoleInput');
         // alert(userRoleInput);
-        const newRole = userRoleInput.value;
-        // alert(newRole);
+        const newRole = userRoleInput.value.trim(); // Trim whitespace
 
+        const errorMessage = document.getElementById('error-message'); // Get the error message element
+
+        // Reset error message if there are no errors
+        errorMessage.textContent = '';
+
+
+        if (newRole === '') {
+            errorMessage.textContent = 'Please select a valid role.'; // Display error message
+            return;
+        }
 
         const userId = document.querySelector('.username.active').getAttribute('data-user-id'); // Assuming you have a class 'active' for the selected member
         const projectId = document.querySelector('.member').getAttribute('data-project-id'); // Get the project ID from the clicked member
 
-
+        errorMessage.textContent = '';
         // Make an AJAX request to update the user role
-        fetch('partial/update_userrole.php', {
+        fetch('partial/project_partial/update_userrole.php', {
             method: 'POST',
             body: new URLSearchParams({ project_id: projectId, user_id: userId, new_role: newRole }),
             headers: {
@@ -994,4 +1007,33 @@ ini_set('display_errors', 1);
         location.reload(); // Reload the page after successful update
     });
 
+</script>
+
+<script>
+    // Add an event listener to the form submission
+    document.getElementById('removeUserForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const userId = document.querySelector('.username.active').getAttribute('data-user-id'); // Assuming you have a class 'active' for the selected member
+        const projectId = document.querySelector('.member').getAttribute('data-project-id'); // Get the project ID from the clicked member
+
+        fetch('partial/project_partial/remove_user_from_project.php', {
+            method: 'POST',
+            body: new URLSearchParams({ project_id: projectId, user_id: userId }),
+
+        })
+            .then(response => response.text())
+            .then(result => {
+                if (result === 'Success') {
+                    console.log('User removed successfully!');
+                    // You can perform any additional actions here after successful removal
+                } else {
+                    console.log('Error removing user.');
+                }
+            })
+            .catch(error => {
+                console.log('An error occurred while removing user.');
+            });
+        location.reload(); // Reload the page after successful update
+    });
 </script>

@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Query to remove the user from the ProjectUsers table
     $sql_remove_user = "DELETE FROM ProjectUsers WHERE project_id = $projectId AND user_id = $userId";
-    
+
     // Execute the query
     if (mysqli_query($connection, $sql_remove_user)) {
         echo 'Success';
@@ -21,8 +21,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo "Error removing user from the project: " . mysqli_error($connection);
         $_SESSION['notification_message'] = "Error removing user from the project.";
     }
-
-    // header("Location: ../project.php?project_id=$project_id");
-
 }
 ?>

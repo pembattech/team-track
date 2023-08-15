@@ -21,6 +21,8 @@ VALUES
     (2, 1, 0, 'Developer'),
     (2, 3, 1, 'Project Owner');
 
+INSERT INTO ProjectUsers (project_id, user_id, is_projectowner) VALUES (7, 2, 0);
+
 -- Insert dummy data into Tasks table
 INSERT INTO Tasks (project_id, user_id, task_name, assignee, task_description, start_date, end_date, status, section, priority)
 VALUES
