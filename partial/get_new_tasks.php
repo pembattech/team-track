@@ -2,6 +2,10 @@
 // Start a session to access session variables (if needed)
 session_start();
 
+// Display all errors
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 // Check if the user ID is set in the session
 if (isset($_SESSION['user_id'])) {
     // Get the user ID of the logged-in user

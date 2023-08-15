@@ -14,19 +14,19 @@
         <form action="partial/create_project.php" method="POST">
 
             <div class="text-input">
-                <input type="text" name="project_name" id="projectname" placeholder="Name your Project">
+                <input type="text" class="input-style" name="project_name" id="projectname" placeholder="Name your Project">
                 <label for="projectname">Project Name</label>
             </div>
             <div class="text-input">
-                <input type="text" name="description" id="projectdesc" placeholder="Describe here">
+                <input type="text" class="input-style" name="description" id="projectdesc" placeholder="Describe here">
                 <label for="projectdesc">Description</label>
             </div>
             <div class="text-input">
-                <input type="text" name="start_date" id="datepicker" class="date" placeholder="Start Date">
+                <input type="text" class="input-style" name="start_date" id="datepicker" class="date" placeholder="Start Date">
                 <label for="datepicker">Start Date</label>
             </div>
             <div class="text-input">
-                <input type="text" name="end_date" id="datepickerEnd" class="date" placeholder="End Date">
+                <input type="text" class="input-style" name="end_date" id="datepickerEnd" class="date" placeholder="End Date">
                 <label for="datepickerEnd">End Date</label>
             </div>
             <!-- Add jQuery and jQuery UI script links -->
@@ -54,7 +54,7 @@
             </script>
 
             <div class="text-input">
-                <input type="submit" value="Create">
+                <input type="submit" class="button-style" value="Submit">
             </div>
         </form>
     </div>

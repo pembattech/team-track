@@ -3,6 +3,10 @@ session_start();
 
 require_once '../config/connect.php';
 
+// Display all errors
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 // Function to sanitize user inputs
 function sanitize_input($input)
 {

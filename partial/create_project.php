@@ -1,4 +1,10 @@
 <?php
+
+// Display all errors
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+
 session_start();
 
 require_once '../config/connect.php';
@@ -40,7 +46,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $project_id = $connection->insert_id;
         echo $project_id;
         // Assign the project to the logged-in user in the ProjectUsers table
-        $assign_project_query = "INSERT INTO ProjectUsers (project_id, user_id, project_owner) VALUES ('$project_id', '$user_id', 1)";
+        $assign_project_query = "INSERT INTO ProjectUsers (project_id, user_id, is_projectowner) VALUES ('$project_id', '$user_id', 1)";
         if ($connection->query($assign_project_query)) {
             // Set a session variable to indicate successful project creation
             // Set a session variable to store the dynamic message

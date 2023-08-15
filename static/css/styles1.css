@@ -64,61 +64,6 @@ button.indicate-danger {
     color: var(--danger-color);
 }
 
-.input-style {
-    outline: none;
-    border: 0;
-    resize: none;
-    background-color: inherit;
-    padding-left: 5px;
-    color: var(--color-text);
-    font-family: inherit;
-}
-
-.input-style:hover {
-    border: 1px solid var(--color-border);
-    border-radius: 5px;
-}
-
-.input-style:focus {
-    border: 1px solid var(--color-text);
-    border-radius: 5px;
-}
-
-.textarea-style textarea {
-    outline: none;
-    border: 0;
-    resize: none;
-    background-color: inherit;
-    padding-left: 5px;
-    color: var(--color-text);
-    font-family: inherit;
-}
-
-.textarea-style textarea:hover {
-    border: 1px solid var(--color-border);
-    border-radius: 5px;
-}
-
-.textarea-style textarea:focus {
-    border: 1px solid var(--color-text);
-    border-radius: 5px;
-}
-
-.button-style {
-    outline: 0;
-    padding: 3px;
-    border: 1px solid var(--color-border);
-    border-radius: 5px;
-    color: var(--color-text-weak);
-    background-color: var(--color-background-weak);
-}
-
-.button-style:hover {
-    background-color: var(--color-background-hover);
-    color: var(--color-text);
-}
-
-
 .related-btn-img {
     display: flex;
     align-items: center;
@@ -496,6 +441,26 @@ th.subhead-task {
     height: 30px;
 }
 
+.project-desc-textarea textarea {
+    outline: none;
+    border: 0;
+    resize: none;
+    background-color: inherit;
+    padding-left: 5px;
+    color: var(--color-text);
+    font-family: inherit;
+}
+
+.project-desc-textarea textarea:hover {
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+}
+
+.project-desc-textarea textarea:focus {
+    border: 1px solid var(--color-text);
+    border-radius: 5px;
+}
+
 .error-message {
     color: red;
 }
@@ -584,18 +549,19 @@ button#closeButton:hover {
     right: 0;
 }
 
-.userrole-popup-content {
-    position: relative;
+.role_popup-menu {
+    display: none;
+    position: absolute;
     background-color: var(--sidebar-bgcolor);
-    width: 200px;
+    width: 250px;
     box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 9;
     border: 1px solid var(--color-border);
     border-radius: 5px;
-    padding-top: 20px;
 }
 
-/* .userrole-popup-content a { */
-.userrole-popup-content li {
+/* .role_popup-menu a { */
+.role_popup-menu li {
     display: block;
     padding: 5px;
     font-size: 14px;
@@ -604,11 +570,11 @@ button#closeButton:hover {
     color: var(--color-text);
 }
 
-.userrole-popup-content .heading-style {
+.role_popup-menu .heading-style {
     font-size: 14px;
 }
 
-.userrole-popup-content li:hover {
+.role_popup-menu li:hover {
     border-radius: 5px;
     background-color: var(--color-background-weak);
 }
@@ -629,6 +595,15 @@ button#closeButton:hover {
 .input-container input[type="text"] {
     flex: 1;
     width: 100px;
+}
+
+.relative-button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 2px 4px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
 }
 
 .sortable {
@@ -796,7 +771,6 @@ button#closeButton:hover {
     gap: 10px;
     padding: 5px 15px 0;
     width: 170px;
-    color: var(--color-text);
 }
 
 .user-role-container .user-content:hover {
@@ -1012,7 +986,19 @@ button#closeButton:hover {
 }
 
 .text-input input[type=submit] {
+    outline: none;
+    appearance: none;
+    border: 0;
+    padding: 5px;
+    border-radius: 3px;
     width: 200px;
+    color: var(--color-text);
+    font-size: 18px;
+    background-color: #4b8ad6;
+}
+
+.text-input input[type=submit]:hover {
+    background-color: #5e9de6;
 }
 
 .text-input input[type=text],
@@ -1022,7 +1008,11 @@ button#closeButton:hover {
     width: 500px;
     height: 40px;
     box-sizing: border-box;
+    outline: none;
+    border: 1px solid lightgray;
+    border-radius: 3px;
     padding: 10px 10px 10px 125px;
+    transition: all 0.1s ease-out;
 }
 
 .text-input input[type=text]+label,
@@ -1035,8 +1025,9 @@ button#closeButton:hover {
     height: 40px;
     line-height: 40px;
     color: var(--color-text);
+    border-radius: 3px 0 0 3px;
     padding: 0 7px;
-    background: var(--sidebar-bgcolor);
+    background: #3499bb;
     transform: translateZ(0) translateX(0);
     transition: all 0.3s ease-in;
     transition-delay: 0.2s;
@@ -1046,6 +1037,7 @@ button#closeButton:hover {
 .text-input input[type=email]:focus+label,
 .text-input input[type=password]:focus+label {
     transform: translateY(-80%) translateX(0%);
+    border-radius: 3px;
     transition: all 0.1s ease-out;
     font-size: 14px;
     background: inherit;
@@ -1221,6 +1213,160 @@ button#closeButton:hover {
 .ui-datepicker-unselectable .ui-state-default {
     color: rgba(255, 255, 255, 0.2);
     pointer-events: none;
+}
+
+.role_popup-menu {
+    display: none;
+    position: absolute;
+    background-color: var(--sidebar-bgcolor);
+    width: 250px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 9;
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+}
+
+/* .role_popup-menu a { */
+.role_popup-menu li {
+    display: block;
+    padding: 5px;
+    font-size: 14px;
+    font-family: inherit;
+    text-decoration: none;
+    color: var(--color-text);
+}
+
+.role_popup-menu .heading-style {
+    font-size: 14px;
+}
+
+.role_popup-menu li:hover {
+    border-radius: 5px;
+    background-color: var(--color-background-weak);
+}
+
+.remove-user-from-proj button {
+    appearance: none;
+    outline: none;
+    border: none;
+    background-color: inherit;
+    font-size: 14px;
+}
+
+.input-container {
+    display: flex;
+    align-items: center;
+}
+
+.input-container input[type="text"] {
+    flex: 1;
+    width: 100px;
+
+}
+
+.relative-button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 2px 4px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* Styling for completed tasks */
+.task.complete {
+    text-decoration: line-through;
+    color: #999;
+}
+
+/* Styling for sortable tasks */
+.sortable {
+    border: 1px solid #ccc;
+    padding: 10px;
+}
+
+/* table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th,
+    td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+
+    th {
+        cursor: pointer;
+    } */
+
+.collapsible {
+    border: 1px solid #ddd;
+    margin-bottom: 10px;
+}
+
+.collapsible h2 {
+    margin: 0;
+    padding: 10px;
+    cursor: pointer;
+}
+
+/* .collapsible h2.active {
+        background-color: #ddd;
+    } */
+
+.collapsible table {
+    display: none;
+}
+
+.collapsible table.show {
+    display: table;
+}
+
+/* Styles for the slide-in popup */
+.task-popup {
+    position: fixed;
+    top: 139;
+    right: -440px;
+    width: 400px;
+    height: 100%;
+    background-color: var(--sidebar-bgcolor);
+    color: var(--color-text);
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    transition: right 0.3s ease-in-out;
+}
+
+#editTaskForm input[type="text"],
+#editTaskForm textarea,
+#editTaskForm input[type="date"],
+#editTaskForm select {
+    border: 0;
+    background-color: var(--color-background-weak);
+}
+
+button#submitButton,
+button#deleteButton,
+button#closeButton {
+    outline: 0;
+    padding: 3px;
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+    color: var(--color-text-weak);
+    background-color: var(--color-background-weak);
+}
+
+button#submitButton:hover,
+button#deleteButton:hover,
+button#closeButton:hover {
+    background-color: var(--color-background-hover);
+    color: var(--color-text);
+}
+
+/* Show the slide-in popup */
+.task-popup.active {
+    right: 0;
 }
 
 

@@ -2,6 +2,10 @@
 
 require_once '../config/connect.php';
 
+// Display all errors
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 // Get the task_id from the AJAX request
 if (isset($_POST['task_id'])) {
     $task_id = $_POST['task_id'];

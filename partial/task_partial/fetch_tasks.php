@@ -12,9 +12,7 @@ if (isset($_GET['project_id']) && is_numeric($_GET['project_id'])) {
     $project_id = $_GET['project_id'];
 
     // Prepare and execute the SQL query using a prepared statement
-    $stmt = $connection->prepare("SELECT t.*, u.username AS assignee_name FROM Tasks t
-                           LEFT JOIN Users u ON t.assignee = u.user_id
-                           WHERE t.project_id = ?");
+    $stmt = $connection->prepare("SELECT t.*, u.username AS assignee_name FROM Tasks t LEFT JOIN Users u ON t.assignee = u.user_id LEFT JOIN ProjectUsers pu ON t.projectuser_id = pu.projectuser_id WHERE pu.project_id = ?");
     $stmt->bind_param("i", $project_id);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -44,4 +42,3 @@ $connection->close();
 // Return the tasks data as JSON
 header('Content-Type: application/json');
 echo json_encode($tasksBySection);
-

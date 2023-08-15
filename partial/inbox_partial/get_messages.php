@@ -26,12 +26,13 @@ $user_id = $_SESSION['user_id'];
 // Retrieve all messages from the messages table
 // SQL query to fetch messages along with the project name for the logged-in recipient_id
 $sql = "SELECT Messages.*, Projects.project_name
-        FROM Messages
-        INNER JOIN Tasks ON Messages.task_id = Tasks.task_id
-        INNER JOIN Projects ON Tasks.project_id = Projects.project_id
-        WHERE Messages.recipient_id = $user_id
-        ORDER BY Messages.timestamp DESC";
-
+FROM Messages
+LEFT JOIN Tasks ON Messages.task_id = Tasks.task_id
+LEFT JOIN ProjectUsers ON Tasks.projectuser_id = ProjectUsers.projectuser_id
+LEFT JOIN Projects ON ProjectUsers.project_id = Projects.project_id
+WHERE Messages.recipient_id = $user_id
+ORDER BY Messages.timestamp DESC;
+";
 
 $result = $conn->query($sql);
 

@@ -3,6 +3,10 @@ session_start();
 
 require_once '../config/connect.php';
 
+// Display all errors
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 // Function to fetch project data based on the project ID
 function get_project_data($project_id)
 {

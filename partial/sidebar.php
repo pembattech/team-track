@@ -23,8 +23,6 @@
         <div class="project-scroll-container">
             <div class="project-item sidebar-project">
                 <?php
-                // Start a session to access session variables (if needed)
-                session_start();
 
                 // Check if the user ID is set in the session
                 if (isset($_SESSION['user_id'])) {

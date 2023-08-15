@@ -1,176 +1,85 @@
-<!-- <?php include 'access_denied.php'; ?> -->
+<?php
+session_start();
+?>
 
-<title>Project - TeamTrack</title>
-<style>
-    .error-message {
-        color: red;
-    }
-
-    table {
-        border-collapse: collapse;
-        width: 100%;
-    }
-
-    th,
-    td {
-        border: 1px solid #ddd;
-        padding: 8px;
-        text-align: left;
-    }
-
-    th {
-        cursor: pointer;
-    }
-
-    .collapsible {
-        border: 1px solid #ddd;
-        margin-bottom: 10px;
-    }
-
-    .collapsible h2 {
-        margin: 0;
-        padding: 10px;
-        cursor: pointer;
-    }
-
-    /* .collapsible h2.active {
-        background-color: #ddd;
-    } */
-
-    .collapsible table {
-        display: none;
-    }
-
-    .collapsible table.show {
-        display: table;
-    }
-
-    /* Styles for the slide-in popup */
-    .task-popup {
-        position: fixed;
-        top: 139;
-        right: -440px;
-        width: 400px;
-        height: 100%;
-        background-color: var(--sidebar-bgcolor);
-        color: var(--color-text);
-        padding: 20px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-        transition: right 0.3s ease-in-out;
-    }
-
-    #editTaskForm input[type="text"],
-    #editTaskForm textarea,
-    #editTaskForm input[type="date"],
-    #editTaskForm select {
-        border: 0;
-        background-color: var(--color-background-weak);
-    }
-
-    button#submitButton,
-    button#deleteButton,
-    button#closeButton {
-        outline: 0;
-        padding: 3px;
-        border: 1px solid var(--color-border);
-        border-radius: 5px;
-        color: var(--color-text-weak);
-        background-color: var(--color-background-weak);
-    }
-
-    button#submitButton:hover,
-    button#deleteButton:hover,
-    button#closeButton:hover {
-        background-color: var(--color-background-hover);
-        color: var(--color-text);
-    }
-
-    /* Show the slide-in popup */
-    .task-popup.active {
-        right: 0;
-    }
-</style>
 <?php include 'partial/navbar.php'; ?>
 
+<?php
+// Display all errors
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+?>
+
 <style>
-    .role_popup-menu {
-        display: none;
-        position: absolute;
-        background-color: var(--sidebar-bgcolor);
-        width: 250px;
-        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-        z-index: 9;
-        border: 1px solid var(--color-border);
-        border-radius: 5px;
+    .members-list {
+        display: flex;
+        flex-wrap: wrap;
     }
 
-    /* .role_popup-menu a { */
-    .role_popup-menu li {
-        display: block;
-        padding: 5px;
-        font-size: 14px;
-        font-family: inherit;
-        text-decoration: none;
-        color: var(--color-text);
-    }
-
-    .role_popup-menu .heading-style {
-        font-size: 14px;
-    }
-
-    .role_popup-menu li:hover {
-        border-radius: 5px;
-        background-color: var(--color-background-weak);
-    }
-
-    .remove-user-from-proj button {
-        appearance: none;
-        outline: none;
-        border: none;
-        background-color: inherit;
-        font-size: 14px;
-    }
-
-    .input-container {
+    .member {
+        cursor: pointer;
         display: flex;
         align-items: center;
     }
 
-    .input-container input[type="text"] {
-        flex: 1;
-        width: 100px;
+    .member span {
+        color: var(--color-text);
     }
 
-    .relative-button {
-        background-color: #4CAF50;
-        color: white;
-        padding: 2px 4px;
-        border: none;
-        border-radius: 4px;
+    .userrole-popup-container {
+        color: var(--color-text);
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 300px;
+        z-index: 1000;
+    }
+
+    .userole-close-popup {
+        position: absolute;
+        top: -5;
+        right: 110;
+        font-size: 20px;
+        color: var(--color-text);
         cursor: pointer;
+        z-index: 999;
     }
 
-    .sortable {
-        border: 1px solid #ccc;
-        padding: 10px;
+    .userole-close-popup:hover {
+        color: var(--color-text-weak);
+    }
+
+    .member #popup-btn {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    #updateRoleButton {
+        display: none;
+    }
+
+    .update_userrole .button-style {
+        margin-left: 5px;
+        padding: 0 1px;
+    }
+
+    .member .user-role {
+        margin-top: -10px;
+        padding: 0;
+        font-size: 12px;
+        color: var(--color-text-weak);
+    }
+
+    .userrole-popup-container .error-message {
+        font-size: 13px;
+        font-family: inherit;
     }
 </style>
+<title>Project - TeamTrack</title>
 <div class="container project-wrapper">
     <?php include 'partial/sidebar.php'; ?>
     <?php
-
-    session_start();
-
-    function get_tasks_by_section($project_id, $section)
-    {
-        global $connection;
-        $project_id = sanitize_input($project_id);
-        $section = sanitize_input($section);
-
-        $sql = "SELECT * FROM Tasks WHERE project_id = $project_id AND section = '$section'";
-        $result = mysqli_query($connection, $sql);
-        return $result;
-    }
 
     // Check if the 'project_id' parameter is present in the URL
     if (isset($_GET['project_id'])) {
@@ -187,202 +96,48 @@
         $project_owner = mysqli_fetch_assoc($result_owner);
 
         // Query to fetch other users associated with the project from the 'ProjectUsers' table (excluding the owner)
-        $sql_users = "SELECT Users.*, ProjectUsers.is_projectowner, ProjectUsers.user_role FROM Users INNER JOIN ProjectUsers ON Users.user_id = ProjectUsers.user_id WHERE ProjectUsers.project_id = $project_id AND ProjectUsers.is_projectowner = 0";
+        $sql_users = "SELECT Users.user_id, Users.username, ProjectUsers.is_projectowner, ProjectUsers.user_role
+        FROM Users
+        JOIN ProjectUsers ON Users.user_id = ProjectUsers.user_id
+        WHERE ProjectUsers.project_id = $project_id
+        ORDER BY ProjectUsers.is_projectowner DESC, Users.username";
         $result_users = mysqli_query($connection, $sql_users);
 
-        // Get tasks for different sections
-        $todo_tasks = get_tasks_by_section($project_id, 'To Do');
-        $doing_tasks = get_tasks_by_section($project_id, 'Doing');
-        $done_tasks = get_tasks_by_section($project_id, 'Done');
-
+        // // Get tasks for different sections
+        // $todo_tasks = get_tasks_by_section($project_id, 'To Do');
+        // $doing_tasks = get_tasks_by_section($project_id, 'Doing');
+        // $done_tasks = get_tasks_by_section($project_id, 'Done');
+    
         // Query to get the total number of tasks for the project
-        $sql_total_tasks = "SELECT COUNT(*) AS total_tasks FROM Tasks WHERE project_id = $project_id";
+        $sql_total_tasks = "SELECT COUNT(*) AS total_tasks FROM Tasks WHERE projectuser_id IN (SELECT projectuser_id FROM ProjectUsers WHERE project_id = $project_id)";
         $result_total_tasks = mysqli_query($connection, $sql_total_tasks);
         $row_total_tasks = mysqli_fetch_assoc($result_total_tasks);
         $total_tasks = $row_total_tasks['total_tasks'];
 
         // Query to get the number of completed tasks for the project
-        $sql_completed_tasks = "SELECT COUNT(*) AS completed_tasks FROM Tasks WHERE project_id = $project_id AND status = 'Completed'";
+        $sql_completed_tasks = "SELECT COUNT(*) AS completed_tasks FROM Tasks WHERE projectuser_id IN (SELECT projectuser_id FROM ProjectUsers WHERE project_id = $project_id) AND status = 'completed'";
         $result_completed_tasks = mysqli_query($connection, $sql_completed_tasks);
         $row_completed_tasks = mysqli_fetch_assoc($result_completed_tasks);
         $completed_tasks = $row_completed_tasks['completed_tasks'];
 
         // Query to get the number of incomplete tasks for the project
-        $sql_incomplete_tasks = "SELECT COUNT(*) AS incomplete_tasks FROM Tasks WHERE project_id = $project_id AND status != 'Completed'";
+        $sql_incomplete_tasks = "SELECT COUNT(*) AS incomplete_tasks FROM Tasks WHERE projectuser_id IN (SELECT projectuser_id FROM ProjectUsers WHERE project_id = $project_id) AND status != 'completed'";
         $result_incomplete_tasks = mysqli_query($connection, $sql_incomplete_tasks);
         $row_incomplete_tasks = mysqli_fetch_assoc($result_incomplete_tasks);
         $incomplete_tasks = $row_incomplete_tasks['incomplete_tasks'];
 
         // Query to get the number of overdue tasks for the project
         $current_date = date('Y-m-d');
-        $sql_overdue_tasks = "SELECT COUNT(*) AS overdue_tasks FROM Tasks WHERE project_id = $project_id AND status != 'Completed' AND end_date < '$current_date'";
+        $sql_overdue_tasks = "SELECT COUNT(*) AS overdue_tasks FROM Tasks WHERE projectuser_id IN (SELECT projectuser_id FROM ProjectUsers WHERE project_id = $project_id) AND status != 'completed' AND end_date < '$current_date'";
         $result_overdue_tasks = mysqli_query($connection, $sql_overdue_tasks);
         $row_overdue_tasks = mysqli_fetch_assoc($result_overdue_tasks);
         $overdue_tasks = $row_overdue_tasks['overdue_tasks'];
-
-        echo $user['project_owner'];
 
 
     } else {
         echo "Project not found.";
     }
     ?>
-
-    <style>
-        .invite-btn {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .invite-popup {
-            display: none;
-            background-color: var(--overlay-bgcolor);
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        .invite-popup-content {
-            background-color: var(--color-background-weak);
-            color: var(--color-text);
-            max-width: 400px;
-            margin: 100px auto;
-            padding: 10px 20px;
-            border-radius: 4px;
-        }
-
-        .invite-popup-close {
-            font-size: 30px;
-            float: right;
-            cursor: pointer;
-        }
-
-        .invite-popup .form-group {
-            margin-bottom: 15px;
-            font-size: 14px;
-        }
-
-        .invite-popup label {
-            font-size: 14px;
-            margin-bottom: 5px;
-        }
-
-        .invite-popup input[type="email"],
-        .invite-popup textarea {
-            width: 100%;
-            border: 1px solid #ccc;
-            padding: 8px 5px;
-            border-radius: 4px;
-            background-color: var(--color-background-weak);
-            color: var(--color-text);
-        }
-
-        .invite-popup .invite-submit-btn {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        /* Styling for the user-role-container */
-        .user-role-container {
-            display: flex;
-            flex-direction: row;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .profile-picture {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-
-        /* Styling for the "+" sign */
-        .border-around-plus {
-            border: 1px solid #ccc;
-            padding: 2px 6px;
-            margin-right: 5px;
-        }
-
-        .addtask-btn {
-            outline: 0;
-            padding: 3px;
-            border: 1px solid var(--color-border);
-            border-radius: 5px;
-            color: var(--color-text-weak);
-            background-color: var(--color-background-weak);
-        }
-
-        .addtask-btn:hover {
-            background-color: var(--color-background-hover);
-            color: var(--color-text);
-        }
-
-        .addtask-popup {
-            display: none;
-            background-color: var(--overlay-bgcolor);
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        .addtask-popup-content {
-            background-color: var(--color-background-weak);
-            color: var(--color-text);
-            max-width: 400px;
-            margin: 100px auto;
-            padding: 10px 20px;
-            border-radius: 4px;
-        }
-
-        .addtask-popup-close {
-            font-size: 30px;
-            float: right;
-            cursor: pointer;
-        }
-
-        .addtask-popup .form-group {
-            margin-bottom: 15px;
-            font-size: 14px;
-        }
-
-        .addtask-popup label {
-            font-size: 14px;
-            margin-bottom: 5px;
-        }
-
-        .addtask-popup textarea {
-            width: 100%;
-            border: 1px solid #ccc;
-            padding: 8px 5px;
-            border-radius: 4px;
-            background-color: var(--color-background-weak);
-            color: var(--color-text);
-        }
-
-        .addtask-popup .editprofile-submit-btn {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-    </style>
 
     <div class='main-content'>
         <div class='heading-content'>
@@ -415,7 +170,7 @@
                     <p>Project description</p>
                 </div>
 
-                <div class="project-desc-textarea">
+                <div class="project-desc-textarea textarea-style">
                     <textarea name="" id="" cols="50" rows="6" placeholder="What's this project about?"><?php
                     // Check if the description is not null and not an empty string before echoing
                     if ($project['description'] !== null && $project['description'] !== "") {
@@ -433,61 +188,66 @@
                             <p><span class='border-around-plus'>+</span> Add member</p>
                         </div>
                         <?php
-                        // Display project owner's details first
-                        if ($project_owner) {
-                            echo "<div class='user-content' data-user-id='" . $user['user_id'] . "' id='role_popup-btn'>";
-                            echo "<img class='profile-picture' src='./static/image/test.JPG' alt='Profile Picture'>";
-                            echo "<div class='profile-info'>";
-                            echo "<p class='user-name'>" . $project_owner['username'] . "</p>";
-                            echo "<p class='user-role'>Project owner</p>";
-                            echo "</div>";
-                            echo "</div>";
-                        }
+                        echo '<div class="members-list">';
+                        while ($row = mysqli_fetch_assoc($result_users)) {
+                            $userId = $row['user_id'];
+                            $username = $row['username'];
+                            $isProjectOwner = $row['is_projectowner'];
+                            $userRole = $row['user_role'];
 
-                        // Display other users associated with the project
-                        if (mysqli_num_rows($result_users) > 0) {
-                            echo "<div class='user-role-container'>";
-                            // Loop through the remaining users associated with the project
-                            while ($user = mysqli_fetch_assoc($result_users)) {
-                                echo "<div class='user-content' data-user-id='" . $user['user_id'] . "' data-user-role='" . $user['user_role'] . "' id='role_popup-btn'>";
-                                echo "<img class='profile-picture' src='./static/image/test.JPG' alt='Profile Picture'>";
-                                echo "<div class='profile-info'>";
-                                echo "<p class='user-name'>" . $user['username'] . "</p>";
-                                if ($user['user_role']) {
-                                    $user_role = $user['user_role'];
-                                    echo "<p class='user-role'>$user_role</p>";
-                                } else {
-                                    echo "<p class='user-role'>+ Add role</p>";
-                                }
-                                echo "</div>";
-                                echo "</div>";
+                            echo $project_id;
+                            echo '<div class="member user-content" data-project-id="' . $project_id . '">';
+                            display_profile_picture($userId);
+                            echo '<div class="user-role-flex">';
+                            echo '<span class="username" data-user-id="' . $userId . '">' . $username . '</span>';
+                            if ($isProjectOwner) {
+                                echo '';
                             }
-                            echo "</div>";
+                            if ($userRole) {
+                                $user_role = $userRole;
+                                echo "<p class='user-role'>$user_role</p>";
+                            } elseif ($isProjectOwner) {
+                                echo "<p class='user-role'>Project Owner</p>";
+                            } else {
+                                echo "<p class='user-role'>+ Add role</p>";
+                            }
+
+                            echo '</div>';
+                            echo '</div>';
                         }
+                        echo '</div>';
                         ?>
-                        <div class="role_popup-menu" id="userrole_popup">
-                            <ul>
-                                <li>
-                                    <form method="post" action="partial/update_userrole.php" class="update_userrole">
-                                        <div class="input-container">
+
+                        <div class="userrole-popup-container" id="userRolePopup">
+                            <span class="userole-close-popup" id="closeUserRolePopup">&times;</span>
+                            <div class="userrole-popup-content">
+                                <ul>
+                                    <li>
+                                        <form id="userRoleForm" method="post" class="update_userrole">
+                                            <div id="error-message" class="error-message"></div>
+                                            <div class="input-container">
+                                                <input type="hidden" name="project_id"
+                                                    value="<?php echo $project_id; ?>">
+                                                <input type="hidden" name="user_id" value="">
+                                                <input type="text" name="user-role" class="input-style"
+                                                    id="userRoleInput">
+                                                <!-- <button type="submit" name="update_userrole" class="button-style"
+                                                    id="updateRoleButton">Update</button> -->
+                                            </div>
+                                        </form>
+                                    <li>
+                                        <form id="removeUserForm" class="remove-user-from-proj">
                                             <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
                                             <input type="hidden" name="user_id" value="">
-                                            <input type="text" name="user-role">
-                                            <button type="submit" name="update_userrole"
-                                                class="relative-button">Done</button>
-                                        </div>
-                                    </form>
-                                <li>
-                                    <form method="post" action="partial/remove_user_from_project.php"
-                                        class="remove-user-from-proj">
-                                        <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
-                                        <input type="hidden" name="user_id" value="">
-                                        <button type="submit" class="indicate-danger" name="remove_user">Remove
-                                            User</button>
-                                    </form>
-                                </li>
-                            </ul>
+                                            <button type="submit" class="indicate-danger" name="remove_user">Remove
+                                                User</button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
+
+
 
                         <div class="invite-popup" id="invite-popup">
                             <div class="invite-popup-content">
@@ -533,8 +293,12 @@
                                 <input type="text" name="taskname" id="taskname">
                                 <span id="taskname-error" class="error-message"></span>
                             </div>
+                            <div class="form-group">
+                                <label for="task_description">Description</label>
+                                <textarea type="text" name="task_description" id="task_description"></textarea>
+                                <span id="task_description-error" class="error-message"></span>
+                            </div>
                             <button type="submit" name="submit" class="btn-style">Submit</button>
-                            <!-- <button type="submit" name="submit" class="editprofile-submit-btn">Submit</button> -->
                         </form>
                     </div>
                 </div>
@@ -545,7 +309,7 @@
                         $project_id = $_GET['project_id'];
 
                         // Prepare and execute the SQL query using a prepared statement
-                        $stmt = $connection->prepare("SELECT * FROM Tasks WHERE project_id = ?");
+                        $stmt = $connection->prepare("SELECT * FROM Tasks WHERE projectuser_id IN (SELECT projectuser_id FROM ProjectUsers WHERE project_id = ?)");
                         $stmt->bind_param("i", $project_id);
                         $stmt->execute();
                         $result = $stmt->get_result();
@@ -655,27 +419,27 @@
                             <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
                             <input type="hidden" id="editTaskId" name="task_id">
                             <label for="editTaskName">Task Name:</label>
-                            <input type="text" id="editTaskName" name="task_name" required>
+                            <input type="text" id="editTaskName" name="task_name">
                             <br>
 
                             <label for="editAssignee">Assignee:</label>
-                            <textarea id="editAssignee" name="assignee" required></textarea>
+                            <textarea id="editAssignee" name="assignee"></textarea>
                             <br>
 
                             <label for="editTaskDescription">Task Description:</label>
-                            <textarea id="editTaskDescription" name="task_description" required></textarea>
+                            <textarea id="editTaskDescription" name="task_description"></textarea>
                             <br>
 
                             <label for="editStartDate">Start Date:</label>
-                            <input type="date" id="editStartDate" name="start_date" required>
+                            <input type="date" id="editStartDate" name="start_date">
                             <br>
 
                             <label for="editEndDate">End Date:</label>
-                            <input type="date" id="editEndDate" name="end_date" required>
+                            <input type="date" id="editEndDate" name="end_date">
                             <br>
 
                             <label for="editStatus">Status:</label>
-                            <select id="editStatus" name="status" required>
+                            <select id="editStatus" name="status">
                                 <option value="At risk">At risk</option>
                                 <option value="Off Track">Off track</option>
                                 <option value="On Track">On track</option>
@@ -688,7 +452,7 @@
                             <br>
 
                             <label for="editPriority">Priority:</label>
-                            <select id="editPriority" name="priority" required>
+                            <select id="editPriority" name="priority">
                                 <option value="Low">Low</option>
                                 <option value="Medium">Medium</option>
                                 <option value="High">High</option>
@@ -771,7 +535,7 @@
         popup.style.display = (popup.style.display === 'block') ? 'none' : 'block';
     }
 </script>
-<script>
+<!-- <script>
     // Add a single event listener to the parent element (.user-role-container)
     document.querySelector(".user-role-container").addEventListener("click", function (event) {
         var clickedElement = event.target.closest(".user-content");
@@ -830,7 +594,7 @@
         var popup = document.getElementById("userrole_popup");
         popup.style.display = "none";
     }
-</script>
+</script> -->
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
@@ -1078,15 +842,16 @@
             type: "POST",
             url: "partial/addtask.php",
             data: {
-                taskname:taskname
+                taskname: taskname,
+                task_description: task_description
             },
             dataType: "json",
-            success: function(response) {
+            success: function (response) {
                 if (response.status === "error") {
                     $("#taskname-error").text(response.message)
                 }
             },
-            error: function(xhr, status, error) {
+            error: function (xhr, status, error) {
                 console.log(error);
             }
         });
@@ -1094,4 +859,181 @@
         // Prevent the default form submission
         return false;
     }
+</script>
+
+<script>
+    const members = document.querySelectorAll('.member');
+    const userRoleForm = document.getElementById('userRoleForm');
+    const userRoleInput = document.getElementById('userRoleInput');
+    const updateRoleButton = document.getElementById('updateRoleButton');
+
+    members.forEach(member => {
+        member.addEventListener('click', function () {
+
+            // Remove 'active' class from all usernames
+            const usernames = document.querySelectorAll('.username');
+            usernames.forEach(username => {
+                username.classList.remove('active');
+            });
+
+            const username = this.querySelector('.username');
+            username.classList.add('active');
+
+            const userId = username.getAttribute('data-user-id');
+            const project_owner_value = <?php echo $project_owner['user_id']; ?>;
+            if (project_owner_value != userId) {
+                console.log(project_owner_value != userId);
+
+                // Make an AJAX request to check if the user is a project owner
+                fetch('check_project_owner.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.is_owner) {
+                            // Make an AJAX request to fetch user role
+                            fetch('get_user_role.php', {
+                                method: 'POST',
+                                body: new URLSearchParams({ user_id: userId }),
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded'
+                                }
+                            })
+                                .then(response => response.text())
+                                .then(userRole => {
+                                    if (userRole !== 'Error') {
+                                        const userRoleInput = document.getElementById('userRoleInput');
+                                        userRoleInput.value = `${userRole}`;
+
+                                        const userRolePopup = document.getElementById('userRolePopup');
+
+                                        // Position the popup below the clicked member
+                                        const rect = member.getBoundingClientRect();
+                                        userRolePopup.style.left = rect.left + 'px';
+                                        userRolePopup.style.top = rect.bottom + 10 + 'px';
+
+                                        userRolePopup.style.display = 'block';
+
+                                        // userRoleInput.addEventListener('focus', function () {
+                                        //     updateRoleButton.style.display = 'block';
+                                        // });
+
+                                        // userRoleInput.addEventListener('blur', function () {
+                                        //     updateRoleButton.style.display = 'none';
+                                        // });
+                                    } else {
+                                        alert('Error fetching user role.');
+                                    }
+                                })
+                                .catch(error => {
+                                    alert('An error occurred while fetching user role.');
+                                });
+                        } else {
+                            console.log('You are not a project owner.');
+                        }
+                    })
+                    .catch(error => {
+                        alert('An error occurred while checking project ownership.');
+                    });
+            } else {
+                console.log("bye");
+            }
+        });
+    });
+
+    document.getElementById('closeUserRolePopup').addEventListener('click', function () {
+        closePopup();
+    });
+
+    document.addEventListener('click', function (event) {
+        const popupContainer = document.getElementById('userRolePopup');
+        if (!popupContainer.contains(event.target)) {
+            closePopup();
+        }
+    });
+
+    function closePopup() {
+        const userRolePopup = document.getElementById('userRolePopup');
+        userRolePopup.style.display = 'none';
+    }
+
+    // Add an event listener to the form submission
+    document.getElementById('userRoleForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        // alert("test1");
+
+        const userRoleInput = document.getElementById('userRoleInput');
+        // alert(userRoleInput);
+        const newRole = userRoleInput.value.trim(); // Trim whitespace
+
+        const errorMessage = document.getElementById('error-message'); // Get the error message element
+
+        // Reset error message if there are no errors
+        errorMessage.textContent = '';
+
+
+        if (newRole === '') {
+            errorMessage.textContent = 'Please select a valid role.'; // Display error message
+            return;
+        }
+
+        const userId = document.querySelector('.username.active').getAttribute('data-user-id'); // Assuming you have a class 'active' for the selected member
+        const projectId = document.querySelector('.member').getAttribute('data-project-id'); // Get the project ID from the clicked member
+
+        errorMessage.textContent = '';
+        // Make an AJAX request to update the user role
+        fetch('partial/update_userrole.php', {
+            method: 'POST',
+            body: new URLSearchParams({ project_id: projectId, user_id: userId, new_role: newRole }),
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        })
+            .then(response => response.text())
+            .then(result => {
+                if (result === 'Success') {
+                    console.log('User role updated successfully!');
+                } else {
+                    console.log('Error updating user role.');
+                }
+            })
+            .catch(error => {
+                console.log('An error occurred while updating user role.');
+            });
+        location.reload(); // Reload the page after successful update
+    });
+
+</script>
+
+<script>
+    // Add an event listener to the form submission
+    document.getElementById('removeUserForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const userId = document.querySelector('.username.active').getAttribute('data-user-id'); // Assuming you have a class 'active' for the selected member
+        const projectId = document.querySelector('.member').getAttribute('data-project-id'); // Get the project ID from the clicked member
+
+        fetch('partial/remove_user_from_project.php', {
+            method: 'POST',
+            body: new URLSearchParams({ project_id: projectId, user_id: userId }),
+
+        })
+            .then(response => response.text())
+            .then(result => {
+                if (result === 'Success') {
+                    console.log('User removed successfully!');
+                    // You can perform any additional actions here after successful removal
+                } else {
+                    console.log('Error removing user.');
+                }
+            })
+            .catch(error => {
+                console.log('An error occurred while removing user.');
+            });
+        location.reload(); // Reload the page after successful update
+    });
 </script>

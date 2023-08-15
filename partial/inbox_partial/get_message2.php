@@ -1,10 +1,29 @@
+<style>
+    .get_message .addtask-popup-content {
+        padding: 0;
+        margin: 0;
+    }
+</style>
+
 <?php
 
 // Display all errors
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-require_once '../../config/connect.php';
+// Replace the database connection code with your actual database connection code
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "teamtrack";
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
 
 // Check if the message_id parameter is present
 if (isset($_POST['message_id']) && is_numeric($_POST['message_id'])) {
@@ -13,13 +32,13 @@ if (isset($_POST['message_id']) && is_numeric($_POST['message_id'])) {
     echo $message_id;
 
     // Retrieve the message from the messages table based on message_id
-    $stmt = $connection->prepare("SELECT * FROM Messages WHERE message_id = ?");
-    $stmt->bind_param("i", $message_id);
+    $stmt = $conn->prepare("SELECT * FROM Message WHERE task_id = ?");
+    $stmt->bind_param("i", $task_id);
     $stmt->execute();
-    $result_msg = $stmt->get_result();
+    $result_task = $stmt->get_result();
 
-    if ($result_msg->num_rows > 0) {
-        $row = $result_msg->fetch_assoc();
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
         $message_id = $row['message_id'];
         $task_id = $row['task_id'];
         $recipient_id = $row['recipient_id'];
@@ -33,7 +52,7 @@ if (isset($_POST['message_id']) && is_numeric($_POST['message_id'])) {
 
         // Mark the message as read
         $sql_update = "UPDATE Messages SET is_read = 1 WHERE message_id = ?";
-        $stmt_update = $connection->prepare($sql_update);
+        $stmt_update = $conn->prepare($sql_update);
         $stmt_update->bind_param("i", $message_id);
         $stmt_update->execute();
         $stmt_update->close();
@@ -43,8 +62,7 @@ if (isset($_POST['message_id']) && is_numeric($_POST['message_id'])) {
             echo "This is project message";
 
         } elseif ($is_newtask_msg) {
-            echo "new task message";
-            $stmt = $connection->prepare("SELECT * FROM Tasks WHERE task_id = ?");
+            $stmt = $conn->prepare("SELECT * FROM Tasks WHERE task_id = ?");
             $stmt->bind_param("i", $task_id);
             $stmt->execute();
             $result = $stmt->get_result();
@@ -55,7 +73,18 @@ if (isset($_POST['message_id']) && is_numeric($_POST['message_id'])) {
             }
             ?>
             <div class="get_message approval-form">
-                <form action="/partial/task_partial/update_task.php" method="post">
+                <div class="heading-content">
+                    <div class="heading-style">
+                        <p>Edit Task</p>
+                    </div>
+                    <div class="bottom-line"></div>
+                    <div class="div-space-top"></div>
+                    <button type="button" id="deleteButton">Delete Task</button>
+                    <div class="div-space-top"></div>
+                </div>
+                <div class="bottom-line"></div>
+                <div class="div-space-top"></div>
+                <form method="post" id="editTaskForm" action="partial/task_partial/update_task.php">
                     <input type="hidden" name="project_id" value="<?php echo $task['project_id']; ?>">
                     <input type="hidden" name="task_id" value="<?php echo $task_id; ?>">
                     <label for="editTaskName">Task Name:</label>
@@ -102,8 +131,11 @@ if (isset($_POST['message_id']) && is_numeric($_POST['message_id'])) {
                     <button type="submit" id="submitButton">Save Changes</button>
                 </form>
             </div>
-
+            </div>
             <?php
+            echo "This is new task messaage";
+
+
         } else {
             // Display the message content
             echo "<h3>$message_id</h3>";
@@ -111,8 +143,12 @@ if (isset($_POST['message_id']) && is_numeric($_POST['message_id'])) {
             echo "<p>$recipient_id</p>";
             echo "<p>$text</p>";
         }
-        $stmt->close();
-
+    } else {
+        echo "<p>Message not found.</p>";
     }
+
+    $stmt->close();
 }
+
+$conn->close();
 ?>

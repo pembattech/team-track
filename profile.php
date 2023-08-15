@@ -1,5 +1,6 @@
 <!-- <?php include 'access_denied.php'; ?> -->
 
+
 <title>Profile - TeamTrack</title>
 
 <?php include 'partial/navbar.php'; ?>
@@ -61,7 +62,6 @@
         background-color: var(--sidebar-bgcolor);
         border: 1px solid var(--color-border);
         border-radius: 5px;
-        block
     }
 
     .user-other-info .heading-style {
@@ -257,11 +257,15 @@
                 global $connection;
 
                 $sql = "SELECT Tasks.*, Projects.project_name, Users.username 
-                    FROM Tasks
-                    INNER JOIN Projects ON Tasks.project_id = Projects.project_id
-                    INNER JOIN Users ON Tasks.user_id = Users.user_id
-                    WHERE Tasks.status != 'Completed' AND Tasks.user_id = $user_id
-                    ORDER BY Tasks.start_date DESC";
+        FROM Tasks
+        INNER JOIN ProjectUsers ON Tasks.projectuser_id = ProjectUsers.projectuser_id
+        INNER JOIN Projects ON ProjectUsers.project_id = Projects.project_id
+        INNER JOIN Users ON ProjectUsers.user_id = Users.user_id
+        WHERE Tasks.status != 'Completed' AND ProjectUsers.user_id = $user_id
+        ORDER BY Tasks.start_date DESC";
+
+
+
 
                 $result = mysqli_query($connection, $sql);
                 return $result;
@@ -307,7 +311,7 @@
                                     onchange="loadImgFile(event)" />
                             </div>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group textarea-style">
                             <label for="about">About</label>
                             <textarea id="about" name="about" rows="4"
                                 placeholder="Please provide a brief introduction about yourself."><?php if (get_user_data($user_id)['about'] !== null && get_user_data($user_id)['about'] !== "") {

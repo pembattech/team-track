@@ -34,9 +34,8 @@ CREATE TABLE IF NOT EXISTS ProjectUsers (
 
 CREATE TABLE IF NOT EXISTS Tasks (
     task_id INT AUTO_INCREMENT PRIMARY KEY,
-    project_id INT,
-    user_id INT,
-    task_creator_id INT
+    projectuser_id INT,
+    task_creator_id INT,
     task_name VARCHAR(255),
     assignee INT,
     task_description VARCHAR(1000),
@@ -45,10 +44,9 @@ CREATE TABLE IF NOT EXISTS Tasks (
     status VARCHAR(50),
     section VARCHAR(50),
     priority VARCHAR(50),
-    FOREIGN KEY (project_id) REFERENCES Projects(project_id),
-    FOREIGN KEY (user_id) REFERENCES Users(user_id),
-    FOREIGN KEY (assignee) REFERENCES Users(user_id),
-    FOREIGN KEY (task_creator_id) REFERENCES Users(user_id)
+    FOREIGN KEY (projectuser_id) REFERENCES ProjectUsers(projectuser_id),
+    FOREIGN KEY (task_creator_id) REFERENCES Users(user_id),
+    FOREIGN KEY (assignee) REFERENCES Users(user_id)
 );
 
 CREATE TABLE IF NOT EXISTS Messages (
@@ -58,9 +56,11 @@ CREATE TABLE IF NOT EXISTS Messages (
     text VARCHAR(1000),
     timestamp TIMESTAMP,
     recipient_id INT,
-    is_read INT DEFAULT 0;
-    -- is_newproject_msg DEFAULT 0,
+    is_read INT DEFAULT 0,
+    is_task_msg INT DEFAULT 0,
+    is_project_msg INT DEFAULT 0,
+    is_newtask_msg INT DEFAULT 0,
     FOREIGN KEY (task_id) REFERENCES Tasks(task_id),
-    FOREIGN KEY (sender_id) REFERENCES Users(user_id)
-    FOREIGN KEY (recipient_id) REFERENCES Users(user_id);
+    FOREIGN KEY (sender_id) REFERENCES Users(user_id),
+    FOREIGN KEY (recipient_id) REFERENCES Users(user_id)
 );

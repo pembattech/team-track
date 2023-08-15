@@ -206,7 +206,7 @@ ini_set('display_errors', 1);
                             } else {
                                 echo "<p class='user-role'>+ Add role</p>";
                             }
-
+                        
                             echo '</div>';
                             echo '</div>';
                         }
@@ -876,67 +876,61 @@ ini_set('display_errors', 1);
             username.classList.add('active');
 
             const userId = username.getAttribute('data-user-id');
-            const project_owner_value = <?php echo $project_owner['user_id']; ?>;
-            if (project_owner_value != userId) {
-                console.log(project_owner_value != userId);
 
-                // Make an AJAX request to check if the user is a project owner
-                fetch('check_project_owner.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    }
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.is_owner) {
-                            // Make an AJAX request to fetch user role
-                            fetch('get_user_role.php', {
-                                method: 'POST',
-                                body: new URLSearchParams({ user_id: userId }),
-                                headers: {
-                                    'Content-Type': 'application/x-www-form-urlencoded'
+            // Make an AJAX request to check if the user is a project owner
+            fetch('check_project_owner.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.is_owner) {
+                        // Make an AJAX request to fetch user role
+                        fetch('get_user_role.php', {
+                            method: 'POST',
+                            body: new URLSearchParams({ user_id: userId }),
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            }
+                        })
+                            .then(response => response.text())
+                            .then(userRole => {
+                                if (userRole !== 'Error') {
+                                    const userRoleInput = document.getElementById('userRoleInput');
+                                    userRoleInput.value = `${userRole}`;
+
+                                    const userRolePopup = document.getElementById('userRolePopup');
+
+                                    // Position the popup below the clicked member
+                                    const rect = member.getBoundingClientRect();
+                                    userRolePopup.style.left = rect.left + 'px';
+                                    userRolePopup.style.top = rect.bottom + 10 + 'px';
+
+                                    userRolePopup.style.display = 'block';
+
+                                    userRoleInput.addEventListener('focus', function () {
+                                        updateRoleButton.style.display = 'block';
+                                    });
+
+                                    userRoleInput.addEventListener('blur', function () {
+                                        updateRoleButton.style.display = 'none';
+                                    });
+                                } else {
+                                    alert('Error fetching user role.');
                                 }
                             })
-                                .then(response => response.text())
-                                .then(userRole => {
-                                    if (userRole !== 'Error') {
-                                        const userRoleInput = document.getElementById('userRoleInput');
-                                        userRoleInput.value = `${userRole}`;
-
-                                        const userRolePopup = document.getElementById('userRolePopup');
-
-                                        // Position the popup below the clicked member
-                                        const rect = member.getBoundingClientRect();
-                                        userRolePopup.style.left = rect.left + 'px';
-                                        userRolePopup.style.top = rect.bottom + 10 + 'px';
-
-                                        userRolePopup.style.display = 'block';
-
-                                        // userRoleInput.addEventListener('focus', function () {
-                                        //     updateRoleButton.style.display = 'block';
-                                        // });
-
-                                        // userRoleInput.addEventListener('blur', function () {
-                                        //     updateRoleButton.style.display = 'none';
-                                        // });
-                                    } else {
-                                        alert('Error fetching user role.');
-                                    }
-                                })
-                                .catch(error => {
-                                    alert('An error occurred while fetching user role.');
-                                });
-                        } else {
-                            console.log('You are not a project owner.');
-                        }
-                    })
-                    .catch(error => {
-                        alert('An error occurred while checking project ownership.');
-                    });
-            } else {
-                console.log("bye");
-            }
+                            .catch(error => {
+                                alert('An error occurred while fetching user role.');
+                            });
+                    } else {
+                        console.log('You are not a project owner.');
+                    }
+                })
+                .catch(error => {
+                    alert('An error occurred while checking project ownership.');
+                });
         });
     });
 
