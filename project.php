@@ -885,7 +885,7 @@ ini_set('display_errors', 1);
                 console.log(project_owner_value != userId);
 
                 // Make an AJAX request to check if the user is a project owner
-                fetch('check_project_owner.php', {
+                fetch('partial/project_partial/check_project_owner.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'
@@ -895,7 +895,7 @@ ini_set('display_errors', 1);
                     .then(data => {
                         if (data.is_owner) {
                             // Make an AJAX request to fetch user role
-                            fetch('get_user_role.php', {
+                            fetch('partial/project_partial/get_user_role.php', {
                                 method: 'POST',
                                 body: new URLSearchParams({ user_id: userId }),
                                 headers: {
@@ -986,7 +986,7 @@ ini_set('display_errors', 1);
 
         errorMessage.textContent = '';
         // Make an AJAX request to update the user role
-        fetch('partial/update_userrole.php', {
+        fetch('partial/project_partial/update_userrole.php', {
             method: 'POST',
             body: new URLSearchParams({ project_id: projectId, user_id: userId, new_role: newRole }),
             headers: {
@@ -1017,7 +1017,7 @@ ini_set('display_errors', 1);
         const userId = document.querySelector('.username.active').getAttribute('data-user-id'); // Assuming you have a class 'active' for the selected member
         const projectId = document.querySelector('.member').getAttribute('data-project-id'); // Get the project ID from the clicked member
 
-        fetch('partial/remove_user_from_project.php', {
+        fetch('partial/project_partial/remove_user_from_project.php', {
             method: 'POST',
             body: new URLSearchParams({ project_id: projectId, user_id: userId }),
 

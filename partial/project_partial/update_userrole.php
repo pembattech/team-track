@@ -1,5 +1,5 @@
 <?php
-require_once '../config/connect.php';
+require_once '../../config/connect.php';
 
 // Display all errors
 error_reporting(E_ALL);
