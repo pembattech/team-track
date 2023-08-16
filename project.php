@@ -337,14 +337,15 @@ ini_set('display_errors', 1);
                             <div class="div-space-top"></div>
                             <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
                             <div class="form-group">
-                                <label for="taskname">Task Name</label>
-                                <input type="text" name="taskname" id="taskname">
                                 <span id="taskname-error" class="error-message"></span>
+                                <input class="input-style" type="text" name="taskname" id="taskname" placeholder="Enter Task Name">
                             </div>
                             <div class="form-group">
                                 <label for="task_description">Description</label>
-                                <textarea type="text" name="task_description" id="task_description"></textarea>
-                                <span id="task_description-error" class="error-message"></span>
+                                <div class="textarea-style">
+                                    <textarea type="text" name="task_description" id="task_description"></textarea>
+                                    <span id="task_description-error" class="error-message"></span>
+                                </div>
                             </div>
                             <button type="submit" name="submit" class="btn-style">Submit</button>
                         </form>
@@ -398,7 +399,7 @@ ini_set('display_errors', 1);
                                     <h2>
                                         <?php echo $section; ?>
                                     </h2>
-                                    <table class="sortable" data-section="<?php echo $section; ?>">
+                                    <table class="sortable show" data-section="<?php echo $section; ?>">
                                         <thead>
                                             <tr>
                                                 <th>Task Name</th>
@@ -876,13 +877,21 @@ ini_set('display_errors', 1);
     function task_validateForm() {
         // Get form input values
         var taskname = document.getElementById('taskname').value;
+        var taskdescription = document.getElementById('task_description').value;
 
         // Reset previous error messages
         document.getElementById('taskname-error').textContent = '';
+        document.getElementById('task_description-error').textContent = '';
 
         // Validate Task Name
         if (taskname === '') {
             $("#taskname-error").text("Task name is required.");
+            return false;
+        }
+
+        // Validate Task Description
+        if (taskdescription === '') {
+            $("#task_description-error").text("Task description is required.");
             return false;
         }
 
@@ -891,7 +900,7 @@ ini_set('display_errors', 1);
             url: "partial/addtask.php",
             data: {
                 taskname: taskname,
-                task_description: task_description
+                task_description: taskdescription
             },
             dataType: "json",
             success: function (response) {

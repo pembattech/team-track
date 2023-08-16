@@ -773,9 +773,7 @@ button#closeButton:hover {
 
 .addtask-popup textarea {
     width: 100%;
-    border: 1px solid #ccc;
     padding: 8px 5px;
-    border-radius: 4px;
     background-color: var(--color-background-weak);
     color: var(--color-text);
 }
@@ -926,14 +924,6 @@ button#closeButton:hover {
     margin-bottom: 5px;
 }
 
-.addtask-popup textarea {
-    width: 100%;
-    border: 1px solid #ccc;
-    padding: 8px 5px;
-    border-radius: 4px;
-    background-color: var(--color-background-weak);
-    color: var(--color-text);
-}
 
 .addtask-popup .editprofile-submit-btn {
     background-color: #4CAF50;

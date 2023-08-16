@@ -8,7 +8,6 @@ session_start();
 
 require_once '../config/connect.php';
 
-
 // Function to sanitize user inputs
 function sanitize_input($input)
 {
@@ -92,7 +91,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
 
         }
-        // header("Location: ../project.php?project_id=$project_id");
+        header("Location: ../project.php?project_id=$project_id");
 
     }
 }
