@@ -75,6 +75,45 @@ ini_set('display_errors', 1);
         font-size: 13px;
         font-family: inherit;
     }
+
+    .project-dropdown {
+        margin-left: 10px;
+        position: relative;
+        font-size: 16px;
+        font-family: inherit;
+    }
+    
+    .project-dropdown-menu {
+        display: none;
+        position: absolute;
+        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+        border: 1px solid var(--color-border);
+        border-radius: 5px;
+        top: 100%;
+        left: 0;
+        padding: 5px 5px;
+        z-index: 1;
+        background-color: var(--sidebar-bgcolor);
+    }
+
+    li.project-dropdown-menu-item p {
+        margin-left: 10px;
+        align-items: center;
+    }
+
+    .project-dropdown-menu-item:hover {
+        background-color: var(--color-background-weak);
+        border-radius: 5px;
+    }
+
+    .project_menu_toggle,
+    .project-dropdown-menu {
+        width: 120px;
+    }
+
+    .is-active .project-dropdown-menu {
+        display: block;
+    }
 </style>
 <title>Project - TeamTrack</title>
 <div class="container project-wrapper">
@@ -103,11 +142,6 @@ ini_set('display_errors', 1);
         ORDER BY ProjectUsers.is_projectowner DESC, Users.username";
         $result_users = mysqli_query($connection, $sql_users);
 
-        // // Get tasks for different sections
-        // $todo_tasks = get_tasks_by_section($project_id, 'To Do');
-        // $doing_tasks = get_tasks_by_section($project_id, 'Doing');
-        // $done_tasks = get_tasks_by_section($project_id, 'Done');
-    
         // Query to get the total number of tasks for the project
         $sql_total_tasks = "SELECT COUNT(*) AS total_tasks FROM Tasks WHERE projectuser_id IN (SELECT projectuser_id FROM ProjectUsers WHERE project_id = $project_id)";
         $result_total_tasks = mysqli_query($connection, $sql_total_tasks);
@@ -150,6 +184,20 @@ ini_set('display_errors', 1);
                         echo "<p>" . $project['project_name'] . "</p>";
                     }
                     ?>
+                    <div class="project-dropdown">
+                        <div class="project_menu_toggle svg-img">
+                            <img src="static/image/arrow-down.svg" alt="">
+                        </div>
+                        <ul class="project-dropdown-menu">
+                            <li class="project-dropdown-menu-item indicate-danger">
+                                <?php
+                                echo '<a href="partial/project_partial/leave_project.php?project_id=' . $project_id . '">';
+                                ?>
+                                <p>Leave Project</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
             <div class="tab-btns">
@@ -230,7 +278,7 @@ ini_set('display_errors', 1);
                                                     value="<?php echo $project_id; ?>">
                                                 <input type="hidden" name="user_id" value="">
                                                 <input type="text" name="user-role" class="input-style"
-                                                    id="userRoleInput">
+                                                    id="userRoleInput" placeholder="Enter role">
                                                 <!-- <button type="submit" name="update_userrole" class="button-style"
                                                     id="updateRoleButton">Update</button> -->
                                             </div>
@@ -289,14 +337,15 @@ ini_set('display_errors', 1);
                             <div class="div-space-top"></div>
                             <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
                             <div class="form-group">
-                                <label for="taskname">Task Name</label>
-                                <input type="text" name="taskname" id="taskname">
                                 <span id="taskname-error" class="error-message"></span>
+                                <input class="input-style" type="text" name="taskname" id="taskname" placeholder="Enter Task Name">
                             </div>
                             <div class="form-group">
                                 <label for="task_description">Description</label>
-                                <textarea type="text" name="task_description" id="task_description"></textarea>
-                                <span id="task_description-error" class="error-message"></span>
+                                <div class="textarea-style">
+                                    <textarea type="text" name="task_description" id="task_description"></textarea>
+                                    <span id="task_description-error" class="error-message"></span>
+                                </div>
                             </div>
                             <button type="submit" name="submit" class="btn-style">Submit</button>
                         </form>
@@ -350,7 +399,7 @@ ini_set('display_errors', 1);
                                     <h2>
                                         <?php echo $section; ?>
                                     </h2>
-                                    <table class="sortable" data-section="<?php echo $section; ?>">
+                                    <table class="sortable show" data-section="<?php echo $section; ?>">
                                         <thead>
                                             <tr>
                                                 <th>Task Name</th>
@@ -828,13 +877,21 @@ ini_set('display_errors', 1);
     function task_validateForm() {
         // Get form input values
         var taskname = document.getElementById('taskname').value;
+        var taskdescription = document.getElementById('task_description').value;
 
         // Reset previous error messages
         document.getElementById('taskname-error').textContent = '';
+        document.getElementById('task_description-error').textContent = '';
 
         // Validate Task Name
         if (taskname === '') {
             $("#taskname-error").text("Task name is required.");
+            return false;
+        }
+
+        // Validate Task Description
+        if (taskdescription === '') {
+            $("#task_description-error").text("Task description is required.");
             return false;
         }
 
@@ -843,7 +900,7 @@ ini_set('display_errors', 1);
             url: "partial/addtask.php",
             data: {
                 taskname: taskname,
-                task_description: task_description
+                task_description: taskdescription
             },
             dataType: "json",
             success: function (response) {
@@ -1035,5 +1092,27 @@ ini_set('display_errors', 1);
                 console.log('An error occurred while removing user.');
             });
         location.reload(); // Reload the page after successful update
+    });
+</script>
+
+<script>
+    $(document).ready(function () {
+        const $menu = $('.project-dropdown');
+
+        const onMouseUp = e => {
+            if (!$menu.is(e.target) && $menu.has(e.target).length === 0) {
+                $menu.removeClass('is-active');
+            }
+        };
+
+        $('.project_menu_toggle').on('click', () => {
+            $menu.toggleClass('is-active').promise().done(() => {
+                if ($menu.hasClass('is-active')) {
+                    $(document).on('mouseup', onMouseUp);
+                } else {
+                    $(document).off('mouseup', onMouseUp);
+                }
+            });
+        });
     });
 </script>

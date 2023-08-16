@@ -501,35 +501,43 @@ th.subhead-task {
     color: red;
 }
 
-table {
+.lst-of-tasks table {
     border-collapse: collapse;
     width: 100%;
 }
 
-th,
-td {
-    border: 1px solid #ddd;
+.lst-of-tasks th {
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--color-text-disabled);
+}
+.lst-of-tasks th,
+.lst-of-tasks td {
+    border: 1px solid var(--color-border);
     padding: 8px;
     text-align: left;
 }
 
-th {
-    cursor: pointer;
+.lst-of-tasks td {
+color: var(--color-text);
 }
 
 .collapsible {
-    border: 1px solid #ddd;
+    border: 1px solid var(--color-border);
     margin-bottom: 10px;
 }
 
 .collapsible h2 {
+    font-size: 20px;
     margin: 0;
     padding: 10px;
     cursor: pointer;
+    color: var(--color-text);
 }
 
 .collapsible h2.active {
     background-color: var(--color-background-weak-hover-deprecated);
+    color: var(--color-text-disabled);
 }
 
 .collapsible table {

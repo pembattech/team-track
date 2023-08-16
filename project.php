@@ -468,7 +468,7 @@ ini_set('display_errors', 1);
                             <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
                             <input type="hidden" id="editTaskId" name="task_id">
                             <label for="editTaskName">Task Name:</label>
-                            <input type="text" id="editTaskName" name="task_name">
+                            <input class="input-style" type="text" id="editTaskName" name="task_name">
                             <br>
 
                             <label for="editAssignee">Assignee:</label>
