@@ -114,6 +114,12 @@ ini_set('display_errors', 1);
     .is-active .project-dropdown-menu {
         display: block;
     }
+
+    .active-task {
+        background-color: var(--color-background-active-two);
+
+        font-weight: 900;
+    }
 </style>
 <title>Project - TeamTrack</title>
 <div class="container project-wrapper">
@@ -468,32 +474,36 @@ ini_set('display_errors', 1);
                         <form id="editTaskForm">
                             <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
                             <input type="hidden" id="editTaskId" name="task_id">
-                            <label for="editTaskName">Task Name:</label>
                             <input class="input-style" type="text" id="editTaskName" name="task_name">
                             <br>
 
+                            <div class="div-space-top"></div>
+
                             <?php include 'partial/project_partial/lst_of_members.php'; ?>
-                            <label for="memberSelect">Select Member:</label>
-                            <select id="memberSelect" name="member_id">
-                                <option value="">Select an assignee</option>
+                            <select id="memberSelect" name="member_id" class="select-style">
+                                <option value="" selected disabled hidden>Select an assignee</option>
                                 <?php echo $selectOptions; ?>
                             </select>
                             <br>
 
-                            <label for="editTaskDescription">Task Description:</label>
-                            <textarea id="editTaskDescription" name="task_description"></textarea>
+                            <div class="div-space-top"></div>
+                            <div class="textarea-style">
+                                <textarea id="editTaskDescription" name="task_description"></textarea>
+                            </div>
+
+                            <div class="div-space-top"></div>
+                            <input class="input-style" type="text" id="editStartDate" name="start_date"
+                                placeholder="Start Date" onfocus="(this.type='date')">
                             <br>
 
-                            <label for="editStartDate">Start Date:</label>
-                            <input type="date" id="editStartDate" name="start_date">
+                            <div class="div-space-top"></div>
+                            <input class="input-style" type="text" id="editEndDate" name="end_date"
+                                placeholder="End Date" onfocus="(this.type='date')">
                             <br>
 
-                            <label for="editEndDate">End Date:</label>
-                            <input type="date" id="editEndDate" name="end_date">
-                            <br>
-
-                            <label for="editStatus">Status:</label>
-                            <select id="editStatus" name="status">
+                            <div class="div-space-top"></div>
+                            <select id="editStatus" name="status" class="select-style">
+                                <option value="" selected disabled hidden>Select a Number</option>
                                 <option value="At risk">At risk</option>
                                 <option value="Off Track">Off track</option>
                                 <option value="On Track">On track</option>
@@ -505,14 +515,15 @@ ini_set('display_errors', 1);
                             </select>
                             <br>
 
-                            <label for="editPriority">Priority:</label>
-                            <select id="editPriority" name="priority">
+                            <div class="div-space-top"></div>
+                            <select id="editPriority" name="priority" class="select-style">
                                 <option value="Low">Low</option>
                                 <option value="Medium">Medium</option>
                                 <option value="High">High</option>
                             </select>
                             <br>
 
+                            <div class="div-space-top"></div>
                             <button type="submit" id="submitButton">Save Changes</button>
                         </form>
                     </div>
@@ -673,11 +684,16 @@ ini_set('display_errors', 1);
             connectWith: '.sortable', // Enable sorting between sections
             placeholder: 'ui-state-highlight', // Style for the placeholder during drag-and-drop
             items: 'tr', // Limit sorting to rows only within the current section
+
             update: function (event, ui) {
                 // Get the dragged task's ID
                 const taskId = ui.item.attr('data-task-id');
+
                 // Get the destination section's ID
                 const sectionId = ui.item.closest('.collapsible').find('h2').text().trim();
+                console.log(sectionId);
+
+
                 // Update the task's section in the database using an AJAX request
                 $.ajax({
                     url: 'partial/task_partial/update_task_section.php', // Replace with the URL to your update task section PHP file
@@ -690,20 +706,16 @@ ini_set('display_errors', 1);
                         // Handle the response if needed
                         console.log('Task section updated successfully.');
                         fetchTasks();
-
                     },
                     error: function (xhr, status, error) {
                         // Handle the error if needed
                         console.error('Error updating task section:', error);
+                        fetchTasks();
                     }
                 });
+
             }
         });
-    });
-
-    // Call the fetchTasks function on page load
-    $(document).ready(function () {
-        fetchTasks();
     });
 
     // Variable to store the current task ID
@@ -730,6 +742,12 @@ ini_set('display_errors', 1);
                 const status = $(this).find('td:nth-child(6)').text();
                 const priority = $(this).find('td:nth-child(7)').text();
 
+                // Remove the active class from all task rows
+                $('.sortable tr').removeClass('active-task');
+
+                // Add the active class to the clicked task row
+                $(this).addClass('active-task');
+
                 // Set the task details in the edit popup form
                 $('#editTaskId').val(taskId);
                 $('#editTaskName').val(taskName);
@@ -745,6 +763,9 @@ ini_set('display_errors', 1);
 
                 // Show the popup with animation
                 $('#taskPopup').addClass('active');
+
+                console.log(currentTaskId);
+
 
                 // Fetch task details and populate the edit form
                 fetchTaskDetails(taskId);
@@ -783,6 +804,10 @@ ini_set('display_errors', 1);
         $('#closeButton').click(function () {
             // Hide the popup with animation
             $('#taskPopup').removeClass('active');
+
+            // Remove the active class from all task rows
+            $('.sortable tr').removeClass('active-task');
+
         });
 
         // Delete the task when the delete button is clicked
@@ -802,6 +827,9 @@ ini_set('display_errors', 1);
                     console.log('Task deleted successfully.');
                     // Hide the popup with animation
                     $('#taskPopup').removeClass('active');
+                    // Remove the active class from all task rows
+                    $('.sortable tr').removeClass('active-task');
+
                     // Fetch tasks again to update the list
                     fetchTasks();
                 },
