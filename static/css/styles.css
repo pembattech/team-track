@@ -522,6 +522,10 @@ th.subhead-task {
 color: var(--color-text);
 }
 
+.lst-of-tasks td {
+    width: 1000px;
+}
+
 .collapsible {
     border: 1px solid var(--color-border);
     margin-bottom: 10px;

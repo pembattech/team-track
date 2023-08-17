@@ -82,7 +82,7 @@ ini_set('display_errors', 1);
         font-size: 16px;
         font-family: inherit;
     }
-    
+
     .project-dropdown-menu {
         display: none;
         position: absolute;
@@ -338,7 +338,8 @@ ini_set('display_errors', 1);
                             <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
                             <div class="form-group">
                                 <span id="taskname-error" class="error-message"></span>
-                                <input class="input-style" type="text" name="taskname" id="taskname" placeholder="Enter Task Name">
+                                <input class="input-style" type="text" name="taskname" id="taskname"
+                                    placeholder="Enter Task Name">
                             </div>
                             <div class="form-group">
                                 <label for="task_description">Description</label>
@@ -468,11 +469,15 @@ ini_set('display_errors', 1);
                             <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
                             <input type="hidden" id="editTaskId" name="task_id">
                             <label for="editTaskName">Task Name:</label>
-                            <input type="text" id="editTaskName" name="task_name">
+                            <input class="input-style" type="text" id="editTaskName" name="task_name">
                             <br>
 
-                            <label for="editAssignee">Assignee:</label>
-                            <textarea id="editAssignee" name="assignee"></textarea>
+                            <?php include 'partial/project_partial/lst_of_members.php'; ?>
+                            <label for="memberSelect">Select Member:</label>
+                            <select id="memberSelect" name="member_id">
+                                <option value="">Select an assignee</option>
+                                <?php echo $selectOptions; ?>
+                            </select>
                             <br>
 
                             <label for="editTaskDescription">Task Description:</label>
@@ -769,6 +774,8 @@ ini_set('display_errors', 1);
                     console.error('Error updating task:', error);
                 }
             });
+            fetchTasks();
+
         });
 
 

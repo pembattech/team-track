@@ -82,7 +82,7 @@ ini_set('display_errors', 1);
         font-size: 16px;
         font-family: inherit;
     }
-    
+
     .project-dropdown-menu {
         display: none;
         position: absolute;
@@ -338,7 +338,8 @@ ini_set('display_errors', 1);
                             <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
                             <div class="form-group">
                                 <span id="taskname-error" class="error-message"></span>
-                                <input class="input-style" type="text" name="taskname" id="taskname" placeholder="Enter Task Name">
+                                <input class="input-style" type="text" name="taskname" id="taskname"
+                                    placeholder="Enter Task Name">
                             </div>
                             <div class="form-group">
                                 <label for="task_description">Description</label>
@@ -471,8 +472,12 @@ ini_set('display_errors', 1);
                             <input class="input-style" type="text" id="editTaskName" name="task_name">
                             <br>
 
-                            <label for="editAssignee">Assignee:</label>
-                            <textarea id="editAssignee" name="assignee"></textarea>
+                            <?php include 'partial/project_partial/lst_of_members.php'; ?>
+                            <label for="memberSelect">Select Member:</label>
+                            <select id="memberSelect" name="member_id">
+                                <option value="">Select an assignee</option>
+                                <?php echo $selectOptions; ?>
+                            </select>
                             <br>
 
                             <label for="editTaskDescription">Task Description:</label>
@@ -769,6 +774,8 @@ ini_set('display_errors', 1);
                     console.error('Error updating task:', error);
                 }
             });
+            fetchTasks();
+
         });
 
 
@@ -827,17 +834,26 @@ ini_set('display_errors', 1);
                 $.each(response, function (section, tasks) {
                     const tableBody = $('.collapsible table[data-section="' + section + '"] tbody');
                     $.each(tasks, function (index, task) {
-                        const assigneeName = task.assignee_name || 'Not Assigned';
+                        const MAX_DESCRIPTION_LENGTH = 50; // Set the maximum length you want to display
+                        const taskDescription = task.task_description.length > MAX_DESCRIPTION_LENGTH
+                            ? task.task_description.substring(0, MAX_DESCRIPTION_LENGTH) + '...'
+                            : task.task_description;
+                        const assigneeName = task.assignee_name ? task.assignee_name : 'Not Assigned';
+                        const start_date = task.start_date ? task.start_date : '';
+                        const end_date = task.end_date ? task.end_date : '';
+                        const status = task.status ? task.status : '';
+                        const priority = task.priority ? task.priority : '';
+
                         const statusClass = task.status === 'Done' ? 'completed' : 'incomplete';
                         const row = `
                                 <tr data-task-id="${task.task_id}" class="${statusClass}">
                                     <td>${task.task_name}</td>
-                                    <td>${task.task_description}</td>
+                                    <td>${taskDescription}</td>
                                     <td>${assigneeName}</td>
-                                    <td>${task.start_date}</td>
-                                    <td>${task.end_date}</td>
-                                    <td>${task.status}</td>
-                                    <td>${task.priority}</td>
+                                    <td>${start_date}</td>
+                                    <td>${end_date}</td>
+                                    <td>${status}</td>
+                                    <td>${priority}</td>
                                 </tr>`;
                         tableBody.append(row);
                     });
