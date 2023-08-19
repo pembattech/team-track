@@ -19,7 +19,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $end_date = $_POST["end_date"];
     $status = $_POST["status"];
     $priority = $_POST["priority"];
-    $assignee = $_POST["member_id"];
+    $assignee = $_POST["task_assingee"];
 
     // Construct the SQL query
     $sql = "UPDATE Tasks SET task_name = '$task_name', task_description = '$task_description', assignee = '$assignee', start_date = '$start_date', end_date = '$end_date', status = '$status', priority = '$priority' WHERE task_id = $task_id";

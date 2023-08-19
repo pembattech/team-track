@@ -780,7 +780,7 @@ ini_set('display_errors', 1);
 
 
             console.log(currentTaskId);
-
+            
             // Get the form data
             const formData = $(this).serialize();
             console.log(formData);
@@ -791,7 +791,7 @@ ini_set('display_errors', 1);
                 method: 'POST',
                 data: formData,
                 success: function (response) {
-                    
+
                     // Handle the response if needed
                     console.log('Task updated successfully.');
                     // Hide the edit popup with animation
@@ -926,22 +926,6 @@ ini_set('display_errors', 1);
                 console.error('Error fetching task details:', error);
             }
         });
-
-        // $.ajax({
-        //     url: 'testserver.php',
-        //     type: 'GET',
-        //     dataType: 'json',
-        //     success: function (countries) {
-        //         var select = $("#editAssignee");
-        //         select.empty();
-        //         $.each(countries, function (index, country) {
-        //             select.append(new Option(country.user_id, country.username));
-        //         });
-        //     },
-        //     error: function (xhr, status, error) {
-        //         console.error(error);
-        //     }
-        // });
     }
 </script>
 <script>
