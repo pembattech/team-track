@@ -851,14 +851,28 @@ ini_set('display_errors', 1);
                 return false;
             }
 
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const selectedStartDate = new Date(startDate);
+            selectedStartDate.setHours(0, 0, 0, 0);
+
+            if (selectedStartDate.getTime() <= today.getTime()) {
+                $("#editStartDate-error").text("Start date cannot be in the past.");
+                return false;
+            }
 
             if (endDate === '') {
-                $("#editStartDate-error").text("Task end date is required.");
+                $("#editEndDate-error").text("Task end date is required.");
+                return false;
+            }
+
+            if (new Date(endDate) < selectedStartDate) {
+                $("#editEndDate-error").text("End date must be after start date.");
                 return false;
             }
 
             if (status === null) {
-
                 $("#editStatus-error").text("Task status is required.");
                 return false;
             }
@@ -870,8 +884,6 @@ ini_set('display_errors', 1);
 
             return true; // All validation passed
         }
-
-
 
 
         // Close the popup when the close button is clicked
