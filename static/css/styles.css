@@ -587,7 +587,7 @@ color: var(--color-text);
 /* Styles for the slide-in popup */
 .task-popup {
     position: fixed;
-    top: 139;
+    top: 90;
     right: -440px;
     width: 400px;
     height: 100%;

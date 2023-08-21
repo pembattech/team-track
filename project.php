@@ -474,6 +474,7 @@ ini_set('display_errors', 1);
                             <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
                             <input type="hidden" id="editTaskId" name="task_id">
                             <input class="input-style" type="text" id="editTaskName" name="task_name">
+                            <span id="editTaskName-error" class="error-message"></span>
                             <br>
 
                             <div class="div-space-top"></div>
@@ -483,21 +484,25 @@ ini_set('display_errors', 1);
                                 <!-- <option value="" selected disabled hidden>Select an assignee</option> -->
                                 <?php echo $selectOptions; ?>
                             </select>
+                            <span id="editAssignee-error" class="error-message"></span>
                             <br>
 
                             <div class="div-space-top"></div>
                             <div class="textarea-style">
                                 <textarea id="editTaskDescription" name="task_description"></textarea>
                             </div>
+                            <span id="editTaskDescription-error" class="error-message"></span>
 
                             <div class="div-space-top"></div>
                             <input class="input-style" type="text" id="editStartDate" name="start_date"
                                 placeholder="Start Date" onfocus="(this.type='date')">
+                            <span id="editStartDate-error" class="error-message"></span>
                             <br>
 
                             <div class="div-space-top"></div>
                             <input class="input-style" type="text" id="editEndDate" name="end_date"
                                 placeholder="End Date" onfocus="(this.type='date')">
+                            <span id="editEndDate-error" class="error-message"></span>
                             <br>
 
                             <div class="div-space-top"></div>
@@ -513,6 +518,7 @@ ini_set('display_errors', 1);
                                 <option value="In Review">In Review</option>
                             </select>
                             <br>
+                            <span id="editStatus-error" class="error-message"></span>
 
                             <div class="div-space-top"></div>
                             <select id="editPriority" name="priority" class="select-style">
@@ -520,6 +526,7 @@ ini_set('display_errors', 1);
                                 <option value="Medium">Medium</option>
                                 <option value="High">High</option>
                             </select>
+                            <span id="editPriority-error" class="error-message"></span>
                             <br>
 
                             <div class="div-space-top"></div>
@@ -748,8 +755,8 @@ ini_set('display_errors', 1);
                 $(this).addClass('active-task');
 
                 console.log("**")
-                console.log(assingee);
                 console.log("**")
+                console.log(assingee);
 
                 // Set the task details in the edit popup form
                 $('#editTaskId').val(taskId);
@@ -778,8 +785,10 @@ ini_set('display_errors', 1);
         $('#editTaskForm').submit(function (event) {
             event.preventDefault();
 
-
-            console.log(currentTaskId);
+            // Perform validation before submitting
+            if (!updateFormValidation()) {
+                return; // Stop form submission if validation fails
+            }
 
             // Get the form data
             const formData = $(this).serialize();
@@ -791,7 +800,7 @@ ini_set('display_errors', 1);
                 method: 'POST',
                 data: formData,
                 success: function (response) {
-                    
+
                     // Handle the response if needed
                     console.log('Task updated successfully.');
                     // Hide the edit popup with animation
@@ -805,6 +814,64 @@ ini_set('display_errors', 1);
             fetchTasks();
 
         });
+
+        function updateFormValidation() {
+            // Clear previous error messages
+            $('.error-message').text('');
+
+            // Perform validation for each input field
+            const taskName = $('#editTaskName').val();
+            const assignee = $('#editAssignee').val();
+            const taskDescription = $('#editTaskDescription').val();
+            const startDate = $('#editStartDate').val();
+            const endDate = $('#editEndDate').val();
+            const status = $('#editStatus').val();
+            const priority = $('#editPriority').val();
+
+            // Add your validation rules here
+            if (taskName.trim() === '') {
+                $("#editTaskName-error").text("Task name is required.");
+                return false;
+            }
+
+            if (assignee === null) {
+
+                $("#editAssignee-error").text("Task assignee is required.");
+                return false;
+            }
+
+
+            if (taskDescription.trim() === '') {
+                $("#editTaskDescription-error").text("Task description is required.");
+                return false;
+            }
+
+            if (startDate === '') {
+                $("#editStartDate-error").text("Task start date is required.");
+                return false;
+            }
+
+
+            if (endDate === '') {
+                $("#editStartDate-error").text("Task end date is required.");
+                return false;
+            }
+
+            if (status === null) {
+
+                $("#editStatus-error").text("Task status is required.");
+                return false;
+            }
+
+            if (priority === null) {
+                $("#editPriority-error").text("Task priority is required.");
+                return false;
+            }
+
+            return true; // All validation passed
+        }
+
+
 
 
         // Close the popup when the close button is clicked
@@ -874,10 +941,10 @@ ini_set('display_errors', 1);
                             ? task.task_description.substring(0, MAX_DESCRIPTION_LENGTH) + '...'
                             : task.task_description;
                         const assigneeName = task.assignee_name ? task.assignee_name : 'Not Assigned';
-                        const start_date = task.start_date ? task.start_date : '';
-                        const end_date = task.end_date ? task.end_date : '';
-                        const status = task.status ? task.status : '';
-                        const priority = task.priority ? task.priority : '';
+                        const start_date = task.start_date ? task.start_date : '-';
+                        const end_date = task.end_date ? task.end_date : '-';
+                        const status = task.status ? task.status : '-';
+                        const priority = task.priority ? task.priority : '-';
 
                         const statusClass = task.status === 'Done' ? 'completed' : 'incomplete';
                         const row = `
@@ -902,6 +969,9 @@ ini_set('display_errors', 1);
 
     // Function to fetch task details using AJAX
     function fetchTaskDetails(taskId) {
+        // Clear previous error messages
+        $('.error-message').text('');
+
         $.ajax({
             url: 'partial/task_partial/fetch_task_details.php', // Replace with the URL to your fetch task details PHP file
             method: 'GET',
@@ -926,22 +996,6 @@ ini_set('display_errors', 1);
                 console.error('Error fetching task details:', error);
             }
         });
-
-        // $.ajax({
-        //     url: 'testserver.php',
-        //     type: 'GET',
-        //     dataType: 'json',
-        //     success: function (countries) {
-        //         var select = $("#editAssignee");
-        //         select.empty();
-        //         $.each(countries, function (index, country) {
-        //             select.append(new Option(country.user_id, country.username));
-        //         });
-        //     },
-        //     error: function (xhr, status, error) {
-        //         console.error(error);
-        //     }
-        // });
     }
 </script>
 <script>
@@ -962,7 +1016,7 @@ ini_set('display_errors', 1);
 
         // Validate Task Description
         if (taskdescription === '') {
-            $("#task_description-error").text("Task description is required.");
+            $("#task_description-error").text("Task_description is required.");
             return false;
         }
 

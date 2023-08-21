@@ -5,8 +5,7 @@ require_once '../../config/connect.php';
 if (isset($_GET['task_id']) && is_numeric($_GET['task_id'])) {
     $task_id = $_GET['task_id'];
 
-    // Prepare and execute the SQL query using a prepared statement
-    $stmt = $connection->prepare("SELECT Tasks.*, Users.username as assignee FROM Tasks
+    $stmt = $connection->prepare("SELECT Tasks.*, Users.user_id FROM Tasks
                                   LEFT JOIN Users ON Tasks.assignee = Users.user_id
                                   WHERE task_id = ?");
     $stmt->bind_param("i", $task_id);
@@ -16,7 +15,7 @@ if (isset($_GET['task_id']) && is_numeric($_GET['task_id'])) {
     // Check if the task was found
     if ($result->num_rows > 0) {
         $task = $result->fetch_assoc();
-        
+
         // Return the task details as a JSON response
         header('Content-Type: application/json');
         echo json_encode($task);
