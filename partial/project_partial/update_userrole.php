@@ -17,8 +17,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (!isValidRole($newRole)) {
-        echo 'Error: Invalid user role format.';
-        $_SESSION['notification_message'] = "Invalid user role format.";
+        header('Content-Type: application/json');
+        echo json_encode(array('status' => 'error', 'message' => 'Invalid user role format.'));
+
         return;
     } else {
 
@@ -41,8 +42,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $result = mysqli_query($connection, $sql_update_userrole);
 
             if ($result) {
-                echo 'Success';
-                $_SESSION['notification_message'] = "User role updated successfully.";
 
                 // Construct the message text
                 $message_text = 'There has been an update to your role within the "' . $projectName . '" project.';
@@ -59,9 +58,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (mysqli_query($connection, $insert_message_query)) {
                     echo '';
                 }
+
+                header('Content-Type: application/json');
+                echo json_encode(array('status' => 'success', 'message' => 'User role updated successfully.'));
+
             } else {
                 echo 'Error'; // Return 'Error' if update fails
-                $_SESSION['notification_message'] = "Error updating user role.";
+                header('Content-Type: application/json');
+                echo json_encode(array('status' => 'error', 'message' => 'Error updating user role.'));
+
             }
         }
     }

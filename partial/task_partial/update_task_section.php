@@ -81,35 +81,39 @@ if (isset($_POST['task_id']) && isset($_POST['section']) && isset($_POST['projec
                 $previousSectionData = $previousSectionResult->fetch_assoc();
                 $previousSection = $previousSectionData['section'];
 
-                if ($previousSection == 'Done') {
-                    // If the previous section was "Done," update the status to "Review"
-                    $updateStatusSql = "UPDATE Tasks SET section='$section', status='Waiting for Approval' WHERE task_id='$taskId'";
+                if ($previousSection != $section) {
 
-                    if ($connection->query($updateStatusSql) === TRUE) {
-                        // Return a success response if the update is successful
-                        header('Content-Type: application/json');
 
-                        echo json_encode(array('status' => 'success', 'message' => 'Task section updated and status set to review.'));
+                    if ($previousSection == 'Done') {
+                        // If the previous section was "Done," update the status to "Review"
+                        $updateStatusSql = "UPDATE Tasks SET section='$section', status='Waiting for Approval' WHERE task_id='$taskId'";
+
+                        if ($connection->query($updateStatusSql) === TRUE) {
+                            // Return a success response if the update is successful
+                            header('Content-Type: application/json');
+
+                            echo json_encode(array('status' => 'success', 'message' => 'Task section updated and status set to review.'));
+                        } else {
+                            // Return an error response if there is an issue with the update
+                            header('Content-Type: application/json');
+
+                            echo json_encode(array('status' => 'error', 'message' => 'Error updating task section and status: ' . $connection->error));
+                        }
                     } else {
-                        // Return an error response if there is an issue with the update
-                        header('Content-Type: application/json');
+                        // If the previous section was not "Done," just update the section
+                        $updateSql = "UPDATE Tasks SET section='$section' WHERE task_id='$taskId'";
 
-                        echo json_encode(array('status' => 'error', 'message' => 'Error updating task section and status: ' . $connection->error));
-                    }
-                } else {
-                    // If the previous section was not "Done," just update the section
-                    $updateSql = "UPDATE Tasks SET section='$section' WHERE task_id='$taskId'";
+                        if ($connection->query($updateSql) === TRUE) {
+                            // Return a success response if the update is successful
+                            header('Content-Type: application/json');
 
-                    if ($connection->query($updateSql) === TRUE) {
-                        // Return a success response if the update is successful
-                        header('Content-Type: application/json');
+                            echo json_encode(array('status' => 'success', 'message' => 'Task section updated successfully.'));
+                        } else {
+                            // Return an error response if there is an issue with the update
+                            header('Content-Type: application/json');
 
-                        echo json_encode(array('status' => 'success', 'message' => 'Task section updated successfully.'));
-                    } else {
-                        // Return an error response if there is an issue with the update
-                        header('Content-Type: application/json');
-
-                        echo json_encode(array('status' => 'error', 'message' => 'Error updating task section: ' . $connection->error));
+                            echo json_encode(array('status' => 'error', 'message' => 'Error updating task section: ' . $connection->error));
+                        }
                     }
                 }
 

@@ -473,7 +473,8 @@ ini_set('display_errors', 1);
                         <div class="div-space-top"></div>
                         <form id="editTaskForm">
                             <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
-                            <input type="hidden" name="projectowner_id" value="<?php echo $project_owner['user_id']; ?>">
+                            <input type="hidden" name="projectowner_id"
+                                value="<?php echo $project_owner['user_id']; ?>">
                             <input type="hidden" id="editTaskId" name="task_id">
                             <input class="input-style" type="text" id="editTaskName" name="task_name">
                             <span id="editTaskName-error" class="error-message"></span>
@@ -628,7 +629,8 @@ ini_set('display_errors', 1);
             connectWith: '.sortable', // Enable sorting between sections
             placeholder: 'ui-state-highlight', // Style for the placeholder during drag-and-drop
             items: 'tr', // Limit sorting to rows only within the current section
-
+            scroll: true, // Enable scrolling
+            scrollSensitivity: 200, // Adjust the value as needed
             update: function (event, ui) {
                 // Get the dragged task's ID
                 const taskId = ui.item.attr('data-task-id');
@@ -749,7 +751,7 @@ ini_set('display_errors', 1);
 
                     // Handle the response if needed
                     console.log('Task updated successfully.');
-                    
+
                     if (response.status == 'success') {
                         console.log(response.message);
                         displayPopupMessage(response.message, 'success');
@@ -864,8 +866,8 @@ ini_set('display_errors', 1);
                 method: 'POST',
                 data: {
                     projectowner_id: <?php echo $project_owner['user_id']; ?>,
-                    task_id: taskId
-                },
+                task_id: taskId
+            },
                 success: function (response) {
                     // Handle the response if needed
                     console.log('Task deleted successfully.');
@@ -888,7 +890,7 @@ ini_set('display_errors', 1);
                     console.error('Error deleting task:', error);
                 }
             });
-        });
+    });
     });
 
     // Function to fetch tasks from the server using AJAX
@@ -1011,8 +1013,8 @@ ini_set('display_errors', 1);
                     console.log(response.message);
                     displayPopupMessage(response.message, 'success');
                 } else if (response.status === 'error') {
-                        $("#taskname-error").text(response.message)
-                        displayPopupMessage(response.message, 'error');
+                    $("#taskname-error").text(response.message)
+                    displayPopupMessage(response.message, 'error');
                 }
 
                 // Reset form fields after successful submission
@@ -1090,14 +1092,6 @@ ini_set('display_errors', 1);
                                         userRolePopup.style.top = rect.bottom + 10 + 'px';
 
                                         userRolePopup.style.display = 'block';
-
-                                        // userRoleInput.addEventListener('focus', function () {
-                                        //     updateRoleButton.style.display = 'block';
-                                        // });
-
-                                        // userRoleInput.addEventListener('blur', function () {
-                                        //     updateRoleButton.style.display = 'none';
-                                        // });
                                     } else {
                                         alert('Error fetching user role.');
                                     }
@@ -1169,12 +1163,13 @@ ini_set('display_errors', 1);
         })
             .then(response => response.text())
             .then(result => {
-                if (response.status == 'success') {
-                        console.log(response.message);
-                        displayPopupMessage(response.message, 'success');
-                    } else if (response.status === 'error') {
-                        displayPopupMessage(response.message, 'error');
-                    }
+                console.log(result.status);
+                if (result.status == 'success') {
+                    console.log(result.message);
+                    displayPopupMessage(result.message, 'success');
+                } else if (result.status === 'error') {
+                    displayPopupMessage(result.message, 'error');
+                }
             })
             .catch(error => {
                 console.log('An error occurred while updating user role.');

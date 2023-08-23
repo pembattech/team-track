@@ -114,6 +114,11 @@ ini_set('display_errors', 1);
     .is-active .project-dropdown-menu {
         display: block;
     }
+
+    .active-task {
+        background-color: var(--color-background-active-two);
+        font-weight: 900;
+    }
 </style>
 <title>Project - TeamTrack</title>
 <div class="container project-wrapper">
@@ -133,6 +138,7 @@ ini_set('display_errors', 1);
         $sql_owner = "SELECT Users.*, ProjectUsers.is_projectowner, ProjectUsers.user_role FROM Users INNER JOIN ProjectUsers ON Users.user_id = ProjectUsers.user_id WHERE ProjectUsers.project_id = $project_id AND ProjectUsers.is_projectowner = 1";
         $result_owner = mysqli_query($connection, $sql_owner);
         $project_owner = mysqli_fetch_assoc($result_owner);
+        echo $project_owner['user_id'];
 
         // Query to fetch other users associated with the project from the 'ProjectUsers' table (excluding the owner)
         $sql_users = "SELECT Users.user_id, Users.username, ProjectUsers.is_projectowner, ProjectUsers.user_role
@@ -174,7 +180,7 @@ ini_set('display_errors', 1);
     ?>
 
     <div class='main-content'>
-        <div class='heading-content'>
+        <div class='heading-content sticky-heading'>
             <div class='heading-style'>
                 <div class='project-link'>
                     <?php
@@ -188,7 +194,7 @@ ini_set('display_errors', 1);
                         <div class="project_menu_toggle svg-img">
                             <img src="static/image/arrow-down.svg" alt="">
                         </div>
-                        <ul class="project-dropdown-menu">
+                        <ul class="project-dropdown-menu popup-style">
                             <li class="project-dropdown-menu-item indicate-danger">
                                 <?php
                                 echo '<a href="partial/project_partial/leave_project.php?project_id=' . $project_id . '">';
@@ -266,7 +272,7 @@ ini_set('display_errors', 1);
                         echo '</div>';
                         ?>
 
-                        <div class="userrole-popup-container" id="userRolePopup">
+                        <div class="userrole-popup-container popup-style" id="userRolePopup">
                             <span class="userole-close-popup" id="closeUserRolePopup">&times;</span>
                             <div class="userrole-popup-content">
                                 <ul>
@@ -467,33 +473,40 @@ ini_set('display_errors', 1);
                         <div class="div-space-top"></div>
                         <form id="editTaskForm">
                             <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
+                            <input type="hidden" name="projectowner_id" value="<?php echo $project_owner['user_id']; ?>">
                             <input type="hidden" id="editTaskId" name="task_id">
-                            <label for="editTaskName">Task Name:</label>
                             <input class="input-style" type="text" id="editTaskName" name="task_name">
+                            <span id="editTaskName-error" class="error-message"></span>
                             <br>
 
+                            <div class="div-space-top"></div>
                             <?php include 'partial/project_partial/lst_of_members.php'; ?>
-                            <label for="memberSelect">Select Member:</label>
-                            <select id="memberSelect" name="member_id">
-                                <option value="">Select an assignee</option>
+                            <select id="editAssignee" name="task_assignee" class="select-style">
                                 <?php echo $selectOptions; ?>
                             </select>
+                            <span id="editAssignee-error" class="error-message"></span>
+
+                            <div class="div-space-top"></div>
+                            <div class="textarea-style">
+                                <textarea id="editTaskDescription" name="task_description"></textarea>
+                            </div>
+                            <span id="editTaskDescription-error" class="error-message"></span>
+
+                            <div class="div-space-top"></div>
+                            <input class="input-style" type="text" id="editStartDate" name="start_date"
+                                placeholder="Start Date" onfocus="(this.type='date')">
+                            <span id="editStartDate-error" class="error-message"></span>
                             <br>
 
-                            <label for="editTaskDescription">Task Description:</label>
-                            <textarea id="editTaskDescription" name="task_description"></textarea>
+                            <div class="div-space-top"></div>
+                            <input class="input-style" type="text" id="editEndDate" name="end_date"
+                                placeholder="End Date" onfocus="(this.type='date')">
+                            <span id="editEndDate-error" class="error-message"></span>
                             <br>
 
-                            <label for="editStartDate">Start Date:</label>
-                            <input type="date" id="editStartDate" name="start_date">
-                            <br>
-
-                            <label for="editEndDate">End Date:</label>
-                            <input type="date" id="editEndDate" name="end_date">
-                            <br>
-
-                            <label for="editStatus">Status:</label>
-                            <select id="editStatus" name="status">
+                            <div class="div-space-top"></div>
+                            <select id="editStatus" name="status" class="select-style">
+                                <option value="" selected disabled hidden>Select a Number</option>
                                 <option value="At risk">At risk</option>
                                 <option value="Off Track">Off track</option>
                                 <option value="On Track">On track</option>
@@ -504,15 +517,18 @@ ini_set('display_errors', 1);
                                 <option value="In Review">In Review</option>
                             </select>
                             <br>
+                            <span id="editStatus-error" class="error-message"></span>
 
-                            <label for="editPriority">Priority:</label>
-                            <select id="editPriority" name="priority">
+                            <div class="div-space-top"></div>
+                            <select id="editPriority" name="priority" class="select-style">
                                 <option value="Low">Low</option>
                                 <option value="Medium">Medium</option>
                                 <option value="High">High</option>
                             </select>
+                            <span id="editPriority-error" class="error-message"></span>
                             <br>
 
+                            <div class="div-space-top"></div>
                             <button type="submit" id="submitButton">Save Changes</button>
                         </form>
                     </div>
@@ -589,67 +605,6 @@ ini_set('display_errors', 1);
         popup.style.display = (popup.style.display === 'block') ? 'none' : 'block';
     }
 </script>
-<!-- <script>
-    // Add a single event listener to the parent element (.user-role-container)
-    document.querySelector(".user-role-container").addEventListener("click", function (event) {
-        var clickedElement = event.target.closest(".user-content");
-        if (!clickedElement) {
-            return; // Clicked outside .user-content, do nothing
-        }
-
-        // Retrieve the user_id and username from the clicked user-content element
-        var userId = clickedElement.getAttribute("data-user-id");
-        var username = clickedElement.querySelector(".user-name").textContent;
-
-        // Use the user_id to set the value of the user_id input in the form for both remove and update user role forms
-        var removeUserForm = document.querySelector(".remove-user-from-proj");
-        var update_userrole = document.querySelector(".update_userrole");
-        var userIdInput = removeUserForm.querySelector("input[name='user_id']");
-        var userIdInput1 = update_userrole.querySelector("input[name='user_id']");
-        userIdInput.value = userId;
-        userIdInput1.value = userId;
-
-        // Use the username to update the placeholder text for the user-role input in the form
-        var userRoleInput = update_userrole.querySelector("input[name='user-role']");
-        var userRoleValue = clickedElement.getAttribute("data-user-role");
-        console.log(userRoleValue);
-
-        if (userRoleValue !== null && userRoleValue !== "") {
-            userRoleInput.value = userRoleValue;
-        } else {
-            userRoleInput.placeholder = "Specify " + username + "'s role in this project";
-        }
-
-        // Stop the click event from propagating to the document body
-        event.stopPropagation();
-
-        var popup = document.getElementById("userrole_popup");
-        var userContentPosition = clickedElement.getBoundingClientRect();
-
-        // Set the popup position based on the clicked user-content element
-        popup.style.left = userContentPosition.left + 20 + "px";
-        popup.style.top = userContentPosition.bottom + 12 + "px";
-
-        if (popup.style.display === "block") {
-            userrole_hidePopup();
-        } else {
-            userrole_showPopup();
-        }
-    });
-
-    // Function to show the popup menu
-    function userrole_showPopup() {
-        var popup = document.getElementById("userrole_popup");
-        popup.style.display = "block";
-    }
-
-    // Function to hide the popup menu
-    function userrole_hidePopup() {
-        var popup = document.getElementById("userrole_popup");
-        popup.style.display = "none";
-    }
-</script> -->
-
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script>
@@ -673,37 +628,46 @@ ini_set('display_errors', 1);
             connectWith: '.sortable', // Enable sorting between sections
             placeholder: 'ui-state-highlight', // Style for the placeholder during drag-and-drop
             items: 'tr', // Limit sorting to rows only within the current section
+
             update: function (event, ui) {
                 // Get the dragged task's ID
                 const taskId = ui.item.attr('data-task-id');
+
                 // Get the destination section's ID
                 const sectionId = ui.item.closest('.collapsible').find('h2').text().trim();
+                console.log(sectionId);
+
+
                 // Update the task's section in the database using an AJAX request
                 $.ajax({
                     url: 'partial/task_partial/update_task_section.php', // Replace with the URL to your update task section PHP file
                     method: 'POST',
                     data: {
+                        projectowner_id: <?php echo $project_owner['user_id']; ?>,
                         task_id: taskId,
                         section: sectionId
                     },
                     success: function (response) {
-                        // Handle the response if needed
+                        console.log(response);
+                        // fetchTasks();
                         console.log('Task section updated successfully.');
-                        fetchTasks();
+                        if (response.status == 'success') {
+                            console.log(response.message);
+                            displayPopupMessage(response.message, 'success');
+                        } else if (response.status === 'error') {
+                            displayPopupMessage(response.message, 'error');
+                        }
 
+                        fetchTasks();
                     },
                     error: function (xhr, status, error) {
                         // Handle the error if needed
                         console.error('Error updating task section:', error);
                     }
                 });
+
             }
         });
-    });
-
-    // Call the fetchTasks function on page load
-    $(document).ready(function () {
-        fetchTasks();
     });
 
     // Variable to store the current task ID
@@ -730,6 +694,16 @@ ini_set('display_errors', 1);
                 const status = $(this).find('td:nth-child(6)').text();
                 const priority = $(this).find('td:nth-child(7)').text();
 
+                // Remove the active class from all task rows
+                $('.sortable tr').removeClass('active-task');
+
+                // Add the active class to the clicked task row
+                $(this).addClass('active-task');
+
+                console.log("**")
+                console.log("**")
+                console.log(assingee);
+
                 // Set the task details in the edit popup form
                 $('#editTaskId').val(taskId);
                 $('#editTaskName').val(taskName);
@@ -746,17 +720,25 @@ ini_set('display_errors', 1);
                 // Show the popup with animation
                 $('#taskPopup').addClass('active');
 
+
                 // Fetch task details and populate the edit form
                 fetchTaskDetails(taskId);
             }
         });
 
+
         // Submit the edited task details when the form is submitted
         $('#editTaskForm').submit(function (event) {
             event.preventDefault();
 
+            // Perform validation before submitting
+            if (!updateFormValidation()) {
+                return; // Stop form submission if validation fails
+            }
+
             // Get the form data
             const formData = $(this).serialize();
+            console.log(formData);
 
             // Send an AJAX request to update the task details
             $.ajax({
@@ -764,25 +746,111 @@ ini_set('display_errors', 1);
                 method: 'POST',
                 data: formData,
                 success: function (response) {
+
                     // Handle the response if needed
                     console.log('Task updated successfully.');
+                    
+                    if (response.status == 'success') {
+                        console.log(response.message);
+                        displayPopupMessage(response.message, 'success');
+                    } else if (response.status === 'error') {
+                        displayPopupMessage(response.message, 'error');
+                    }
+
                     // Hide the edit popup with animation
                     $('#taskPopup').removeClass('active');
+
+                    fetchTasks();
+
                 },
                 error: function (xhr, status, error) {
                     // Handle the error if needed
                     console.error('Error updating task:', error);
+                    console.log(xhr.responseText);
                 }
             });
-            fetchTasks();
 
         });
+
+        function updateFormValidation() {
+            // Clear previous error messages
+            $('.error-message').text('');
+
+            // Perform validation for each input field
+            const taskName = $('#editTaskName').val();
+            const assignee = $('#editAssignee').val();
+            const taskDescription = $('#editTaskDescription').val();
+            const startDate = $('#editStartDate').val();
+            const endDate = $('#editEndDate').val();
+            const status = $('#editStatus').val();
+            const priority = $('#editPriority').val();
+
+            // Add your validation rules here
+            if (taskName.trim() === '') {
+                $("#editTaskName-error").text("Task name is required.");
+                return false;
+            }
+
+            if (assignee === null) {
+
+                $("#editAssignee-error").text("Task assignee is required.");
+                return false;
+            }
+
+
+            if (taskDescription.trim() === '') {
+                $("#editTaskDescription-error").text("Task description is required.");
+                return false;
+            }
+
+            if (startDate === '') {
+                $("#editStartDate-error").text("Task start date is required.");
+                return false;
+            }
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const selectedStartDate = new Date(startDate);
+            selectedStartDate.setHours(0, 0, 0, 0);
+
+            if (selectedStartDate.getTime() <= today.getTime()) {
+                $("#editStartDate-error").text("Start date cannot be in the past.");
+                return false;
+            }
+
+            if (endDate === '') {
+                $("#editEndDate-error").text("Task end date is required.");
+                return false;
+            }
+
+            if (new Date(endDate) <= selectedStartDate) {
+                $("#editEndDate-error").text("End date must be after start date.");
+                return false;
+            }
+
+            if (status === null) {
+                $("#editStatus-error").text("Task status is required.");
+                return false;
+            }
+
+            if (priority === null) {
+                $("#editPriority-error").text("Task priority is required.");
+                return false;
+            }
+
+            return true; // All validation passed
+        }
 
 
         // Close the popup when the close button is clicked
         $('#closeButton').click(function () {
             // Hide the popup with animation
             $('#taskPopup').removeClass('active');
+
+            // Remove the active class from all task rows
+            $('.sortable tr').removeClass('active-task');
+
         });
 
         // Delete the task when the delete button is clicked
@@ -795,6 +863,7 @@ ini_set('display_errors', 1);
                 url: 'partial/task_partial/delete_task.php', // Replace with the URL to your delete task PHP file
                 method: 'POST',
                 data: {
+                    projectowner_id: <?php echo $project_owner['user_id']; ?>,
                     task_id: taskId
                 },
                 success: function (response) {
@@ -802,8 +871,17 @@ ini_set('display_errors', 1);
                     console.log('Task deleted successfully.');
                     // Hide the popup with animation
                     $('#taskPopup').removeClass('active');
+                    // Remove the active class from all task rows
+                    $('.sortable tr').removeClass('active-task');
+
                     // Fetch tasks again to update the list
                     fetchTasks();
+                    if (response.status == 'success') {
+                        console.log(response.message);
+                        displayPopupMessage(response.message, 'success');
+                    } else if (response.status === 'error') {
+                        displayPopupMessage(response.message, 'error');
+                    }
                 },
                 error: function (xhr, status, error) {
                     // Handle the error if needed
@@ -834,17 +912,26 @@ ini_set('display_errors', 1);
                 $.each(response, function (section, tasks) {
                     const tableBody = $('.collapsible table[data-section="' + section + '"] tbody');
                     $.each(tasks, function (index, task) {
-                        const assigneeName = task.assignee_name || 'Not Assigned';
+                        const MAX_DESCRIPTION_LENGTH = 50; // Set the maximum length you want to display
+                        const taskDescription = task.task_description.length > MAX_DESCRIPTION_LENGTH
+                            ? task.task_description.substring(0, MAX_DESCRIPTION_LENGTH) + '...'
+                            : task.task_description;
+                        const assigneeName = task.assignee_name ? task.assignee_name : 'Not Assigned';
+                        const start_date = task.start_date ? task.start_date : '-';
+                        const end_date = task.end_date ? task.end_date : '-';
+                        const status = task.status ? task.status : '-';
+                        const priority = task.priority ? task.priority : '-';
+
                         const statusClass = task.status === 'Done' ? 'completed' : 'incomplete';
                         const row = `
                                 <tr data-task-id="${task.task_id}" class="${statusClass}">
                                     <td>${task.task_name}</td>
-                                    <td>${task.task_description}</td>
+                                    <td>${taskDescription}</td>
                                     <td>${assigneeName}</td>
-                                    <td>${task.start_date}</td>
-                                    <td>${task.end_date}</td>
-                                    <td>${task.status}</td>
-                                    <td>${task.priority}</td>
+                                    <td>${start_date}</td>
+                                    <td>${end_date}</td>
+                                    <td>${status}</td>
+                                    <td>${priority}</td>
                                 </tr>`;
                         tableBody.append(row);
                     });
@@ -858,16 +945,23 @@ ini_set('display_errors', 1);
 
     // Function to fetch task details using AJAX
     function fetchTaskDetails(taskId) {
+        // Clear previous error messages
+        $('.error-message').text('');
+
         $.ajax({
             url: 'partial/task_partial/fetch_task_details.php', // Replace with the URL to your fetch task details PHP file
             method: 'GET',
             data: { task_id: taskId },
             dataType: 'json',
             success: function (response) {
+                console.log("--")
+                console.log(response);
+                console.log("--")
                 // Populate the form fields with the fetched task details
                 $('#editTaskId').val(response.task_id);
                 $('#editTaskName').val(response.task_name);
                 $('#editTaskDescription').val(response.task_description);
+                $('#editAssignee').val(response.assingee);
                 $('#editStartDate').val(response.start_date);
                 $('#editEndDate').val(response.end_date);
                 $('#editStatus').val(response.status);
@@ -898,22 +992,38 @@ ini_set('display_errors', 1);
 
         // Validate Task Description
         if (taskdescription === '') {
-            $("#task_description-error").text("Task description is required.");
+            $("#task_description-error").text("Task_description is required.");
             return false;
         }
 
-        $ajax({
-            type: "POST",
+        $.ajax({
+            method: "POST",
             url: "partial/addtask.php",
             data: {
+                project_id: <?php echo $project_id ?>,
                 taskname: taskname,
                 task_description: taskdescription
             },
             dataType: "json",
             success: function (response) {
-                if (response.status === "error") {
-                    $("#taskname-error").text(response.message)
+                console.log(response);
+                if (response.status == 'success') {
+                    console.log(response.message);
+                    displayPopupMessage(response.message, 'success');
+                } else if (response.status === 'error') {
+                        $("#taskname-error").text(response.message)
+                        displayPopupMessage(response.message, 'error');
                 }
+
+                // Reset form fields after successful submission
+                document.getElementById('taskname').value = '';
+                document.getElementById('task_description').value = '';
+
+                // toggling the add task popup, if it is in block then change to none and vice verse.
+                addtask_popup_toggle();
+
+                // Fetching the task again.
+                fetchTasks();
             },
             error: function (xhr, status, error) {
                 console.log(error);
@@ -1059,11 +1169,12 @@ ini_set('display_errors', 1);
         })
             .then(response => response.text())
             .then(result => {
-                if (result === 'Success') {
-                    console.log('User role updated successfully!');
-                } else {
-                    console.log('Error updating user role.');
-                }
+                if (response.status == 'success') {
+                        console.log(response.message);
+                        displayPopupMessage(response.message, 'success');
+                    } else if (response.status === 'error') {
+                        displayPopupMessage(response.message, 'error');
+                    }
             })
             .catch(error => {
                 console.log('An error occurred while updating user role.');

@@ -75,7 +75,7 @@
                 foreach ($name_parts as $part) {
                     $initials .= strtoupper(substr($part, 0, 1));
                 }
-                echo '<button id="popup-btn" style="background-color: ' . $user_data['background_color'] . ';">' . $initials . '</button>';
+                echo '<button id="popup-btn" style="color: black; background-color: ' . $user_data['background_color'] . ';">' . $initials . '</button>';
             }
         }
         ?>
