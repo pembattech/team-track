@@ -180,7 +180,7 @@ ini_set('display_errors', 1);
     ?>
 
     <div class='main-content'>
-        <div class='heading-content'>
+        <div class='heading-content sticky-heading'>
             <div class='heading-style'>
                 <div class='project-link'>
                     <?php

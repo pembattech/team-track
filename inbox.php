@@ -7,7 +7,7 @@
     <?php include 'partial/sidebar.php'; ?>
 
     <div class="main-content">
-        <div class="heading-content">
+        <div class="heading-content sticky-heading">
             <div class="heading-style">
                 <p>Inbox</p>
             </div>

@@ -166,7 +166,12 @@ button.indicate-danger {
     animation: fadeIn 0.3s ease-in-out forwards;
 }
 
-
+.sticky-heading {
+    position: sticky;
+    top: 67;
+    background-color: inherit;
+    padding: 10px 0;
+}
 
 .related-btn-img {
     display: flex;
@@ -325,7 +330,6 @@ button.indicate-danger {
 .container {
     background-color: var(--bg-color);
     display: flex;
-    overflow: hidden;
 }
 
 /* sidebar */
@@ -424,7 +428,6 @@ button.indicate-danger {
     flex: 1;
     min-height: 88.5vh;
     width: 85%;
-    overflow-y: auto;
     background-color: var(--bg-color);
     margin-left: 200px;
     padding: 8px 25px;
@@ -949,6 +952,7 @@ button#closeButton:hover {
 }
 
 .dashboard-item span {
+    color: var(--color-text);
     font-size: 25px;
 }
 
