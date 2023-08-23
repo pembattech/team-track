@@ -56,7 +56,8 @@ table {
     border-collapse: collapse;
 }
 
-option, select {
+option,
+select {
     border-radius: 5px;
     height: 35px;
     color: var(--color-text);
@@ -150,6 +151,22 @@ button.indicate-danger {
     color: var(--color-text);
 }
 
+/* Define the animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.popup-style {
+    animation: fadeIn 0.3s ease-in-out forwards;
+}
+
+
 
 .related-btn-img {
     display: flex;
@@ -242,6 +259,8 @@ button.indicate-danger {
     padding: 5px 10px 0;
     display: flex;
     align-items: center;
+    top: 0;
+    position: sticky;
 }
 
 .search__container {
@@ -305,20 +324,20 @@ button.indicate-danger {
 
 .container {
     background-color: var(--bg-color);
-    /* Subtracting the navbar height */
     display: flex;
-    transition: 1s ease;
+    overflow: hidden;
 }
 
 /* sidebar */
-
 .sidebar {
     padding: 1rem;
     width: 15%;
+    height: 100%;
     background-color: var(--sidebar-bgcolor);
-    transition: 1s ease;
-    position: relative;
+    box-sizing: border-box;
+    position: fixed;
 }
+
 
 .sidebar-item {
     font-size: 14px;
@@ -402,10 +421,12 @@ button.indicate-danger {
 }
 
 .main-content {
+    flex: 1;
     min-height: 88.5vh;
     width: 85%;
-    overflow-y: hidden;
+    overflow-y: auto;
     background-color: var(--bg-color);
+    margin-left: 200px;
     padding: 8px 25px;
 }
 
@@ -542,6 +563,7 @@ th.subhead-task {
     font-size: 14px;
     color: var(--color-text-disabled);
 }
+
 .lst-of-tasks th,
 .lst-of-tasks td {
     border: 1px solid var(--color-border);
@@ -550,7 +572,7 @@ th.subhead-task {
 }
 
 .lst-of-tasks td {
-color: var(--color-text);
+    color: var(--color-text);
 }
 
 .lst-of-tasks td {

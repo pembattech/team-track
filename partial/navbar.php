@@ -81,7 +81,7 @@
         ?>
 
         <!-- The popup menu -->
-        <div class="popup-menu" id="myPopup">
+        <div class="popup-menu popup-style" id="myPopup">
             <a href="#" onclick="editProfile()">
                 <p>Profile</p>
             </a>
@@ -92,22 +92,5 @@
     </div>
 </div>
 
-<script>
-    // Check if the session variable for project creation message exists
-    var NotificationMessage = <?php echo isset($_SESSION['notification_message']) ? json_encode($_SESSION['notification_message']) : 'null'; ?>;
-    if (NotificationMessage) {
-        // Display the popup notification with the dynamic message
-        var popupNotification = document.getElementById("popupNotification");
-        popupNotification.innerText = NotificationMessage;
-        popupNotification.style.display = "block";
 
-        // Hide the popup after some time (e.g., 5 seconds)
-        setTimeout(function () {
-            popupNotification.style.display = "none";
-        }, 5000); // 5000 milliseconds = 5 seconds
-
-        // Clear the session variable to avoid showing the notification again on page refresh
-        <?php unset($_SESSION['notification_message']); ?>
-    }
-</script>
 <script src="static/js/main.js"></script>

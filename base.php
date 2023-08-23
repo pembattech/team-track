@@ -71,6 +71,10 @@
         z-index: 9999;
     }
 
+    .popup_notify.error {
+        border-top: 5px solid var(--danger-color);
+    }
+
     .loginregister-form-container .heading-style {
         margin: 0;
         padding: 0 20px;
@@ -159,8 +163,42 @@
 
 <div class="popup_notify" id="popupNotification"></div>
 
+
 <?php include 'config/connect.php'; ?>
 <?php include 'partial/utils.php'; ?>
 
 
+
 <script src="static/js/main.js"></script>
+<script>
+    // Function to display a message in the popup notification
+    function displayPopupMessage(message, type) {
+        // Display the popup notification with the dynamic message
+        var popupNotification = document.getElementById("popupNotification");
+        popupNotification.innerText = message;
+        console.log(popupNotification);
+        popupNotification.style.display = "block";
+
+        const popup = $('#popupNotification');
+        popup.html(message);
+
+        if (type === 'success') {
+            popup.removeClass('error');
+            popup.addClass('success');
+        } else if (type === 'error') {
+            popup.removeClass('success');
+            popup.addClass('error');
+        }
+
+        // Show the popup
+        popup.slideDown(300);
+
+        setTimeout(function () {
+        popup.slideUp(300, function () {
+            popupNotification.style.display = "none"; // Hide the popup completely
+        });
+    }, 5000);
+    }
+
+
+</script>

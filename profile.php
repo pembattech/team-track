@@ -296,7 +296,7 @@
                     <button class="edit-profile-btn" onclick="editprofile_popup_toggle()">Edit Profile</button>
                 </div>
             </div>
-            <div class="editprofile-popup" id="editprofile-popup">
+            <div class="editprofile-popup popup-style" id="editprofile-popup">
                 <div class="editprofile-popup-content">
                     <form action="partial/update_profile.php" method="post" enctype="multipart/form-data">
                         <span class="editprofile-popup-close" onclick="editprofile_popup_toggle()">&times;</span>
@@ -437,7 +437,7 @@
                         }
                     }
                     ?>
-                    <div class="editproject-popup" id="editproject-popup">
+                    <div class="editproject-popup popup-style" id="editproject-popup">
                         <div class="editproject-popup-content">
                             <form action="partial/edit_project.php" method="post" enctype="multipart/form-data">
                                 <span class="editproject-popup-close"

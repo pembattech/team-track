@@ -45,4 +45,22 @@ function get_project_data($project_id)
     }
 }
 
+// Function to get user's name by user_id
+function getUserName($user_id) {
+    global $connection;
+    
+    $user_id = sanitize_input($user_id);
+
+
+    $sql = "SELECT name FROM Users WHERE user_id = $user_id";
+    $result = $connection->query($sql);
+    
+    if ($result && $result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        return $row['name'];
+    } else {
+        return "Team member"; // Default if user not found
+    }
+}
+
 ?>

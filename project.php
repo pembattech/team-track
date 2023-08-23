@@ -138,6 +138,7 @@ ini_set('display_errors', 1);
         $sql_owner = "SELECT Users.*, ProjectUsers.is_projectowner, ProjectUsers.user_role FROM Users INNER JOIN ProjectUsers ON Users.user_id = ProjectUsers.user_id WHERE ProjectUsers.project_id = $project_id AND ProjectUsers.is_projectowner = 1";
         $result_owner = mysqli_query($connection, $sql_owner);
         $project_owner = mysqli_fetch_assoc($result_owner);
+        echo $project_owner['user_id'];
 
         // Query to fetch other users associated with the project from the 'ProjectUsers' table (excluding the owner)
         $sql_users = "SELECT Users.user_id, Users.username, ProjectUsers.is_projectowner, ProjectUsers.user_role
@@ -193,7 +194,7 @@ ini_set('display_errors', 1);
                         <div class="project_menu_toggle svg-img">
                             <img src="static/image/arrow-down.svg" alt="">
                         </div>
-                        <ul class="project-dropdown-menu">
+                        <ul class="project-dropdown-menu popup-style">
                             <li class="project-dropdown-menu-item indicate-danger">
                                 <?php
                                 echo '<a href="partial/project_partial/leave_project.php?project_id=' . $project_id . '">';
@@ -271,7 +272,7 @@ ini_set('display_errors', 1);
                         echo '</div>';
                         ?>
 
-                        <div class="userrole-popup-container" id="userRolePopup">
+                        <div class="userrole-popup-container popup-style" id="userRolePopup">
                             <span class="userole-close-popup" id="closeUserRolePopup">&times;</span>
                             <div class="userrole-popup-content">
                                 <ul>
@@ -472,20 +473,18 @@ ini_set('display_errors', 1);
                         <div class="div-space-top"></div>
                         <form id="editTaskForm">
                             <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
+                            <input type="hidden" name="projectowner_id" value="<?php echo $project_owner['user_id']; ?>">
                             <input type="hidden" id="editTaskId" name="task_id">
                             <input class="input-style" type="text" id="editTaskName" name="task_name">
                             <span id="editTaskName-error" class="error-message"></span>
                             <br>
 
                             <div class="div-space-top"></div>
-
                             <?php include 'partial/project_partial/lst_of_members.php'; ?>
-                            <select id="editAssignee" name="task_assingee" class="select-style">
-                                <!-- <option value="" selected disabled hidden>Select an assignee</option> -->
+                            <select id="editAssignee" name="task_assignee" class="select-style">
                                 <?php echo $selectOptions; ?>
                             </select>
                             <span id="editAssignee-error" class="error-message"></span>
-                            <br>
 
                             <div class="div-space-top"></div>
                             <div class="textarea-style">
@@ -606,67 +605,6 @@ ini_set('display_errors', 1);
         popup.style.display = (popup.style.display === 'block') ? 'none' : 'block';
     }
 </script>
-<!-- <script>
-    // Add a single event listener to the parent element (.user-role-container)
-    document.querySelector(".user-role-container").addEventListener("click", function (event) {
-        var clickedElement = event.target.closest(".user-content");
-        if (!clickedElement) {
-            return; // Clicked outside .user-content, do nothing
-        }
-
-        // Retrieve the user_id and username from the clicked user-content element
-        var userId = clickedElement.getAttribute("data-user-id");
-        var username = clickedElement.querySelector(".user-name").textContent;
-
-        // Use the user_id to set the value of the user_id input in the form for both remove and update user role forms
-        var removeUserForm = document.querySelector(".remove-user-from-proj");
-        var update_userrole = document.querySelector(".update_userrole");
-        var userIdInput = removeUserForm.querySelector("input[name='user_id']");
-        var userIdInput1 = update_userrole.querySelector("input[name='user_id']");
-        userIdInput.value = userId;
-        userIdInput1.value = userId;
-
-        // Use the username to update the placeholder text for the user-role input in the form
-        var userRoleInput = update_userrole.querySelector("input[name='user-role']");
-        var userRoleValue = clickedElement.getAttribute("data-user-role");
-        console.log(userRoleValue);
-
-        if (userRoleValue !== null && userRoleValue !== "") {
-            userRoleInput.value = userRoleValue;
-        } else {
-            userRoleInput.placeholder = "Specify " + username + "'s role in this project";
-        }
-
-        // Stop the click event from propagating to the document body
-        event.stopPropagation();
-
-        var popup = document.getElementById("userrole_popup");
-        var userContentPosition = clickedElement.getBoundingClientRect();
-
-        // Set the popup position based on the clicked user-content element
-        popup.style.left = userContentPosition.left + 20 + "px";
-        popup.style.top = userContentPosition.bottom + 12 + "px";
-
-        if (popup.style.display === "block") {
-            userrole_hidePopup();
-        } else {
-            userrole_showPopup();
-        }
-    });
-
-    // Function to show the popup menu
-    function userrole_showPopup() {
-        var popup = document.getElementById("userrole_popup");
-        popup.style.display = "block";
-    }
-
-    // Function to hide the popup menu
-    function userrole_hidePopup() {
-        var popup = document.getElementById("userrole_popup");
-        popup.style.display = "none";
-    }
-</script> -->
-
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script>
@@ -705,18 +643,26 @@ ini_set('display_errors', 1);
                     url: 'partial/task_partial/update_task_section.php', // Replace with the URL to your update task section PHP file
                     method: 'POST',
                     data: {
+                        projectowner_id: <?php echo $project_owner['user_id']; ?>,
                         task_id: taskId,
                         section: sectionId
                     },
                     success: function (response) {
-                        // Handle the response if needed
+                        console.log(response);
+                        // fetchTasks();
                         console.log('Task section updated successfully.');
+                        if (response.status == 'success') {
+                            console.log(response.message);
+                            displayPopupMessage(response.message, 'success');
+                        } else if (response.status === 'error') {
+                            displayPopupMessage(response.message, 'error');
+                        }
+
                         fetchTasks();
                     },
                     error: function (xhr, status, error) {
                         // Handle the error if needed
                         console.error('Error updating task section:', error);
-                        fetchTasks();
                     }
                 });
 
@@ -803,15 +749,26 @@ ini_set('display_errors', 1);
 
                     // Handle the response if needed
                     console.log('Task updated successfully.');
+                    
+                    if (response.status == 'success') {
+                        console.log(response.message);
+                        displayPopupMessage(response.message, 'success');
+                    } else if (response.status === 'error') {
+                        displayPopupMessage(response.message, 'error');
+                    }
+
                     // Hide the edit popup with animation
                     $('#taskPopup').removeClass('active');
+
+                    fetchTasks();
+
                 },
                 error: function (xhr, status, error) {
                     // Handle the error if needed
                     console.error('Error updating task:', error);
+                    console.log(xhr.responseText);
                 }
             });
-            fetchTasks();
 
         });
 
@@ -867,7 +824,7 @@ ini_set('display_errors', 1);
                 return false;
             }
 
-            if (new Date(endDate) < selectedStartDate) {
+            if (new Date(endDate) <= selectedStartDate) {
                 $("#editEndDate-error").text("End date must be after start date.");
                 return false;
             }
@@ -906,6 +863,7 @@ ini_set('display_errors', 1);
                 url: 'partial/task_partial/delete_task.php', // Replace with the URL to your delete task PHP file
                 method: 'POST',
                 data: {
+                    projectowner_id: <?php echo $project_owner['user_id']; ?>,
                     task_id: taskId
                 },
                 success: function (response) {
@@ -918,6 +876,12 @@ ini_set('display_errors', 1);
 
                     // Fetch tasks again to update the list
                     fetchTasks();
+                    if (response.status == 'success') {
+                        console.log(response.message);
+                        displayPopupMessage(response.message, 'success');
+                    } else if (response.status === 'error') {
+                        displayPopupMessage(response.message, 'error');
+                    }
                 },
                 error: function (xhr, status, error) {
                     // Handle the error if needed
@@ -1032,18 +996,34 @@ ini_set('display_errors', 1);
             return false;
         }
 
-        $ajax({
-            type: "POST",
+        $.ajax({
+            method: "POST",
             url: "partial/addtask.php",
             data: {
+                project_id: <?php echo $project_id ?>,
                 taskname: taskname,
                 task_description: taskdescription
             },
             dataType: "json",
             success: function (response) {
-                if (response.status === "error") {
-                    $("#taskname-error").text(response.message)
+                console.log(response);
+                if (response.status == 'success') {
+                    console.log(response.message);
+                    displayPopupMessage(response.message, 'success');
+                } else if (response.status === 'error') {
+                        $("#taskname-error").text(response.message)
+                        displayPopupMessage(response.message, 'error');
                 }
+
+                // Reset form fields after successful submission
+                document.getElementById('taskname').value = '';
+                document.getElementById('task_description').value = '';
+
+                // toggling the add task popup, if it is in block then change to none and vice verse.
+                addtask_popup_toggle();
+
+                // Fetching the task again.
+                fetchTasks();
             },
             error: function (xhr, status, error) {
                 console.log(error);
@@ -1189,11 +1169,12 @@ ini_set('display_errors', 1);
         })
             .then(response => response.text())
             .then(result => {
-                if (result === 'Success') {
-                    console.log('User role updated successfully!');
-                } else {
-                    console.log('Error updating user role.');
-                }
+                if (response.status == 'success') {
+                        console.log(response.message);
+                        displayPopupMessage(response.message, 'success');
+                    } else if (response.status === 'error') {
+                        displayPopupMessage(response.message, 'error');
+                    }
             })
             .catch(error => {
                 console.log('An error occurred while updating user role.');

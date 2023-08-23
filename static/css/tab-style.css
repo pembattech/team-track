@@ -17,6 +17,24 @@
     /* To position the indicator relative to the tab button */
 }
 
+.tab-btn:hover {
+    color: var(--color-text-active);
+    background-color: var(--color-card-background);
+    position: relative;
+    /* To position the indicator relative to the tab button */
+}
+
+/* Define the animation */
+@keyframes slideIn {
+    0% {
+        transform: scaleX(0);
+    }
+
+    100% {
+        transform: scaleX(1);
+    }
+}
+
 /* Style for the active indicator */
 .tab-btn.active::after {
     content: "";
@@ -25,12 +43,13 @@
     left: 0;
     width: 90%;
     height: 2px;
-    /* Adjust the height of the indicator as per your preference */
     background-color: var(--color-text-active);
-    /* Choose the color you want for the indicator */
     border-radius: 5px 5px 0 0;
-    /* To match the rounded corners of the tab button */
+    animation: slideIn 0.3s ease-in-out;
+    /* Apply the animation to the indicator */
 }
+
+
 
 
 /* Style for the tab content */
@@ -41,5 +60,3 @@
 .tab-content.active {
     display: block;
 }
-
-
