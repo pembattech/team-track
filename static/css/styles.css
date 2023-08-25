@@ -66,10 +66,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     filter: invert(40%) sepia(80%) saturate(2000%);
 }
 
-.form-group label {
-    color: var(--color-text);
-}
-
 .indicate-danger p,
 .indicate-danger li,
 button.indicate-danger {
@@ -148,6 +144,19 @@ button.indicate-danger {
 .button-style:hover {
     background-color: var(--color-background-hover);
     color: var(--color-text);
+}
+
+.button-style-w-danger {
+    outline: 0;
+    padding: 3px;
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+    color: var(--color-text-weak);
+    background-color: var(--color-background-weak);
+}
+
+.button-style-w-danger:hover {
+    background-color: var(--color-background-hover);
 }
 
 /* Define the animation */

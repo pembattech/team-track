@@ -24,6 +24,10 @@ include 'base.php';
     </div>
     <div class="LR-form">
         <form id="loginForm" action="partial/login.php" method="post">
+            <?php if (isset($_GET['project_id'])) { ?>
+                <input type="hidden" name="project_id" value="<?php echo $_GET['project_id']; ?>">
+            <?php } ?>
+
             <div class="form-group">
                 <input type="text" placeholder="Username" id="username" name="username">
             </div>

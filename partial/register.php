@@ -49,10 +49,8 @@ function register_user($name, $username, $email, $password)
     echo $sql_register_user;
 
     if (mysqli_query($connection, $sql_register_user)) {
-        echo "Hello";
         return "Registration successful";
     } else {
-        echo "Bye";
         return "Registration failed";
     }
 }

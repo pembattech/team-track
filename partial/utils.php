@@ -62,5 +62,4 @@ function getUserName($user_id) {
         return "Team member"; // Default if user not found
     }
 }
-
 ?>

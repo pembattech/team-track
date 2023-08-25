@@ -12,7 +12,7 @@ function sanitize_input($input)
 }
 
 // Function to handle user login
-function login_user($username, $password)
+function login_user($username, $password, $project_id)
 {
     global $connection;
 
@@ -32,8 +32,12 @@ function login_user($username, $password)
             $_SESSION['user_id'] = $user['user_id'];
             $_SESSION['username'] = $user['username'];
 
-            // Redirect to the user's home or desired page after login
-            header("Location: ../home.php");
+
+            if ($project_id !== null) {
+                header("Location: ../project.php?project_id=" . $project_id . "&verify=false");
+            } else {
+                header("Location: ../home.php");
+            }
             exit();
         } else {
             return "Invalid password";
@@ -47,24 +51,25 @@ function login_user($username, $password)
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $username = $_POST["username"];
     $password = $_POST["password"];
-    
+    $project_id = isset($_POST["project_id"]) ? $_POST["project_id"] : null;
+
     // Call the function to login the user
-    $login_result = login_user($username, $password);
+    $login_result = login_user($username, $password, $project_id);
 
-        // // Perform validation
-        // $errors = array();
+    // // Perform validation
+    // $errors = array();
 
-        // if (empty($username)) {
-        //     $errors[] = "Username is required.";
-        // }
-    
-        // if (empty($password)) {
-        //     $errors[] = "Password is required.";
-        // }
-    
-        // // If there are no errors, you can proceed with login logic
-        // if (empty($errors)) {
-        // }
+    // if (empty($username)) {
+    //     $errors[] = "Username is required.";
+    // }
+
+    // if (empty($password)) {
+    //     $errors[] = "Password is required.";
+    // }
+
+    // // If there are no errors, you can proceed with login logic
+    // if (empty($errors)) {
+    // }
 
 }
 ?>

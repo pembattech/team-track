@@ -1,3 +1,5 @@
+<?php include 'access_denied.php'; ?>
+
 <?php
 session_start();
 ?>
@@ -53,6 +55,7 @@ ini_set('display_errors', 1);
     .member #popup-btn {
         margin-left: 0;
         margin-right: 0;
+        object-fit: cover;
     }
 
     #updateRoleButton {
@@ -119,6 +122,27 @@ ini_set('display_errors', 1);
         background-color: var(--color-background-active-two);
         font-weight: 900;
     }
+
+    /* OTP Popup Styles */
+    .otp-popup {
+        display: none;
+        background-color: var(--overlay-bgcolor);
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        backdrop-filter: blur(5px);
+    }
+
+    .otp-popup-content {
+        background-color: var(--color-background-weak);
+        color: var(--color-text);
+        max-width: 400px;
+        margin: 100px auto;
+        padding: 10px 20px;
+        border-radius: 4px;
+    }
 </style>
 <title>Project - TeamTrack</title>
 <div class="container project-wrapper">
@@ -127,8 +151,24 @@ ini_set('display_errors', 1);
 
     // Check if the 'project_id' parameter is present in the URL
     if (isset($_GET['project_id'])) {
+
+        if (isset($_GET['verify'])) {
+
+            if ($_GET['verify'] == 'false') { ?>
+                <script>
+                    $(document).ready(function () {
+                        openOtpPopup(); // Opens the OTP verification popup
+                    });
+                </script>
+
+                <?php
+            }
+        }
+
         $project_id = $_GET['project_id'];
         $user_id = $_SESSION['user_id'];
+        echo $project_id;
+        echo $user_id;
 
         // Query to fetch project details from the 'Projects' table
         $sql_project = "SELECT * FROM Projects WHERE project_id = $project_id";
@@ -272,6 +312,23 @@ ini_set('display_errors', 1);
                         echo '</div>';
                         ?>
 
+                        <div id="otpPopup" class="otp-popup popup-style" style="display:none;">
+                            <div id="otpPopupContent" class="otp-popup-content">
+                                <p class="heading-style">OTP Verification '
+                                    <?php echo $project['project_name'] ?>'
+                                </p>
+                                <div class="bottom-line"></div>
+                                <div class="div-space-top"></div>
+                                <form id="otpForm">
+                                    <input type="text" class="input-style" id="otpInput" name="otpInput"
+                                        placeholder="Enter OTP">
+
+                                    <button type="button" class="button-style" id="verifyOtpButton">Verify OTP</button>
+                                </form>
+                                <p id="otpStatus"></p>
+                            </div>
+                        </div>
+
                         <div class="userrole-popup-container popup-style" id="userRolePopup">
                             <span class="userole-close-popup" id="closeUserRolePopup">&times;</span>
                             <div class="userrole-popup-content">
@@ -309,8 +366,9 @@ ini_set('display_errors', 1);
                                 <p class="heading-style">Share '
                                     <?php echo $project['project_name'] ?>'
                                 </p>
-
-                                <form>
+                                <div class="bottom-line"></div>
+                                <div class="div-space-top"></div>
+                                <form id="invite-form">
                                     <div class="form-group">
                                         <p>Invite with email</p>
                                         <input type="email" id="email" name="email"
@@ -591,6 +649,8 @@ ini_set('display_errors', 1);
             <p>This is the content of Tab 2.</p>
         </div>
 
+        <!-- Include jQuery library -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     </div>
 
 </div>
@@ -1224,6 +1284,56 @@ ini_set('display_errors', 1);
                     $(document).on('mouseup', onMouseUp);
                 } else {
                     $(document).off('mouseup', onMouseUp);
+                }
+            });
+        });
+    });
+</script>
+
+<script>
+    $(document).ready(function () {
+        $("#invite-form").submit(function (event) {
+            event.preventDefault();
+
+            var email = $("#email").val();
+            var message = $("#message").val();
+
+            console.log(email)
+            console.log(message)
+
+            // Frontend validation
+            if (email === "") {
+                alert("Please enter an email address.");
+                return;
+            }
+
+            // AJAX request
+            $.ajax({
+                type: "POST",
+                url: "invite_to_project.php", // Backend processing script
+                data: { email: email, message: message, project_id: <?php echo $project_id ?> },
+                success: function (response) {
+                    alert(response); // Display the response from the server
+                }
+            });
+        });
+    });
+</script>
+<script>
+    function openOtpPopup() {
+        $("#otpPopup").show();
+    }
+
+    $(document).ready(function () {
+        $("#verifyOtpButton").click(function () {
+            var enteredOtp = $("#otpInput").val();
+
+            $.ajax({
+                type: "POST",
+                url: "partial/verify_addmember_otp.php",
+                data: { otp: enteredOtp, project_id: "<?php echo $project_id ?>", },
+                success: function (response) {
+                    $("#otpStatus").html(response);
                 }
             });
         });

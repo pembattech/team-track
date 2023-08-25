@@ -64,3 +64,14 @@ CREATE TABLE IF NOT EXISTS Messages (
     FOREIGN KEY (sender_id) REFERENCES Users(user_id),
     FOREIGN KEY (recipient_id) REFERENCES Users(user_id)
 );
+
+
+CREATE TABLE IF NOT EXISTS ProjectInvitations (
+    invitation_id INT AUTO_INCREMENT PRIMARY KEY,
+    project_id INT,
+    email VARCHAR(255),
+    otp VARCHAR(10),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_used TINYINT(1) DEFAULT 0,
+    FOREIGN KEY (project_id) REFERENCES Projects(project_id)
+);
