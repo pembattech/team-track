@@ -4,8 +4,8 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 ?>
 
-<?php include 'partial/send_mail.php'; ?>
-<?php include 'partial/gen_otp.php'; ?>
+<?php include '../../partial/send_mail.php'; ?>
+<?php include '../../partial/gen_otp.php'; ?>
 
 <?php
 if ($_SERVER["REQUEST_METHOD"] == "POST") {

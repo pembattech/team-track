@@ -131,6 +131,10 @@
         z-index: 9;
     }
 
+    .remove-profile-picture .button-style-w-danger {
+        padding: 0 5px;
+    }
+
     .editprofile-popup-content {
         background-color: var(--color-background-weak);
         color: var(--color-text);
@@ -177,6 +181,7 @@
         display: grid;
         grid-template-columns: 1fr 1fr;
         width: 100%;
+        align-items: center;
     }
 
     .user-project .project-options {
@@ -361,20 +366,21 @@
                                     foreach ($name_parts as $part) {
                                         $initials .= strtoupper(substr($part, 0, 1));
                                     }
-                                    
-                                    function hexToPercentEncoded($hexColor) {
+
+                                    function hexToPercentEncoded($hexColor)
+                                    {
                                         // Remove any leading "#" if present
                                         $hexColor = ltrim($hexColor, "#");
-                                        
+
                                         if (strlen($hexColor) !== 6) {
                                             return false; // Invalid hex color format
                                         }
-                                        
+
                                         $percentEncoded = "%23" . strtoupper($hexColor);
-                                        
+
                                         return $percentEncoded;
                                     }
-                                    
+
                                     $hexColor = $user_data['background_color'];
                                     $percentEncodedColor = hexToPercentEncoded($hexColor);
 
@@ -471,6 +477,7 @@
                             </div>
                         </div>
                         <div class="bottom-line"></div>
+                        <div class="div-space-top"></div>
                         <div class="about">
                             <p>
                                 <?php if (get_user_data($user_id)['about'] !== null && get_user_data($user_id)['about'] !== "") {

@@ -14,9 +14,9 @@
 
             <div class="tab-btns">
                 <!-- Tab Buttons -->
-                <div class="heading-nav between-verticle-line tab-btn active" onclick="openTab(event, 'tab1')">Activity
+                <div class="heading-nav between-verticle-line tab-btn active" onclick="openTab_inbox(event, 'tab1')">Activity
                 </div>
-                <div class="heading-nav between-verticle-line tab-btn" onclick="openTab(event, 'tab2')">
+                <div class="heading-nav between-verticle-line tab-btn" onclick="openTab_inbox(event, 'tab2')">
                     Message I've sent</div>
             </div>
         </div>

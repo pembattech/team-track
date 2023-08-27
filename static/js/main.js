@@ -32,6 +32,40 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
+function openTab_inbox(event, tabId) {
+    // Get all tab contents and hide them
+    const tabContents = document.getElementsByClassName('tab-content');
+    for (let i = 0; i < tabContents.length; i++) {
+        tabContents[i].style.display = 'none';
+    }
+
+    // Get all tab buttons and remove the 'active' class
+    const tabButtons = document.getElementsByClassName('tab-btn');
+    for (let i = 0; i < tabButtons.length; i++) {
+        tabButtons[i].classList.remove('active');
+    }
+
+    // Show the clicked tab content and mark the button as active
+    document.getElementById(tabId).style.display = 'block';
+    event.currentTarget.classList.add('active');
+
+    // Store the active tab in localStorage
+    localStorage.setItem('activeTab_inbox', tabId);
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    // Retrieve the active tab from localStorage
+    const activeTab = localStorage.getItem('activeTab_inbox');
+
+    // If there is an active tab stored, open it
+    if (activeTab) {
+        const tabButton = document.querySelector(`[onclick="openTab_inbox(event, '${activeTab}')"]`);
+        if (tabButton) {
+            tabButton.click();
+        }
+    }
+});
+
 // Function to show the popup menu
 function showPopup() {
     var popup = document.getElementById("myPopup");

@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 // Start the session to access session data
 session_start();
@@ -43,8 +43,14 @@ include 'base.php'; ?>
             </div>
 
             <input type="submit" placeholder="" id="submitButton" value="Register" disabled>
+            <div class="div-space-top"></div>
+            <div class="div-space-top"></div>
+            <div class="div-space-top"></div>
+            <div class="div-space-top"></div>
+            <div class="already">
+                <p>Already have an account? <a href="login_form.php">Login</a></p>
+            </div>
         </form>
-
     </div>
 </div>
 

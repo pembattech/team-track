@@ -38,6 +38,13 @@ include 'base.php';
 
             <input type="submit" placeholder="" id="submitButton" value="Login">
         </form>
+        <div class="div-space-top"></div>
+        <div class="div-space-top"></div>
+        <div class="div-space-top"></div>
+        <div class="div-space-top"></div>
+        <div class="donthave_acc">
+            <p>Don't have an account? <a href="register_form.php">Sign Up</a></p>
+        </div>
 
     </div>
 </div>

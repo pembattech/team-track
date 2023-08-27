@@ -222,11 +222,11 @@ ini_set('display_errors', 1);
     <div class='main-content'>
         <div class='heading-content sticky-heading'>
             <div class='heading-style'>
-                <div class='project-link'>
+                <div class='project-link project-wrapper'>
                     <?php
                     if (mysqli_num_rows($result_project) > 0) {
                         $project = mysqli_fetch_assoc($result_project);
-                        echo '<div class="square" style="background-color:' . $project['background_color'] . '"></div>';
+                        echo '<div class="square project-wrapper" style="background-color:' . $project['background_color'] . '"></div>';
                         echo "<p>" . $project['project_name'] . "</p>";
                     }
                     ?>
@@ -289,7 +289,6 @@ ini_set('display_errors', 1);
                             $isProjectOwner = $row['is_projectowner'];
                             $userRole = $row['user_role'];
 
-                            echo $project_id;
                             echo '<div class="member user-content" data-project-id="' . $project_id . '">';
                             display_profile_picture($userId);
                             echo '<div class="user-role-flex">';
@@ -359,7 +358,6 @@ ini_set('display_errors', 1);
                         </div>
 
 
-
                         <div class="invite-popup" id="invite-popup">
                             <div class="invite-popup-content">
                                 <span class="invite-popup-close" onclick="addmember_popup_toggle()">&times;</span>
@@ -371,15 +369,18 @@ ini_set('display_errors', 1);
                                 <form id="invite-form">
                                     <div class="form-group">
                                         <p>Invite with email</p>
-                                        <input type="email" id="email" name="email"
+                                        <input type="email" class="input-style" id="email" name="email"
                                             placeholder="Add members by email...">
+                                        <p id="email-exists-message" style="color: red;"></p>
                                     </div>
                                     <div class="form-group">
                                         <label for="message">Message (optional)</label>
-                                        <textarea id="message" name="message" rows="4"
-                                            placeholder="Add a message"></textarea>
+                                        <div class="textarea-style">
+                                            <textarea id="message" name="message" rows="4"
+                                                placeholder="Add a message"></textarea>
+                                        </div>
                                     </div>
-                                    <button type="submit" class="invite-submit-btn">Send Invite</button>
+                                    <button type="submit" class="button-style">Send Invite</button>
                                 </form>
                             </div>
                         </div>
@@ -1290,16 +1291,50 @@ ini_set('display_errors', 1);
     });
 </script>
 
+<!-- Add jQuery library -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Add this script to your HTML file -->
 <script>
     $(document).ready(function () {
+        var emailInput = $("#email");
+
+        emailInput.keyup(function () {
+            var email = emailInput.val();
+
+            // Frontend validation
+            if (email === "") {
+                $("#email-exists-message").text("");
+                return;
+            }
+
+            // AJAX request to check if the email exists in the project
+            $.ajax({
+                type: "POST",
+                url: "partial/project_partial/is_exist_user.php", // Your existing email checking script
+                data: { email: email, project_id: <?php echo $project_id ?> },
+                dataType: "json",
+                success: function (response) {
+                    if (response.exists) {
+                        $("#email-exists-message").text("A user with this email is already part of the project.");
+                    } else {
+                        $("#email-exists-message").text("");
+                    }
+                },
+                error: function () {
+                    alert("An error occurred while checking the email.");
+                }
+            });
+        });
+
         $("#invite-form").submit(function (event) {
             event.preventDefault();
 
-            var email = $("#email").val();
+            var email = emailInput.val();
             var message = $("#message").val();
 
-            console.log(email)
-            console.log(message)
+            console.log(email);
+            console.log(message);
 
             // Frontend validation
             if (email === "") {
@@ -1307,17 +1342,23 @@ ini_set('display_errors', 1);
                 return;
             }
 
-            // AJAX request
+            // Proceed with inviting the user to the project
+            inviteUserToProject(email, message);
+        });
+
+        function inviteUserToProject(email, message) {
+            // AJAX request to invite the user to the project
             $.ajax({
                 type: "POST",
-                url: "invite_to_project.php", // Backend processing script
+                url: "partial/project_partial/invite_to_project.php", // Backend processing script
                 data: { email: email, message: message, project_id: <?php echo $project_id ?> },
                 success: function (response) {
                     alert(response); // Display the response from the server
                 }
             });
-        });
+        }
     });
+
 </script>
 <script>
     function openOtpPopup() {

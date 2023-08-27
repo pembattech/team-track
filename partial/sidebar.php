@@ -1,13 +1,13 @@
 <div class="sidebar">
-    <ul class="bottom-line">
-        <a href="home.php">
+    <ul class="bottom-line" id="lst-link">
+        <a href="home.php" id="link">
             <li class="sidebar-item related-btn-img"><img src="./static/image/home.svg" alt="">Home</li>
         </a>
-        <a href="mytasks.php">
+        <a href="mytasks.php" id="link">
             <li class="sidebar-item related-btn-img"><img src="./static/image/check-square.svg" alt="">My
                 Tasks</li>
         </a>
-        <a href="inbox.php">
+        <a href="inbox.php" id="link">
             <li class="sidebar-item related-btn-img"><img src="./static/image/bell.svg" alt="">Inbox</li>
         </a>
     </ul>
@@ -44,7 +44,7 @@
                             $project_name = $row['project_name'];
                             $background_color = $row['background_color'];
                             echo '<div class="project-lst">';
-                            echo '<a href="project.php?project_id=' . $project_id . '" class="project-link">';
+                            echo '<a href="project.php?project_id=' . $project_id . '" class="project-link" id="link">';
                             echo '    <div class="square" style="background-color:' . $background_color . '"></div>';
                             echo '    <p class="project-title">' . $project_name . '</p>';
                             echo '</a>';
