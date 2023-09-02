@@ -4,11 +4,6 @@ require_once '../../config/connect.php';
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-
-if ($connection->connect_error) {
-    die('Connection failed: ' . $connection->connect_error);
-}
-
 if (isset($_POST['username'])) {
     $username = $_POST['username'];
 

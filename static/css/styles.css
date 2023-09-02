@@ -19,6 +19,7 @@
     --color-background-hover: rgba(255, 255, 255, 0.06);
     --color-background-active: rgba(255, 255, 255, 0.11);
     --color-background-active-two: rgba(255, 255, 255, 0.20);
+    --color-background-active-three: rgba(255, 255, 255, 0.00);
 }
 
 * {
@@ -27,6 +28,10 @@
     line-height: 2rem;
     font-family: 'Poppins', sans-serif;
     color: var(--color-text);
+}
+
+.active {
+    color: red;
 }
 
 body {
@@ -40,11 +45,13 @@ hr {
 
 a {
     text-decoration: none;
-    color: var(--color-text)
+    color: var(--color-text);
+    transition: color 0.3s ease;
 }
 
 a:hover {
-    color: var(--color-text-weak)
+    color: var(--color-text-weak);
+    transition: color 0.3s ease;
 }
 
 li {
@@ -52,7 +59,7 @@ li {
 }
 
 p {
-    color: var(--color-text)
+    color: var(--color-text);
 }
 
 table {
@@ -70,6 +77,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     filter: invert(40%) sepia(80%) saturate(2000%);
 }
 
+.indicate-danger,
 .indicate-danger p,
 .indicate-danger li,
 button.indicate-danger {
@@ -214,6 +222,7 @@ button.indicate-danger {
 }
 
 .square {
+    position: relative;
     display: inline-block;
     background-color: green;
     width: 15px;
@@ -221,6 +230,18 @@ button.indicate-danger {
     border-radius: 3px;
     margin-right: 5px;
     margin-top: -1px;
+}
+
+.overlay-image {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    width: 13px;
+    height: 13px;
+    opacity: 0.6;
+
 }
 
 .overlay-border {
@@ -239,6 +260,15 @@ button.indicate-danger {
 }
 
 .access-denied-container {
+    color: var(--color-text);
+    background-color: var(--bg-color);
+    position: relative;
+    margin: 150px auto;
+    padding: 15px;
+    width: 710px;
+    border: 0;
+    border-radius: 5px;
+    box-shadow: 3px 3px 10px #333;
     color: var(--color-text);
 }
 
@@ -364,16 +394,10 @@ button.indicate-danger {
 }
 
 /* sidebar */
-.sidebar {
-    padding: 1rem;
-    width: 15%;
-    height: 100%;
-    background-color: var(--sidebar-bgcolor);
-    box-sizing: border-box;
-    position: fixed;
-}
 
 
+
+/* 
 .sidebar-item {
     font-size: 14px;
     color: var(--color-text)
@@ -394,7 +418,7 @@ button.indicate-danger {
 .project-link:hover {
     border-radius: 5px;
     background-color: var(--color-background-weak);
-}
+} */
 
 .project-lst {
     font-family: inherit;
@@ -415,31 +439,14 @@ button.indicate-danger {
     width: 16px;
     height: 16px;
     background-color: #ccc;
-    margin-right: 10px;
-}
-
-.collapsible-header {
-    cursor: pointer;
-    font-size: 14px;
-    font-family: inherit;
-    color: var(--color-text);
-}
-
-.collapsible-icon {
-    display: inline-block;
-    transition: transform 0.2s ease-out;
-}
-
-.collapsible-header.open .collapsible-icon {
-    transform: rotate(180deg);
+    margin-right: 5px;
 }
 
 .project-scroll-container {
-    max-height: 300px;
+    max-height: 400px;
     overflow-y: auto;
 }
 
-/* Hide the vertical scrollbar when not needed */
 .project-scroll-container::-webkit-scrollbar {
     width: 5px;
 }
@@ -457,10 +464,10 @@ button.indicate-danger {
 .main-content {
     flex: 1;
     min-height: 87.5vh;
-    width: 85%;
+    /* width: 85%; */
     background-color: var(--bg-color);
-    margin-left: 200px;
-    padding: 8px 25px;
+    margin-left: 255px;
+    padding: 8px 15px;
 }
 
 .main-content_large {
@@ -583,11 +590,18 @@ th.subhead-task {
     display: flex;
     align-items: center;
     padding: 0;
-} 
+    width: fit-content;
+    cursor: pointer;
+}
 
 .project-wrapper.square {
     width: 30px;
     height: 30px;
+}
+
+.project-wrapper > .overlay-image {
+    width: 25px;
+    height: 25px;
 }
 
 .error-message {
@@ -713,6 +727,7 @@ button#closeButton:hover {
 .userrole-popup-content li {
     display: block;
     padding: 5px;
+    margin: 5px;
     font-size: 14px;
     font-family: inherit;
     text-decoration: none;
@@ -805,14 +820,7 @@ button#closeButton:hover {
 .invite-popup textarea {
     width: 100%;
     padding: 8px 5px;
-}
-
-/* Styling for the user-role-container */
-.user-role-container {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 10px;
+    background-color: inherit;
 }
 
 /* Styling for the "+" sign */
@@ -903,7 +911,6 @@ button#closeButton:hover {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    gap: 10px;
 }
 
 

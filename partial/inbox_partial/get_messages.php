@@ -12,12 +12,13 @@ $password = "";
 $dbname = "teamtrack";
 
 // Create connection
-$conn = new mysqli($servername, $username, $password, $dbname);
+$connection = new mysqli($servername, $username, $password, $dbname);
 
 // Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+if ($connection->connect_error) {
+    die("Connection failed: " . $connection->connect_error);
 }
+
 
 session_start();
 
@@ -34,7 +35,7 @@ WHERE Messages.recipient_id = $user_id
 ORDER BY Messages.timestamp DESC;
 ";
 
-$result = $conn->query($sql);
+$result = $connection->query($sql);
 
 $messages = array();
 
@@ -53,7 +54,7 @@ if ($result->num_rows > 0) {
     }
 }
 
-$conn->close();
+$connection->close();
 
 // Return the messages as JSON
 header('Content-Type: application/json');

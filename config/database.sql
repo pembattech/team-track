@@ -1,6 +1,8 @@
 -- Create the database and tables
 CREATE DATABASE IF NOT EXISTS teamtrack;
 
+USE teamtrack;
+
 CREATE TABLE IF NOT EXISTS Users (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(255),
@@ -73,5 +75,7 @@ CREATE TABLE IF NOT EXISTS ProjectInvitations (
     otp VARCHAR(10),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     is_used TINYINT(1) DEFAULT 0,
+    invitation_sender INT,
+    FOREIGN KEY (invitation_sender) REFERENCES Users(user_id),
     FOREIGN KEY (project_id) REFERENCES Projects(project_id)
 );

@@ -1,3 +1,11 @@
+// JavaScript function to add ellipsis
+function addEllipsis(text, maxLength) {
+    if (text.length > maxLength) {
+        text = text.substring(0, maxLength) + '...';
+    }
+    return text;
+}
+
 function openTab(event, tabId) {
     // Get all tab contents and hide them
     const tabContents = document.getElementsByClassName('tab-content');

@@ -1,67 +1,71 @@
 <style>
     .sidebar {
         width: 250px;
+        background-color: #333;
         color: white;
         height: 100vh;
-        top: 65;
+        top: 0;
+        left: 0;
         overflow-y: auto;
-        background-color: var(--sidebar-bgcolor);
-        position: fixed;
     }
 
     .sidebar ul {
         list-style: none;
-        padding: 10px 0;
+        padding: 0;
     }
 
     .sidebar li {
-        margin-bottom: 10px;
-        padding: 3px 8px;
+        margin: 0;
+        padding: 0;
+        width: 100%;
     }
 
     .sidebar a {
-        border-radius: 5px;
-        padding: 0 5px;
+        display: block;
+        padding: 10px;
         text-decoration: none;
-        font-size: 16px;
-        color: var(--color-text);
+        font-size: 18px;
+        color: #fff;
+        background-color: blue;
+        transition: background-color 0.3s ease;
     }
 
     .sidebar a.full-width {
         display: flex;
         align-items: center;
         text-decoration: none;
-        color: var(--color-text);
-        padding: 0 5px;
-        font-size: 16px;
+        color: #fff;
+        background-color: blue;
+        transition: background-color 0.3s ease;
+        padding: 10px;
+        font-size: 18px;
         width: 100%;
     }
 
     .sidebar a.full-width:hover {
-        background-color: var(--color-background-hover);
+        background-color: red;
     }
 
     .sidebar a:hover {
-        background-color: var(--color-background-hover);
+        background-color: red;
     }
 
     .sidebar a.active {
-        background-color: var(--color-background-weak);
+        background-color: #555;
     }
 
-    .sidebar .project-lst.active {
-        background-color: var(--color-background-weak);
-        border-radius: 5px;
-    }
-
-    .collapsible-project {
+    .collapsible {
         cursor: pointer;
-        padding: 0 5px;
     }
 
     .collapsible-content {
+        display: none;
+        padding-left: 20px;
+    }
+
+    /* Additional styles to fix collapsible issue */
+    .collapsible-content a {
         display: block;
-        padding-left: 5px;
     }
 </style>
 <nav class="sidebar">
@@ -85,13 +89,15 @@
             </a>
         </li>
         <li>
-            <div class="collapsible-project">Project ▼</div>
+            <div class="collapsible project">Project ▼</div>
             <div class="collapsible-content">
                 <div class="project-scroll-container">
                     <div class="project-item sidebar-project">
                         <?php
+                        // Check if the user ID is set in the session
+                        
                         // Get the user ID of the logged-in user
-                        $user_id = $_SESSION['user_id'];
+                        $user_id = 1;
 
                         // Fetch project names from the "Projects" table where the user is assigned
                         $sql = "SELECT P.project_id, P.project_name, P.background_color 
@@ -109,14 +115,14 @@
                                 $background_color = $row['background_color'];
                                 echo '<div class="project-lst">';
                                 echo '<a href="project.php?project_id=' . $project_id . '" class="project-link" id="link">';
-                                echo '    <div class="square" style="background-color:' . $background_color . '"><img src="static/image/project.svg" alt="Image" class="overlay-image"></div>';
-                                echo '    <p class="project-title">' . add_ellipsis($project_name, 23) . '</p>';
+                                echo '    <div class="square" style="background-color:' . $background_color . '"></div>';
+                                echo '    <p class="project-title">' . $project_name . '</p>';
                                 echo '</a>';
                                 echo '</div>';
                             }
                         } else {
                             // If no projects are assigned, display a message or do something else
-                            echo 'No projects.';
+                            echo 'No projects assigned to this user.';
                         }
 
                         ?>
@@ -127,6 +133,15 @@
     </ul>
 </nav>
 <script>
+    // const links = document.querySelectorAll('.sidebar a.full-width');
+
+    // links.forEach(link => {
+    //     link.addEventListener('click', () => {
+    //         links.forEach(otherLink => otherLink.classList.remove('active'));
+    //         link.classList.add('active');
+    //     });
+    // });
+
     // Function to remove active class from all links
     function removeAllActive() {
         const links = document.querySelectorAll('.sidebar a.full-width');
@@ -135,41 +150,21 @@
         });
     }
 
-    // Function to remove active class from all links
-    function removeAllProjectLstActive() {
-        const links = document.querySelectorAll('.sidebar project-link');
-        links.forEach(link => {
-            link.classList.remove('active');
-        });
-    }
-
     // Add active class based on current page URL
     const links = document.querySelectorAll('.sidebar a.full-width');
     const currentPageFileName = window.location.pathname.split('/').pop(); // Extract the filename
-    console.log(currentPageFileName);
-    removeAllActive();
-    removeAllProjectLstActive();
+
     links.forEach(link => {
         console.log(link.getAttribute('href'));
+        console.log(window.location.pathname)
+        console.log(currentPageFileName)
         if (link.getAttribute('href') === currentPageFileName) {
             link.classList.add('active');
         }
     });
 
-    // Add active class to the project list item based on the current project ID
-    const projectLinks = document.querySelectorAll('.sidebar .project-link');
-    const currentProjectID = <?php echo isset($_GET['project_id']) ? $_GET['project_id'] : 'null'; ?>;
-    projectLinks.forEach(projectLink => {
-        const projectID = projectLink.getAttribute('href').split('=')[1];
-        if (projectID === String(currentProjectID)) {
-            console.log(projectLink.closest('.project-lst'));
-            projectLink.closest('.project-lst').classList.add('active');
-        }
-    });
+    const collapsibles = document.querySelectorAll('.collapsible');
 
-
-
-    const collapsibles = document.querySelectorAll('.collapsible-project');
     collapsibles.forEach(collapsible => {
         collapsible.addEventListener('click', () => {
             const content = collapsible.nextElementSibling;
