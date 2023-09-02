@@ -25,10 +25,10 @@ function sendEmail($recipientEmail, $subject, $body)
         $mail->Body = $body;
 
         $mail->send();
-        echo 'Email sent successfully';
+        echo '';
         return true;
     } catch (Exception $e) {
-        echo 'Email could not be sent. Error: ' . $mail->ErrorInfo;
+        echo '' . $mail->ErrorInfo;
         return false;
     }
 }

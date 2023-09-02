@@ -92,8 +92,8 @@ ini_set('display_errors', 1);
         box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
         border: 1px solid var(--color-border);
         border-radius: 5px;
-        top: 100%;
-        left: 0;
+        top: 150%;
+        left: -98;
         padding: 5px 5px;
         z-index: 1;
         background-color: var(--sidebar-bgcolor);
@@ -109,9 +109,8 @@ ini_set('display_errors', 1);
         border-radius: 5px;
     }
 
-    .project_menu_toggle,
     .project-dropdown-menu {
-        width: 120px;
+        width: 150px;
     }
 
     .is-active .project-dropdown-menu {
@@ -151,10 +150,14 @@ ini_set('display_errors', 1);
 
     // Check if the 'project_id' parameter is present in the URL
     if (isset($_GET['project_id'])) {
+        $project_id = $_GET['project_id'];
+        $user_id = $_SESSION['user_id'];
 
-        if (isset($_GET['verify'])) {
+        if (isset($_GET['verify']) && isset($_GET['invite'])) {
 
-            if ($_GET['verify'] == 'false') { ?>
+            include 'partial/validation_check/check_user_exists_inproject.php';
+            $userAssociated = check_user_exists_inproject($user_id, $project_id);
+            if ($_GET['verify'] == 'false' && !$userAssociated && $_GET['invite'] == 'true') { ?>
                 <script>
                     $(document).ready(function () {
                         openOtpPopup(); // Opens the OTP verification popup
@@ -165,11 +168,6 @@ ini_set('display_errors', 1);
             }
         }
 
-        $project_id = $_GET['project_id'];
-        $user_id = $_SESSION['user_id'];
-        echo $project_id;
-        echo $user_id;
-
         // Query to fetch project details from the 'Projects' table
         $sql_project = "SELECT * FROM Projects WHERE project_id = $project_id";
         $result_project = mysqli_query($connection, $sql_project);
@@ -178,7 +176,6 @@ ini_set('display_errors', 1);
         $sql_owner = "SELECT Users.*, ProjectUsers.is_projectowner, ProjectUsers.user_role FROM Users INNER JOIN ProjectUsers ON Users.user_id = ProjectUsers.user_id WHERE ProjectUsers.project_id = $project_id AND ProjectUsers.is_projectowner = 1";
         $result_owner = mysqli_query($connection, $sql_owner);
         $project_owner = mysqli_fetch_assoc($result_owner);
-        echo $project_owner['user_id'];
 
         // Query to fetch other users associated with the project from the 'ProjectUsers' table (excluding the owner)
         $sql_users = "SELECT Users.user_id, Users.username, ProjectUsers.is_projectowner, ProjectUsers.user_role
@@ -222,16 +219,17 @@ ini_set('display_errors', 1);
     <div class='main-content'>
         <div class='heading-content sticky-heading'>
             <div class='heading-style'>
-                <div class='project-link project-wrapper'>
+                <div class='project-link project-wrapper project_menu_toggle'>
                     <?php
                     if (mysqli_num_rows($result_project) > 0) {
                         $project = mysqli_fetch_assoc($result_project);
-                        echo '<div class="square project-wrapper" style="background-color:' . $project['background_color'] . '"></div>';
-                        echo "<p>" . $project['project_name'] . "</p>";
+                        // echo '<div class="square " style="background-color:' . $project['background_color'] . '"></div>';
+                        echo '<div class="square project-wrapper" style="background-color:' . $project['background_color'] . '"><img src="static/image/project.svg" alt="Image" class="overlay-image"></div>';
+                        echo "<p class='project-name'>" . $project['project_name'] . "</p>";
                     }
                     ?>
                     <div class="project-dropdown">
-                        <div class="project_menu_toggle svg-img">
+                        <div class="svg-img">
                             <img src="static/image/arrow-down.svg" alt="">
                         </div>
                         <ul class="project-dropdown-menu popup-style">
@@ -357,7 +355,6 @@ ini_set('display_errors', 1);
                             </div>
                         </div>
 
-
                         <div class="invite-popup" id="invite-popup">
                             <div class="invite-popup-content">
                                 <span class="invite-popup-close" onclick="addmember_popup_toggle()">&times;</span>
@@ -367,14 +364,16 @@ ini_set('display_errors', 1);
                                 <div class="bottom-line"></div>
                                 <div class="div-space-top"></div>
                                 <form id="invite-form">
+
+                                    <p>Invite with email</p>
+                                    <input type="email" class="input-style" id="email" name="email"
+                                        placeholder="Add members by email...">
+                                    <p id="email-exists-message" class="indicate-danger"></p>
+
                                     <div class="form-group">
-                                        <p>Invite with email</p>
-                                        <input type="email" class="input-style" id="email" name="email"
-                                            placeholder="Add members by email...">
-                                        <p id="email-exists-message" style="color: red;"></p>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="message">Message (optional)</label>
+                                        <label for="message">Message <p
+                                                style="display:inline; color: var(--color-text-weak);">(optional)</p>
+                                        </label>
                                         <div class="textarea-style">
                                             <textarea id="message" name="message" rows="4"
                                                 placeholder="Add a message"></textarea>
@@ -691,7 +690,7 @@ ini_set('display_errors', 1);
             placeholder: 'ui-state-highlight', // Style for the placeholder during drag-and-drop
             items: 'tr', // Limit sorting to rows only within the current section
             scroll: true, // Enable scrolling
-            scrollSensitivity: 200, // Adjust the value as needed
+            scrollSensitivity: 50, // Adjust the value as needed
             update: function (event, ui) {
                 // Get the dragged task's ID
                 const taskId = ui.item.attr('data-task-id');
@@ -1273,28 +1272,28 @@ ini_set('display_errors', 1);
     $(document).ready(function () {
         const $menu = $('.project-dropdown');
 
-        const onMouseUp = e => {
-            if (!$menu.is(e.target) && $menu.has(e.target).length === 0) {
-                $menu.removeClass('is-active');
+        const onClick = e => {
+            if ($menu.hasClass('is-active')) {
+                if (!$menu.is(e.target) && $menu.has(e.target).length === 0) {
+                    $menu.removeClass('is-active');
+                    $(document).off('click', onClick);
+                }
             }
         };
 
         $('.project_menu_toggle').on('click', () => {
             $menu.toggleClass('is-active').promise().done(() => {
                 if ($menu.hasClass('is-active')) {
-                    $(document).on('mouseup', onMouseUp);
+                    $(document).on('click', onClick);
                 } else {
-                    $(document).off('mouseup', onMouseUp);
+                    $(document).off('click', onClick);
                 }
             });
         });
     });
 </script>
 
-<!-- Add jQuery library -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<!-- Add this script to your HTML file -->
 <script>
     $(document).ready(function () {
         var emailInput = $("#email");
@@ -1344,6 +1343,10 @@ ini_set('display_errors', 1);
 
             // Proceed with inviting the user to the project
             inviteUserToProject(email, message);
+
+            // Clear input fields after successful submission
+            $("#email").val("");
+            $("#message").val("");
         });
 
         function inviteUserToProject(email, message) {
@@ -1352,10 +1355,21 @@ ini_set('display_errors', 1);
                 type: "POST",
                 url: "partial/project_partial/invite_to_project.php", // Backend processing script
                 data: { email: email, message: message, project_id: <?php echo $project_id ?> },
+                dataType: "json",
                 success: function (response) {
-                    alert(response); // Display the response from the server
+                    console.log("hello");
+                    console.log(response);
+                    console.log("hello");
+                    if (response.status == 'success') {
+                        console.log(response.message);
+                        displayPopupMessage(response.message, 'success');
+                    } else if (response.status === 'error') {
+                        displayPopupMessage(response.message, 'error');
+                    }
                 }
             });
+
+            addmember_popup_toggle()
         }
     });
 
@@ -1363,6 +1377,10 @@ ini_set('display_errors', 1);
 <script>
     function openOtpPopup() {
         $("#otpPopup").show();
+    }
+
+    function closeOtpPopup() {
+        $("#otpPopup").hide();
     }
 
     $(document).ready(function () {
@@ -1377,6 +1395,10 @@ ini_set('display_errors', 1);
                     $("#otpStatus").html(response);
                 }
             });
+
+            closeOtpPopup()
+            location.reload();
+
         });
     });
 </script>

@@ -8,13 +8,16 @@ ini_set('display_errors', 1);
 <?php include '../../partial/gen_otp.php'; ?>
 
 <?php
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST["email"];
     $message = $_POST["message"];
     $project_id = $_POST["project_id"];
 
-    echo $email;
-    echo $message;
+    session_start();
+    $user_id = $_SESSION['user_id'];
+
+
     // Backend validation
     if (empty($email)) {
         echo "Email address is required.";
@@ -26,29 +29,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $uniqueOtp = generateUniqueOTP();
 
         // SQL query to insert data into ProjectInvitations table
-        $sql = "INSERT INTO ProjectInvitations (project_id, email, otp) VALUES (?, ?, ?)";
+        $sql = "INSERT INTO ProjectInvitations (project_id, email, otp, invitation_sender) VALUES (?, ?, ?, ?)";
         $stmt = $connection->prepare($sql);
-        $stmt->bind_param("iss", $project_id, $email, $uniqueOtp);
+        $stmt->bind_param("issi", $project_id, $email, $uniqueOtp, $user_id);
+
 
         if ($stmt->execute()) {
-            echo "Data inserted successfully!";
+            echo "";
         } else {
-            echo "Error inserting data: " . $stmt->error;
+            echo "";
         }
 
 
         // Sending the email
         $subject = "Invitation to Join";
         $to = $email;
-        $mailMessage = "You have received an invitation to join the <a href='http://localhost/teamtrack/project.php?project_id=" . $project_id . "'>project</a>.\n\n Your verification PIN is " . $uniqueOtp;
+        $mailMessage = "You have received an invitation to join the <a href='http://localhost/teamtrack/project.php?project_id=" . $project_id . "&invite=true'>project</a>.\n\n Your verification PIN is " . $uniqueOtp;
         if (!empty($message)) {
-            $mailMessage .= "Message: $message\n";
+            $mailMessage .= "\n\n$message\n";
         }
 
         if (sendEmail($to, $subject, $mailMessage)) {
-            echo "Invitation sent successfully!";
+            header('Content-Type: application/json');
+            echo json_encode(array('status' => 'success', 'message' => 'Invitation sent successfully!'));
         } else {
-            echo "Failed to send invitation.";
+            header('Content-Type: application/json');
+            echo json_encode(array('status' => 'error', 'message' => 'Failed to send invitation.'));
         }
     }
 } else {

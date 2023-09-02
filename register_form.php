@@ -25,6 +25,10 @@ include 'base.php'; ?>
     </div>
     <div class="LR-form">
         <form id="registrationForm" action="partial/register.php" method="post">
+            <?php if (isset($_GET['project_id']) && isset($_GET['invite'])) { ?>
+                <input type="hidden" name="project_id" value="<?php echo $_GET['project_id']; ?>">
+                <input type="hidden" name="invite" value="<?php echo $_GET['invite']; ?>">
+            <?php } ?>
             <div class="form-group">
                 <input type="text" placeholder="Name" id="name" name="name" required>
             </div>

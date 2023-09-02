@@ -43,7 +43,14 @@ include 'base.php';
         <div class="div-space-top"></div>
         <div class="div-space-top"></div>
         <div class="donthave_acc">
-            <p>Don't have an account? <a href="register_form.php">Sign Up</a></p>
+            <p>Don't have an account? <a href="<?php
+            if (isset($_GET['project_id']) && isset($_GET['invite'])) {
+                echo 'register_form.php?project_id=' . $_GET['project_id'] . '&invite=true';
+            } else {
+                echo 'register_form.php';
+            }
+            ?>">Sign Up</a></p>
+
         </div>
 
     </div>

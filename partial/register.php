@@ -1,6 +1,9 @@
 <?php
-
 require_once '../config/connect.php';
+
+
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 
 // Start the session
 session_start();
@@ -11,7 +14,6 @@ function sanitize_input($input)
     global $connection;
     return mysqli_real_escape_string($connection, $input);
 }
-
 
 function generateRandomColor()
 {
@@ -25,33 +27,24 @@ function register_user($name, $username, $email, $password)
 {
     global $connection;
 
-
     // Sanitize user inputs to prevent SQL injection
-    $name = sanitize_input(($name));
+    $name = sanitize_input($name);
     $username = sanitize_input($username);
     $email = sanitize_input($email);
 
-
-    echo $name, $username, $email, $password;
-
-
     // Hash the password before storing it in the database
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-    echo $hashed_password;
-
 
     $background_color = generateRandomColor();
-    echo $background_color;
-
 
     // Insert the new user into the 'Users' table
     $sql_register_user = "INSERT INTO Users (name, username, email, password, background_color) VALUES ('$name', '$username', '$email', '$hashed_password', '$background_color')";
-    echo $sql_register_user;
 
     if (mysqli_query($connection, $sql_register_user)) {
-        return "Registration successful";
+        // Registration successful
+        return "Registration_Successful";
     } else {
-        return "Registration failed";
+        return "Registration_Failed";
     }
 }
 
@@ -61,14 +54,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $username = $_POST["username"];
     $email = $_POST["email"];
     $password = $_POST["password"];
-
-
+    $project_id = $_POST["project_id"];
+    $invite = $_POST["invite"];
 
     $registration_result = register_user($name, $username, $email, $password);
 
-    // Redirect the user after registration
-    header("Location: ../login_form.php?message=" . urlencode($registration_result));
-    exit();
+    if ($project_id !== null && $invite !== null && $registration_result !== "Registration_Failed") {
+        $other_queries = "&project_id=" . $project_id . "&invite=true";
+        $registration_result = $registration_result . $other_queries;
+    }     
 
+    // Redirect the user after registration
+    header("Location: ../login_form.php?message=" . $registration_result);
+    exit();
 }
 ?>

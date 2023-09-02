@@ -34,7 +34,7 @@ function login_user($username, $password, $project_id)
 
 
             if ($project_id !== null) {
-                header("Location: ../project.php?project_id=" . $project_id . "&verify=false");
+                header("Location: ../project.php?project_id=" . $project_id . "&verify=false&invite=true");
             } else {
                 header("Location: ../home.php");
             }
