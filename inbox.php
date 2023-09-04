@@ -38,6 +38,7 @@
         overflow-y: auto;
         background-color: var(--bg-color);
         border-radius: 5px;
+        width: 100%;
     }
 
     .inbox-left-side::-webkit-scrollbar,
@@ -86,6 +87,10 @@
     .unread_message {
         font-weight: 900;
     }
+
+    .options-btn-inbox {
+        display: flex;
+    }
 </style>
 
 <?php include 'partial/navbar.php'; ?>
@@ -110,19 +115,25 @@
         <div class="bottom-line"></div>
 
         <div class="tab-content active" id="tab1">
-            <div class="send-msg-content div-space-top">
-                <div class="send-message-btn related-btn-img overlay-border">
-                    <img src="./static/image/sms.svg" alt="">
-                    <p>Send message</p>
+            <div class="div-space-top"></div>
+            <div class="options-btn-inbox">
+                <div class="send-msg-content">
+                    <div class="send-message-btn button-style related-btn-img overlay-border">
+                        <img src="./static/image/sms.svg" alt="">
+                        Send message
+                    </div>
+                </div>
+                <div class="filter-btns">
+                    <button class="filter-button button-style" data-filter="all">All</button>
+                    <button class="filter-button button-style" data-filter="unread">Unread</button>
                 </div>
             </div>
-
+            <div class="div-space-top"></div>
             <div class="bottom-line"></div>
             <div class="inbox-container div-space-top">
                 <div class="inbox-left-side">
                     <div class="message-list">
                         <table border="1" class="message-list">
-
                             <tbody>
                                 <!-- Message rows will be populated here dynamically -->
                             </tbody>
@@ -147,40 +158,101 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     let currentOpenMessageId = null; // Initialize a variable to store the current open message ID
+    // Initial filter setting
+    let currentFilter = 'all'; // Default filter: All messages
+    $(document).ready(function () {
 
-    // Function to fetch the list of messages and display them in the left-side container
+        // Fetch messages on page load
+        fetchMessages();
+
+        // Event listener for clicking on a message row
+        $(document).on('click', '.message-list tbody tr', function () {
+            event.preventDefault();
+
+            const messageId = $(this).data('message-id');
+
+            // Then, display the selected message content
+            showMessageContent(messageId);
+        });
+
+        // Event listener for clicking the "Close" button
+        $(document).on('click', '.close-message-button', function () {
+            // Hide the "Close" button
+            $(this).hide();
+
+            // Remove the 'open-message' class from all message rows
+            $('.message-list tbody tr').removeClass('open-message');
+
+            // Clear the selected message content
+            $('#messageInbox-Container').html('<p>Click on a message to view its contents.</p>');
+
+            // Reset the current open message ID
+            currentOpenMessageId = null;
+        });
+
+        // Event listener for clicking the filter buttons
+        $('.filter-button').click(function () {
+            // Get the filter value from the data-filter attribute
+            const filterValue = $(this).data('filter');
+
+            // Update the current filter
+            currentFilter = filterValue;
+            console.log(currentFilter);
+
+            // Fetch messages with the selected filter
+            fetchMessages();
+        });
+
+    });
+
+    // Function to fetch messages based on the current filter and display them in the left-side container
     function fetchMessages() {
         $.ajax({
             url: 'partial/inbox_partial/get_messages.php',
             method: 'GET',
+            data: { filter: currentFilter }, // Send the filter value to the server
             success: function (response) {
                 const messageList = $('.message-list tbody');
                 messageList.empty();
 
                 if (response.length > 0) {
+                    // Sort the messages based on read status (unread messages first)
+                    response.sort((a, b) => {
+                        if (currentFilter === 'unread') {
+                            return a.is_read - b.is_read;
+                        } else {
+                            return b.timestamp.localeCompare(a.timestamp);
+                        }
+                    });
+
                     response.forEach(message => {
                         // Check if the message is unread based on the 'is_read' property
                         const isUnread = message.is_read == 0;
 
-                        // Set the appropriate class name
-                        const messageStyleClass = isUnread ? 'message-text unread_message' : 'amessage-text';
+                        // Set the appropriate class name based on the filter
+                        let messageStyleClass = 'message-text';
+                        if (isUnread) {
+                            messageStyleClass += ' unread';
+                        }
+
                         const messageText = message.text;
 
                         // Get the limited message text using the JavaScript function
                         const messageTextLimited = addEllipsis(messageText, 120);
                         const row = `
-                        <tr data-message-id="${message.message_id}" class="${messageStyleClass}">
-                            <td>
-                                <p class="messsage-project-name">${message.project_name}</p>
-                                <p class="message-timestamp">${message.timestamp}</p>
-                                <p class="messageStyleClass">${messageTextLimited}</p>
-                            </td>
-                        </tr>
-                        `;
+                    <tr data-message-id="${message.message_id}" class="${messageStyleClass}">
+                        <td>
+                            <p class="messsage-project-name">${message.project_name}</p>
+                            <p class="message-timestamp">${message.timestamp}</p>
+                            <p class="messageStyleClass">${messageTextLimited}</p>
+                        </td>
+                    </tr>
+                    `;
                         messageList.append(row);
                     });
                 } else {
                     const row = '<tr><td colspan="4">No messages found.</td></tr>';
+                    // const row = '<p>No messages found.</p>';
                     messageList.append(row);
                 }
 
@@ -259,7 +331,7 @@
         const badge = document.querySelector('.unread-badge');
         console.log(count);
         if (badge) {
-            if (count == 0){ 
+            if (count == 0) {
                 badge.style.backgroundColor = "transparent";
                 badge.textContent = '';
             } else {
@@ -267,35 +339,4 @@
             }
         }
     }
-
-    $(document).ready(function () {
-        // Fetch messages on page load
-        fetchMessages();
-
-        // Event listener for clicking on a message row
-        $(document).on('click', '.message-list tbody tr', function () {
-            event.preventDefault();
-
-            const messageId = $(this).data('message-id');
-
-            // Then, display the selected message content
-            showMessageContent(messageId);
-        });
-
-        // Event listener for clicking the "Close" button
-        $(document).on('click', '.close-message-button', function () {
-
-            // Hide the "Close" button
-            $(this).hide();
-
-            // Remove the 'open-message' class from all message rows
-            $('.message-list tbody tr').removeClass('open-message');
-
-            // Clear the selected message content
-            $('#messageInbox-Container').html('<p>Click on a message to view its contents.</p>');
-
-            // Reset the current open message ID
-            currentOpenMessageId = null;
-        });
-    });
 </script>

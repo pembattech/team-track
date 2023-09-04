@@ -152,15 +152,15 @@ ini_set('display_errors', 1);
     if (isset($_GET['project_id'])) {
         $project_id = $_GET['project_id'];
         $user_id = $_SESSION['user_id'];
-
-        if (isset($_GET['verify']) && isset($_GET['invite'])) {
+        if (isset($_GET['invite']) && isset($_GET['verify'])) {
 
             include 'partial/validation_check/check_user_exists_inproject.php';
-            $userAssociated = check_user_exists_inproject($user_id, $project_id);
-            if ($_GET['verify'] == 'false' && !$userAssociated && $_GET['invite'] == 'true') { ?>
+            $userAssociated = check_user_exists_inproject($project_id);
+
+            if ($_GET['verify'] == 'false' && !$userAssociated && $userAssociated == 0 && $_GET['invite'] == 'true') { ?>
                 <script>
                     $(document).ready(function () {
-                        openOtpPopup(); // Opens the OTP verification popup
+                        openOtpPopup(); // Opens the OTP verification popup$user_id = $_SESSION['user_id'];
                     });
                 </script>
 
@@ -299,11 +299,12 @@ ini_set('display_errors', 1);
                                 echo "<p class='user-role'>$user_role</p>";
                             } elseif ($isProjectOwner) {
                                 echo "<p class='user-role'>Project Owner</p>";
-                            } else {
+                            } elseif ($project_owner['user_id'] == $user_id){
                                 echo "<p class='user-role'>+ Add role</p>";
                             }
 
                             echo '</div>';
+                            // }
                             echo '</div>';
                         }
                         echo '</div>';
@@ -1205,7 +1206,7 @@ ini_set('display_errors', 1);
 
 
         if (newRole === '') {
-            errorMessage.textContent = 'Please select a valid role.'; // Display error message
+            errorMessage.textContent = 'Please enter a valid role.'; // Display error message
             return;
         }
 
