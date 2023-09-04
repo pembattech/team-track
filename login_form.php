@@ -45,7 +45,7 @@ include 'base.php';
         <div class="donthave_acc">
             <p>Don't have an account? <a href="<?php
             if (isset($_GET['project_id']) && isset($_GET['invite'])) {
-                echo 'register_form.php?project_id=' . $_GET['project_id'] . '&invite=true';
+                echo 'register_form.php?project_id=' . $_GET['project_id'] . '&invite=true&verify=false';
             } else {
                 echo 'register_form.php';
             }

@@ -44,10 +44,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Sending the email
         $subject = "Invitation to Join";
         $to = $email;
-        $mailMessage = "You have received an invitation to join the <a href='http://localhost/teamtrack/project.php?project_id=" . $project_id . "&invite=true'>project</a>.\n\n Your verification PIN is " . $uniqueOtp;
+        $mailMessage = "You have received an invitation to join the <a href='http://localhost/teamtrack/project.php?project_id=" . $project_id . "&invite=true&verify=false'>project</a>.<br>Your verification PIN is " . $uniqueOtp;
         if (!empty($message)) {
-            $mailMessage .= "\n\n$message\n";
+            $mailMessage .= "<br>" . nl2br($message); // Use nl2br to convert newline characters to <br> tags for the message
         }
+
 
         if (sendEmail($to, $subject, $mailMessage)) {
             header('Content-Type: application/json');

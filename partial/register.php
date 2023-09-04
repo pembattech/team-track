@@ -60,7 +60,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $registration_result = register_user($name, $username, $email, $password);
 
     if ($project_id !== null && $invite !== null && $registration_result !== "Registration_Failed") {
-        $other_queries = "&project_id=" . $project_id . "&invite=true";
+        $other_queries = "&project_id=" . $project_id . "&invite=true&verify=false";
         $registration_result = $registration_result . $other_queries;
     }     
 

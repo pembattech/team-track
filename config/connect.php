@@ -18,7 +18,7 @@ if ($connection->connect_error) {
     // Check if the user ID is set in the session
     if (isset($_SESSION['user_id'])) {
         // Get the user ID of the logged-in user
-        $user_id = $_SESSION['user_id'];
+        $user_id = $_SESSION['user_id'];   
         echo "";
         // echo "Successfully connected to $database. User ID: $user_id";
     } else {

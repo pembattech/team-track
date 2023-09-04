@@ -21,7 +21,7 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['username'])) {
             <p class="countdown">You will be automatically redirected to the login page in <span id="countdown" style="color: var(--danger-color); font-weight: 900; font-size: 20px;">5</span>
                 seconds.</p>
             <p>Alternatively, you can manually proceed to the login page by clicking on the "Login" link: <a
-                    href="<?php echo (isset($project_id) && isset($invite_bool)) ? 'login_form.php?project_id=' . $_GET['project_id'] . '&invite=true' : 'login_form.php'; ?>">Login</a>
+                    href="<?php echo (isset($project_id) && isset($invite_bool)) ? 'login_form.php?project_id=' . $_GET['project_id'] . '&invite=true&verify=false' : 'login_form.php'; ?>">Login</a>
             </p>
 
         </div>
@@ -32,7 +32,7 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['username'])) {
             var countdownElement = document.getElementById("countdown");
             var countdown = parseInt(countdownElement.innerText);
             if (countdown <= 1) {
-                window.location.href = "<?php echo (isset($project_id) && isset($invite_bool)) ? 'login_form.php?project_id=' . $_GET['project_id'] . '&invite=true' : 'login_form.php'; ?>"; // Replace "login_page.php" with your login page URL
+                window.location.href = "<?php echo (isset($project_id) && isset($invite_bool)) ? 'login_form.php?project_id=' . $_GET['project_id'] . '&invite=true&verify=false' : 'login_form.php'; ?>"; // Replace "login_page.php" with your login page URL
             } else {
                 countdown -= 1;
                 countdownElement.innerText = countdown;
