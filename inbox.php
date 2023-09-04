@@ -40,7 +40,8 @@
         border-radius: 5px;
     }
 
-    .inbox-left-side::-webkit-scrollbar, .inbox-right-side::-webkit-scrollbar {
+    .inbox-left-side::-webkit-scrollbar,
+    .inbox-right-side::-webkit-scrollbar {
         width: 5px;
     }
 
@@ -76,9 +77,14 @@
     }
 
     .open-message {
-        font-weight: 900;
+        font-style: italic;
+        font-weight: 100;
         background-color: var(--color-background-weak-hover-deprecated);
-        transition: background-color 0.3s ease;
+        transition: background-color 0.3s ease, font-style 0.3 ease;
+    }
+
+    .unread_message {
+        font-weight: 900;
     }
 </style>
 
@@ -153,13 +159,17 @@
 
                 if (response.length > 0) {
                     response.forEach(message => {
-                        const messageStyleClass = message.is_read === 0 ? 'message-text unread' : 'message-text';
+                        // Check if the message is unread based on the 'is_read' property
+                        const isUnread = message.is_read == 0;
+
+                        // Set the appropriate class name
+                        const messageStyleClass = isUnread ? 'message-text unread_message' : 'amessage-text';
                         const messageText = message.text;
-                        
+
                         // Get the limited message text using the JavaScript function
                         const messageTextLimited = addEllipsis(messageText, 120);
                         const row = `
-                        <tr data-message-id="${message.message_id}">
+                        <tr data-message-id="${message.message_id}" class="${messageStyleClass}">
                             <td>
                                 <p class="messsage-project-name">${message.project_name}</p>
                                 <p class="message-timestamp">${message.timestamp}</p>
@@ -232,12 +242,30 @@
             method: 'POST',
             data: { message_id: messageId },
             success: function (response) {
+                console.log(response);
                 console.log('Marked read!');
+                console.log(response.unreadCount);
+
+                updateSidebarUnreadCount(response.unreadCount);
             },
             error: function (xhr, status, error) {
                 console.error('Error marking message as read:', error);
             }
         });
+    }
+
+    // Function to update the sidebar unread badge
+    function updateSidebarUnreadCount(count) {
+        const badge = document.querySelector('.unread-badge');
+        console.log(count);
+        if (badge) {
+            if (count == 0){ 
+                badge.style.backgroundColor = "transparent";
+                badge.textContent = '';
+            } else {
+                badge.textContent = count;
+            }
+        }
     }
 
     $(document).ready(function () {
@@ -249,9 +277,6 @@
             event.preventDefault();
 
             const messageId = $(this).data('message-id');
-
-            // // First, mark the message as read
-            // markAsRead(messageId);
 
             // Then, display the selected message content
             showMessageContent(messageId);

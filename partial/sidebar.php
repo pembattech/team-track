@@ -63,6 +63,22 @@
         display: block;
         padding-left: 5px;
     }
+
+    .unread-badge {
+        background-color: var(--danger-color);
+        color: white;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        margin-left: 8px;
+        transition: background-color 0.3s ease;
+    }
+
+
 </style>
 <nav class="sidebar">
     <ul>
@@ -82,6 +98,24 @@
             <a href="inbox.php" class="full-width">
                 <img src="./static/image/bell.svg" alt="">
                 Inbox
+                <?php
+                // Query to count unread messages for the user
+                $sql = "SELECT COUNT(message_id) AS unread_count FROM Messages
+                WHERE recipient_id = $user_id AND is_read = 0";
+
+                $result = mysqli_query($connection, $sql);
+
+                if ($result) {
+                    $row = mysqli_fetch_assoc($result);
+                    $unreadCount = $row['unread_count'];
+
+                    if ($unreadCount > 0) {
+                        echo '<span class="unread-badge">' . $unreadCount . '</span>';
+                    }
+                } else {
+                    echo 'Error: ' . mysqli_error($connection);
+                }
+                ?>
             </a>
         </li>
         <li>

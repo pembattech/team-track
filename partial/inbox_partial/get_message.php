@@ -1,6 +1,11 @@
 <?php
-include '../../partial/utils.php';
+// Enable error reporting
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+?>
 
+
+<?php
 require_once '../../config/connect.php';
 
 // Check if the message_id parameter is present
@@ -26,7 +31,12 @@ if (isset($_POST['message_id']) && is_numeric($_POST['message_id'])) {
         $is_project_msg = $row['is_project_msg'];
         $is_newtask_msg = $row['is_newtask_msg'];
 
-        $projectName = getProjectNameByTaskId($task_id);
+        echo $task_id;
+
+        include '../../partial/utils.php';
+        if (!empty($task_id)) {
+            $projectName = getProjectNameByTaskId($task_id);
+        }
 
         // Mark the message as read
         $sql_update = "UPDATE Messages SET is_read = 1 WHERE message_id = ?";
