@@ -132,15 +132,21 @@ ini_set('display_errors', 1);
         width: 100%;
         height: 100%;
         backdrop-filter: blur(5px);
+        z-index: 999999999999;
     }
 
     .otp-popup-content {
         background-color: var(--color-background-weak);
         color: var(--color-text);
-        max-width: 400px;
+        max-width: 355px;
         margin: 100px auto;
         padding: 10px 20px;
-        border-radius: 4px;
+        border-radius: 5px;
+        border: 1px solid var(--color-border);
+    }
+
+    .task-popup::-webkit-scrollbar {
+        width: 5px;
     }
 </style>
 <title>Project - TeamTrack</title>
@@ -244,6 +250,21 @@ ini_set('display_errors', 1);
                     </div>
                 </div>
             </div>
+            <div id="otpPopup" class="otp-popup popup-style" style="display:none;">
+                <div id="otpPopupContent" class="otp-popup-content">
+                    <p class="heading-style">OTP Verification '
+                        <?php echo $project['project_name'] ?>'
+                    </p>
+                    <div class="bottom-line"></div>
+                    <div class="div-space-top"></div>
+                    <form id="otpForm">
+                        <input type="text" class="input-style" id="otpInput" name="otpInput" placeholder="Enter OTP">
+
+                        <button type="button" class="button-style" id="verifyOtpButton">Verify OTP</button>
+                    </form>
+                    <p id="otpStatus"></p>
+                </div>
+            </div>
             <div class="tab-btns">
                 <!-- Tab Buttons -->
                 <div class="heading-nav between-verticle-line tab-btn active" onclick="openTab(event, 'tab1')">Overview
@@ -310,23 +331,6 @@ ini_set('display_errors', 1);
                         }
                         echo '</div>';
                         ?>
-
-                        <div id="otpPopup" class="otp-popup popup-style" style="display:none;">
-                            <div id="otpPopupContent" class="otp-popup-content">
-                                <p class="heading-style">OTP Verification '
-                                    <?php echo $project['project_name'] ?>'
-                                </p>
-                                <div class="bottom-line"></div>
-                                <div class="div-space-top"></div>
-                                <form id="otpForm">
-                                    <input type="text" class="input-style" id="otpInput" name="otpInput"
-                                        placeholder="Enter OTP">
-
-                                    <button type="button" class="button-style" id="verifyOtpButton">Verify OTP</button>
-                                </form>
-                                <p id="otpStatus"></p>
-                            </div>
-                        </div>
 
                         <div class="userrole-popup-container popup-style" id="userRolePopup">
                             <span class="userole-close-popup" id="closeUserRolePopup">&times;</span>
@@ -541,11 +545,18 @@ ini_set('display_errors', 1);
                             <br>
 
                             <div class="div-space-top"></div>
-                            <?php include 'partial/project_partial/lst_of_members.php'; ?>
-                            <select id="editAssignee" name="task_assignee" class="select-style">
-                                <?php echo $selectOptions; ?>
-                            </select>
+
+
+                            <?php include 'partial/project_partial/populate_assignee.php';
+                            populateAssigneeOptions($project_id);
+                            ?>
+
+
+
+
+
                             <span id="editAssignee-error" class="error-message"></span>
+
 
                             <div class="div-space-top"></div>
                             <div class="textarea-style">
@@ -764,9 +775,7 @@ ini_set('display_errors', 1);
                 // Add the active class to the clicked task row
                 $(this).addClass('active-task');
 
-                console.log("**")
-                console.log("**")
-                console.log(assingee);
+                console.log(taskId);
 
                 // Set the task details in the edit popup form
                 $('#editTaskId').val(taskId);
@@ -1025,7 +1034,7 @@ ini_set('display_errors', 1);
                 $('#editTaskId').val(response.task_id);
                 $('#editTaskName').val(response.task_name);
                 $('#editTaskDescription').val(response.task_description);
-                $('#editAssignee').val(response.assingee);
+                $('#editAssignee').val(response.assignee);
                 $('#editStartDate').val(response.start_date);
                 $('#editEndDate').val(response.end_date);
                 $('#editStatus').val(response.status);

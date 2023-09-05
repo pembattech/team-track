@@ -662,7 +662,8 @@ th.subhead-task {
     top: 90;
     right: -440px;
     width: 400px;
-    height: 100%;
+    max-height: 540px;
+    overflow-y: auto;
     background-color: var(--sidebar-bgcolor);
     color: var(--color-text);
     padding: 20px;
