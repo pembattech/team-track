@@ -821,7 +821,7 @@ button#closeButton:hover {
 /* Styling for the "+" sign */
 .border-around-plus {
     border: 1px solid #ccc;
-    padding: 2px 6px;
+    padding: 7px 11px;
     margin-right: 5px;
 }
 

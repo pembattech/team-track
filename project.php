@@ -269,6 +269,7 @@ ini_set('display_errors', 1);
                         echo $project['description'];
                     }
                     ?></textarea>
+                    <div class="div-space-top"></div>
 
                 </div>
                 <div class="project-role-container">
@@ -299,7 +300,7 @@ ini_set('display_errors', 1);
                                 echo "<p class='user-role'>$user_role</p>";
                             } elseif ($isProjectOwner) {
                                 echo "<p class='user-role'>Project Owner</p>";
-                            } elseif ($project_owner['user_id'] == $user_id){
+                            } elseif ($project_owner['user_id'] == $user_id) {
                                 echo "<p class='user-role'>+ Add role</p>";
                             }
 
@@ -1106,6 +1107,9 @@ ini_set('display_errors', 1);
 
     members.forEach(member => {
         member.addEventListener('click', function () {
+            const errorMessage = document.getElementById('error-message'); // Get the error message element
+            // Reset error message if there are no errors
+            errorMessage.textContent = '';
 
             // Remove 'active' class from all usernames
             const usernames = document.querySelectorAll('.username');
@@ -1200,6 +1204,7 @@ ini_set('display_errors', 1);
         const newRole = userRoleInput.value.trim(); // Trim whitespace
 
         const errorMessage = document.getElementById('error-message'); // Get the error message element
+        console.log(errorMessage);
 
         // Reset error message if there are no errors
         errorMessage.textContent = '';
