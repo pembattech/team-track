@@ -28,7 +28,5 @@ function check_user_exists_inproject($project_id)
         return false;
     }
 }
-
-check_user_exists_inproject(project_id: 7);
 ?>
 

@@ -12,143 +12,6 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 ?>
 
-<style>
-    .members-list {
-        display: flex;
-        flex-wrap: wrap;
-    }
-
-    .member {
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-    }
-
-    .member span {
-        color: var(--color-text);
-    }
-
-    .userrole-popup-container {
-        color: var(--color-text);
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 300px;
-        z-index: 1000;
-    }
-
-    .userole-close-popup {
-        position: absolute;
-        top: -5;
-        right: 110;
-        font-size: 20px;
-        color: var(--color-text);
-        cursor: pointer;
-        z-index: 999;
-    }
-
-    .userole-close-popup:hover {
-        color: var(--color-text-weak);
-    }
-
-    .member #popup-btn {
-        margin-left: 0;
-        margin-right: 0;
-        object-fit: cover;
-    }
-
-    #updateRoleButton {
-        display: none;
-    }
-
-    .update_userrole .button-style {
-        margin-left: 5px;
-        padding: 0 1px;
-    }
-
-    .member .user-role {
-        margin-top: -10px;
-        padding: 0;
-        font-size: 12px;
-        color: var(--color-text-weak);
-    }
-
-    .userrole-popup-container .error-message {
-        font-size: 13px;
-        font-family: inherit;
-    }
-
-    .project-dropdown {
-        margin-left: 10px;
-        position: relative;
-        font-size: 16px;
-        font-family: inherit;
-    }
-
-    .project-dropdown-menu {
-        display: none;
-        position: absolute;
-        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-        border: 1px solid var(--color-border);
-        border-radius: 5px;
-        top: 150%;
-        left: -98;
-        padding: 5px 5px;
-        z-index: 1;
-        background-color: var(--sidebar-bgcolor);
-    }
-
-    li.project-dropdown-menu-item p {
-        margin-left: 10px;
-        align-items: center;
-    }
-
-    .project-dropdown-menu-item:hover {
-        background-color: var(--color-background-weak);
-        border-radius: 5px;
-    }
-
-    .project-dropdown-menu {
-        width: 150px;
-    }
-
-    .is-active .project-dropdown-menu {
-        display: block;
-    }
-
-    .active-task {
-        background-color: var(--color-background-active-two);
-        font-weight: 900;
-    }
-
-    /* OTP Popup Styles */
-    .otp-popup {
-        display: none;
-        background-color: var(--overlay-bgcolor);
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        backdrop-filter: blur(5px);
-        z-index: 999999999999;
-    }
-
-    .otp-popup-content {
-        background-color: var(--color-background-weak);
-        color: var(--color-text);
-        max-width: 355px;
-        margin: 100px auto;
-        padding: 10px 20px;
-        border-radius: 5px;
-        border: 1px solid var(--color-border);
-    }
-
-    .task-popup::-webkit-scrollbar {
-        width: 5px;
-    }
-</style>
 <title>Project - TeamTrack</title>
 <div class="container project-wrapper">
     <?php include 'partial/sidebar.php'; ?>
@@ -158,20 +21,25 @@ ini_set('display_errors', 1);
     if (isset($_GET['project_id'])) {
         $project_id = $_GET['project_id'];
         $user_id = $_SESSION['user_id'];
+
+        include 'partial/validation_check/check_user_exists_inproject.php';
+        $userAssociated = check_user_exists_inproject($project_id);
+
         if (isset($_GET['invite']) && isset($_GET['verify'])) {
 
-            include 'partial/validation_check/check_user_exists_inproject.php';
-            $userAssociated = check_user_exists_inproject($project_id);
 
             if ($_GET['verify'] == 'false' && !$userAssociated && $userAssociated == 0 && $_GET['invite'] == 'true') { ?>
-                <script>
-                    $(document).ready(function () {
-                        openOtpPopup(); // Opens the OTP verification popup$user_id = $_SESSION['user_id'];
-                    });
-                </script>
+                            <script>
+                                $(document).ready(function () {
+                                    openOtpPopup(); // Opens the OTP verification popup$user_id = $_SESSION['user_id'];
+                                });
+                            </script>
 
-                <?php
+                            <?php
             }
+        } elseif (!$userAssociated && $userAssociated == 0) {
+            echo '<h1 class="warning-style">Project not located or access is restricted.</h1>';
+            exit();
         }
 
         // Query to fetch project details from the 'Projects' table
@@ -464,61 +332,61 @@ ini_set('display_errors', 1);
                     }
                     ?>
                     <?php if (isset($tasksBySection)): ?>
-                        <?php if (!empty($tasksBySection)): ?>
-                            <?php foreach ($tasksBySection as $section => $tasks): ?>
-                                <div class="collapsible">
-                                    <h2>
-                                        <?php echo $section; ?>
-                                    </h2>
-                                    <table class="sortable show" data-section="<?php echo $section; ?>">
-                                        <thead>
-                                            <tr>
-                                                <th>Task Name</th>
-                                                <th>Task Description</th>
-                                                <th>Assignee</th>
-                                                <th>Start Date</th>
-                                                <th>End Date</th>
-                                                <th>Status</th>
-                                                <th>Priority</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php foreach ($tasks as $task): ?>
-                                                <tr data-task-id="<?php echo $task['task_id']; ?>"
-                                                    class="<?php echo getTaskStatusClass($task['status']); ?>">
-                                                    <td>
-                                                        <?php echo $task['task_name']; ?>
-                                                    </td>
-                                                    <td>
-                                                        <?php echo $task['task_description']; ?>
-                                                    </td>
-                                                    <td>
-                                                        <?php echo $task['assignee']; ?>
-                                                    </td>
-                                                    <td>
-                                                        <?php echo $task['start_date']; ?>
-                                                    </td>
-                                                    <td>
-                                                        <?php echo $task['end_date']; ?>
-                                                    </td>
-                                                    <td>
-                                                        <?php echo $task['status']; ?>
-                                                    </td>
-                                                    <td>
-                                                        <?php echo $task['priority']; ?>
-                                                    </td>
-                                                    <!-- <td>
+                            <?php if (!empty($tasksBySection)): ?>
+                                    <?php foreach ($tasksBySection as $section => $tasks): ?>
+                                            <div class="collapsible">
+                                                <h2>
+                                                    <?php echo $section; ?>
+                                                </h2>
+                                                <table class="sortable show" data-section="<?php echo $section; ?>">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Task Name</th>
+                                                            <th>Task Description</th>
+                                                            <th>Assignee</th>
+                                                            <th>Start Date</th>
+                                                            <th>End Date</th>
+                                                            <th>Status</th>
+                                                            <th>Priority</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <?php foreach ($tasks as $task): ?>
+                                                                <tr data-task-id="<?php echo $task['task_id']; ?>"
+                                                                    class="<?php echo getTaskStatusClass($task['status']); ?>">
+                                                                    <td>
+                                                                        <?php echo $task['task_name']; ?>
+                                                                    </td>
+                                                                    <td>
+                                                                        <?php echo $task['task_description']; ?>
+                                                                    </td>
+                                                                    <td>
+                                                                        <?php echo $task['assignee']; ?>
+                                                                    </td>
+                                                                    <td>
+                                                                        <?php echo $task['start_date']; ?>
+                                                                    </td>
+                                                                    <td>
+                                                                        <?php echo $task['end_date']; ?>
+                                                                    </td>
+                                                                    <td>
+                                                                        <?php echo $task['status']; ?>
+                                                                    </td>
+                                                                    <td>
+                                                                        <?php echo $task['priority']; ?>
+                                                                    </td>
+                                                                    <!-- <td>
                                         <button class="delete-btn" data-task-id="<?php echo $task['task_id']; ?>">Delete</button>
                                     </td> -->
-                                                </tr>
-                                            <?php endforeach; ?>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <p>No tasks assigned to this project.</p>
-                        <?php endif; ?>
+                                                                </tr>
+                                                        <?php endforeach; ?>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                    <?php endforeach; ?>
+                            <?php else: ?>
+                                    <p>No tasks assigned to this project.</p>
+                            <?php endif; ?>
                     <?php endif; ?>
 
                     <!-- Slide-in popup to display task description -->
