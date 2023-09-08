@@ -29,13 +29,13 @@ ini_set('display_errors', 1);
 
 
             if ($_GET['verify'] == 'false' && !$userAssociated && $userAssociated == 0 && $_GET['invite'] == 'true') { ?>
-                            <script>
-                                $(document).ready(function () {
-                                    openOtpPopup(); // Opens the OTP verification popup$user_id = $_SESSION['user_id'];
-                                });
-                            </script>
+                <script>
+                    $(document).ready(function () {
+                        openOtpPopup(); // Opens the OTP verification popup$user_id = $_SESSION['user_id'];
+                    });
+                </script>
 
-                            <?php
+                <?php
             }
         } elseif (!$userAssociated && $userAssociated == 0) {
             echo '<h1 class="warning-style">Project not located or access is restricted.</h1>';
@@ -97,9 +97,8 @@ ini_set('display_errors', 1);
                     <?php
                     if (mysqli_num_rows($result_project) > 0) {
                         $project = mysqli_fetch_assoc($result_project);
-                        // echo '<div class="square " style="background-color:' . $project['background_color'] . '"></div>';
                         echo '<div class="square project-wrapper" style="background-color:' . $project['background_color'] . '"><img src="static/image/project.svg" alt="Image" class="overlay-image"></div>';
-                        echo "<p class='project-name'>" . $project['project_name'] . "</p>";
+                        echo "<p class='project-name'>" . capitalizeEachWord($project['project_name']) . "</p>";
                     }
                     ?>
                     <div class="project-dropdown">
@@ -332,61 +331,61 @@ ini_set('display_errors', 1);
                     }
                     ?>
                     <?php if (isset($tasksBySection)): ?>
-                            <?php if (!empty($tasksBySection)): ?>
-                                    <?php foreach ($tasksBySection as $section => $tasks): ?>
-                                            <div class="collapsible">
-                                                <h2>
-                                                    <?php echo $section; ?>
-                                                </h2>
-                                                <table class="sortable show" data-section="<?php echo $section; ?>">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Task Name</th>
-                                                            <th>Task Description</th>
-                                                            <th>Assignee</th>
-                                                            <th>Start Date</th>
-                                                            <th>End Date</th>
-                                                            <th>Status</th>
-                                                            <th>Priority</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <?php foreach ($tasks as $task): ?>
-                                                                <tr data-task-id="<?php echo $task['task_id']; ?>"
-                                                                    class="<?php echo getTaskStatusClass($task['status']); ?>">
-                                                                    <td>
-                                                                        <?php echo $task['task_name']; ?>
-                                                                    </td>
-                                                                    <td>
-                                                                        <?php echo $task['task_description']; ?>
-                                                                    </td>
-                                                                    <td>
-                                                                        <?php echo $task['assignee']; ?>
-                                                                    </td>
-                                                                    <td>
-                                                                        <?php echo $task['start_date']; ?>
-                                                                    </td>
-                                                                    <td>
-                                                                        <?php echo $task['end_date']; ?>
-                                                                    </td>
-                                                                    <td>
-                                                                        <?php echo $task['status']; ?>
-                                                                    </td>
-                                                                    <td>
-                                                                        <?php echo $task['priority']; ?>
-                                                                    </td>
-                                                                    <!-- <td>
+                        <?php if (!empty($tasksBySection)): ?>
+                            <?php foreach ($tasksBySection as $section => $tasks): ?>
+                                <div class="collapsible">
+                                    <h2>
+                                        <?php echo $section; ?>
+                                    </h2>
+                                    <table class="sortable show" data-section="<?php echo $section; ?>">
+                                        <thead>
+                                            <tr>
+                                                <th>Task Name</th>
+                                                <th>Task Description</th>
+                                                <th>Assignee</th>
+                                                <th>Start Date</th>
+                                                <th>End Date</th>
+                                                <th>Status</th>
+                                                <th>Priority</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($tasks as $task): ?>
+                                                <tr data-task-id="<?php echo $task['task_id']; ?>"
+                                                    class="<?php echo getTaskStatusClass($task['status']); ?>">
+                                                    <td>
+                                                        <?php echo $task['task_name']; ?>
+                                                    </td>
+                                                    <td>
+                                                        <?php echo $task['task_description']; ?>
+                                                    </td>
+                                                    <td>
+                                                        <?php echo $task['assignee']; ?>
+                                                    </td>
+                                                    <td>
+                                                        <?php echo $task['start_date']; ?>
+                                                    </td>
+                                                    <td>
+                                                        <?php echo $task['end_date']; ?>
+                                                    </td>
+                                                    <td>
+                                                        <?php echo $task['status']; ?>
+                                                    </td>
+                                                    <td>
+                                                        <?php echo $task['priority']; ?>
+                                                    </td>
+                                                    <!-- <td>
                                         <button class="delete-btn" data-task-id="<?php echo $task['task_id']; ?>">Delete</button>
                                     </td> -->
-                                                                </tr>
-                                                        <?php endforeach; ?>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                    <?php endforeach; ?>
-                            <?php else: ?>
-                                    <p>No tasks assigned to this project.</p>
-                            <?php endif; ?>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <p>No tasks assigned to this project.</p>
+                        <?php endif; ?>
                     <?php endif; ?>
 
                     <!-- Slide-in popup to display task description -->
@@ -902,7 +901,39 @@ ini_set('display_errors', 1);
                 $('#editTaskId').val(response.task_id);
                 $('#editTaskName').val(response.task_name);
                 $('#editTaskDescription').val(response.task_description);
-                $('#editAssignee').val(response.assignee);
+
+
+                // Set the assignee select option
+                var assigneeSelect = $('#editAssignee');
+
+                // Check if the "Select Assignee" option already exists
+                if (assigneeSelect.find('option[value="0"]').length === 0) {
+                    // If it doesn't exist, add "Select Assignee" option
+                    assigneeSelect.append($('<option>', {
+                        value: '0',
+                        text: 'Select Assignee',
+                        hidden: "hidden"
+                    }));
+                }
+
+                // Check if the "User not found" option already exists
+                if (assigneeSelect.find('option[value="-1"]').length === 0) {
+                    // If it doesn't exist, add "Select Assignee" option
+                    assigneeSelect.append($('<option>', {
+                        value: '-1',
+                        text: 'Assignee not found',
+                        hidden: "hidden"
+                    }));
+                }
+
+                // Set the selected option based on response
+                if (response.assignee == null) {
+                    // If assignee is null, select "Select Assignee"
+                    $('#editAssignee').val('0');
+                } else {
+                    check_assignee_exists(taskId, response);
+                }
+
                 $('#editStartDate').val(response.start_date);
                 $('#editEndDate').val(response.end_date);
                 $('#editStatus').val(response.status);
@@ -911,6 +942,32 @@ ini_set('display_errors', 1);
             error: function (xhr, status, error) {
                 // Handle the error if needed
                 console.error('Error fetching task details:', error);
+            }
+        });
+    }
+
+    function check_assignee_exists(taskId, response) {
+        $.ajax({
+            url: 'partial/project_partial/check_assignee_exists_inproject.php', // Replace with the URL to your fetch task details PHP file
+            method: 'GET',
+            data: { project_id: <?php echo $project_id; ?>, task_id: taskId
+        },
+            dataType: 'json',
+            success: function (exists_assignee_response) {
+                console.log(exists_assignee_response.result);
+                if (exists_assignee_response.result == true) {
+                    // Assign the response.assignee value
+                    $('#editAssignee').val(response.assignee);
+                } else {
+                    // If assignee is not found, select "Assignee not found"
+                    $('#editAssignee').val('-1');
+                }
+            },
+            error: function (xhr, status, error) {
+                // Handle the error if needed
+                console.error('Error fetching task details:', xhr.responseText);
+                console.error('Status:', status);
+                console.error('Error:', error);
             }
         });
     }

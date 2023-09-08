@@ -125,4 +125,21 @@ function add_ellipsis($string, $aftercount) {
     
     return $string;
 }
+
+
+// Function to capitalize the first letter of a string
+function capitalizeFirstLetter($string) {
+    return ucfirst($string);
+}
+
+// Function to capitalize the first letter of each word in a string
+function capitalizeEachWord($string) {
+    return ucwords($string);
+}
+
+
+
+
+
+
 ?>
