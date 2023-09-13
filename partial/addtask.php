@@ -6,6 +6,9 @@ ini_set('display_errors', 1);
 
 require_once '../config/connect.php';
 
+// Start the session to access session data
+session_start();
+
 // Function to sanitize user inputs
 function sanitize_input($input)
 {
@@ -28,7 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         header('Content-Type: application/json');
         echo json_encode(array('status' => 'error', 'message' => 'Task name is required'));
         exit;
-        
+
     } elseif (empty($_POST['task_description'])) {
         header('Content-Type: application/json');
         echo json_encode(array('status' => 'error', 'message' => 'Task description is required'));

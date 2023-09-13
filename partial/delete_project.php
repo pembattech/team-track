@@ -13,6 +13,9 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+// Start the session to access session data
+session_start();
+
 // Check if the 'project_id' parameter is present in the URL
 if (isset($_GET['project_id'])) {
     $project_id = $_GET['project_id'];
@@ -34,9 +37,9 @@ if (isset($_GET['project_id'])) {
     if ($connection->query($sql_delete_tasks) === FALSE) {
         echo "Error deleting project users: " . $connection->error;
     }
-    
+
     $delete_project_query = "DELETE FROM Projects WHERE project_id = $project_id";
-    
+
     if ($connection->query($delete_project_query) === TRUE) {
         echo "Project and its related tasks deleted successfully.";
         $_SESSION['notification_message'] = "Project and its related tasks deleted successfully.";

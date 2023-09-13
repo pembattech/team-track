@@ -27,7 +27,8 @@ function get_user_data($user_id)
     }
 }
 
-function getProjectNameByTaskId($taskId) {
+function getProjectNameByTaskId($taskId)
+{
     global $connection;
 
     $query = "SELECT Projects.project_name
@@ -35,9 +36,9 @@ function getProjectNameByTaskId($taskId) {
               INNER JOIN ProjectUsers ON Tasks.projectuser_id = ProjectUsers.projectuser_id
               INNER JOIN Projects ON ProjectUsers.project_id = Projects.project_id
               WHERE Tasks.task_id = $taskId";
-    
+
     $result = mysqli_query($connection, $query);
-    
+
     if ($result) {
         $row = mysqli_fetch_assoc($result);
         $projectName = $row['project_name'];
@@ -118,28 +119,55 @@ function get_project_owner_id($project_id)
 
 }
 
-function add_ellipsis($string, $aftercount) {
+function add_ellipsis($string, $aftercount)
+{
     if (strlen($string) > $aftercount) {
         $string = substr($string, 0, $aftercount) . "...";
     }
-    
+
     return $string;
 }
 
 
 // Function to capitalize the first letter of a string
-function capitalizeFirstLetter($string) {
+function capitalizeFirstLetter($string)
+{
     return ucfirst($string);
 }
 
 // Function to capitalize the first letter of each word in a string
-function capitalizeEachWord($string) {
+function capitalizeEachWord($string)
+{
     return ucwords($string);
 }
 
+function removeParenthesesWithNumber($string)
+{
+    $pattern = '/\s*\(\s*\d+\s*\)\s*/';
+    return preg_replace($pattern, '', $string);
+}
 
+function countTasksBySectionAndProject($section, $projectId)
+{
+    global $connection;
+    // Sanitize user inputs
+    $section = $connection->real_escape_string($section);
+    $projectId = intval($projectId);
 
+    // SQL query to count tasks
+    $sql = "SELECT COUNT(*) as task_count FROM Tasks WHERE section = '$section' AND projectuser_id IN (SELECT projectuser_id FROM ProjectUsers WHERE project_id = $projectId)";
 
+    // Execute the query
+    $result = $connection->query($sql);
 
+    // Check if the query was successful
+    if ($result) {
+        $row = $result->fetch_assoc();
+        $taskCount = $row["task_count"];
+        $result->close();
+    }
+
+    return $taskCount;
+}
 
 ?>

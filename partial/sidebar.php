@@ -143,7 +143,7 @@
                                 $background_color = $row['background_color'];
                                 echo '<div class="project-lst">';
                                 echo '<a href="project.php?project_id=' . $project_id . '" class="project-link" id="link">';
-                                echo '    <div class="square" style="background-color:' . $background_color . '"><img src="static/image/project.svg" alt="Image" class="overlay-image"></div>';
+                                echo '    <div class="square" style="background-color:' . $background_color . '"></div>';
                                 echo '    <p class="project-title">' . add_ellipsis($project_name, 23) . '</p>';
                                 echo '</a>';
                                 echo '</div>';

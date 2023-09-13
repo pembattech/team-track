@@ -124,7 +124,7 @@ session_start();
                     <?php
                     if (mysqli_num_rows($result_project) > 0) {
                         $project = mysqli_fetch_assoc($result_project);
-                        echo '<div class="square project-wrapper" style="background-color:' . $project['background_color'] . '"><img src="static/image/project.svg" alt="Image" class="overlay-image"></div>';
+                        echo '<div class="square project-wrapper" style="background-color:' . $project['background_color'] . '"></div>';
                         echo "<p class='project-name'>" . capitalizeEachWord($project['project_name']) . "</p>";
                     }
                     ?>
@@ -375,8 +375,7 @@ session_start();
                                 <div class="collapsible">
                                     <h2>
                                         <?php echo $section; ?>
-                                        <span class="section-task-count">(
-                                            <?php echo count($tasks); ?>)
+                                        <span class="section-task-count">(<?php echo countTasksBySectionAndProject($section, $project_id); ?>)
                                         </span>
                                     </h2>
                                     <table class="sortable show" data-section="<?php echo $section; ?>">
@@ -465,14 +464,12 @@ session_start();
                             <span id="editTaskDescription-error" class="error-message"></span>
 
                             <div class="div-space-top"></div>
-                            <input class="input-style" type="text" id="editStartDate" name="start_date"
-                                placeholder="Start Date" onfocus="(this.type='date')">
+                            <input class="input-style" type="text" id="editStartDate" name="start_date" onfocus="this.type='date'" onblur="if(!this.value)this.type='text';" placeholder="Start Date">
                             <span id="editStartDate-error" class="error-message"></span>
                             <br>
 
                             <div class="div-space-top"></div>
-                            <input class="input-style" type="text" id="editEndDate" name="end_date"
-                                placeholder="End Date" onfocus="(this.type='date')">
+                            <input class="input-style" type="text" id="editEndDate" name="end_date" onfocus="(this.type='date')" onblur="if(!this.value)this.type='text';" placeholder="End Date">
                             <span id="editEndDate-error" class="error-message"></span>
                             <br>
 
@@ -587,6 +584,11 @@ session_start();
         fetchTasks();
     });
 
+    // Call the function to initialize the date range picker
+    $(document).ready(function () {
+        initializeDateRangePicker('editStartDate', 'editEndDate');
+    });
+
     // JavaScript for collapsible sections
     $(document).ready(function () {
         $('.collapsible h2').click(function () {
@@ -664,7 +666,7 @@ session_start();
                 const taskId = $(this).attr('data-task-id');
                 const taskName = $(this).find('td:nth-child(1)').text();
                 const taskDescription = $(this).find('td:nth-child(2)').text();
-                const assingee = $(this).find('td:nth-child(3)').text();
+                const assignee = $(this).find('td:nth-child(3)').text();
                 const startDate = $(this).find('td:nth-child(4) .due-date').text();
                 const endDate = $(this).find('td:nth-child(5) .due-date').text();
                 const status = $(this).find('td:nth-child(6)').text();
@@ -680,7 +682,7 @@ session_start();
                 $('#editTaskId').val(taskId);
                 $('#editTaskName').val(taskName);
                 $('#editTaskDescription').val(taskDescription);
-                $('#editAssignee').val(assingee);
+                $('#editAssignee').val(assignee);
                 $('#editStartDate').val(startDate);
                 $('#editEndDate').val(endDate);
                 $('#editStatus').val(status);
@@ -699,7 +701,6 @@ session_start();
                 }
             }
         });
-
 
         // Submit the edited task details when the form is submitted
         $('#editTaskForm').submit(function (event) {
@@ -720,10 +721,6 @@ session_start();
                 method: 'POST',
                 data: formData,
                 success: function (response) {
-
-                    // Handle the response if needed
-                    console.log('Task updated successfully.');
-
                     if (response.status == 'success') {
                         console.log(response.message);
                         displayPopupMessage(response.message, 'success');
@@ -759,14 +756,22 @@ session_start();
             const status = $('#editStatus').val();
             const priority = $('#editPriority').val();
 
+            console.log(taskName);
+            console.log(assignee);
+            console.log(taskDescription);
+            console.log(startDate);
+            console.log(endDate);
+            console.log(status);
+            console.log(priority);
+
+
             // Add your validation rules here
             if (taskName.trim() === '') {
                 $("#editTaskName-error").text("Task name is required.");
                 return false;
             }
 
-            if (assignee === null) {
-
+            if (assignee === null || assignee == 0 || assignee == -1) {
                 $("#editAssignee-error").text("Task assignee is required.");
                 return false;
             }
@@ -782,33 +787,17 @@ session_start();
                 return false;
             }
 
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-
-            const selectedStartDate = new Date(startDate);
-            selectedStartDate.setHours(0, 0, 0, 0);
-
-            if (selectedStartDate.getTime() <= today.getTime()) {
-                $("#editStartDate-error").text("Start date cannot be in the past.");
-                return false;
-            }
-
             if (endDate === '') {
                 $("#editEndDate-error").text("Task end date is required.");
                 return false;
             }
 
-            if (new Date(endDate) <= selectedStartDate) {
-                $("#editEndDate-error").text("End date must be after start date.");
-                return false;
-            }
-
-            if (status === null) {
+            if (status === null || status == 0) {
                 $("#editStatus-error").text("Task status is required.");
                 return false;
             }
 
-            if (priority === null) {
+            if (priority === null || priority == 0) {
                 $("#editPriority-error").text("Task priority is required.");
                 return false;
             }
@@ -838,8 +827,8 @@ session_start();
                 method: 'POST',
                 data: {
                     projectowner_id: <?php echo $project_owner['user_id']; ?>,
-                task_id: taskId
-            },
+                    task_id: taskId
+                },
                 success: function (response) {
                     // Handle the response if needed
                     console.log('Task deleted successfully.');
@@ -862,7 +851,7 @@ session_start();
                     console.error('Error deleting task:', error);
                 }
             });
-    });
+        });
     });
 
     // Function to fetch tasks from the server using AJAX
@@ -918,6 +907,7 @@ session_start();
         const $row = $('<tr>');
         $row.attr('data-task-id', task.task_id);
         const assigneeName = task.assignee_name || 'Not Assigned'; // Use 'Not Assigned' if assignee is empty
+        const taskpriority = task.priority || 'n/a'; // Use 'n/a' if priority is empty
         $row.addClass(task.status === 'Done' ? 'completed' : 'incomplete');
 
         const taskName = task.task_name.length > 19 ? addTooltip(task.task_name) : task.task_name;
@@ -926,7 +916,7 @@ session_start();
         $row.append(`<td>${assigneeName}</td>`);
         $row.append(`<td><span class="due-date">${formatDateRange(task.start_date, task.end_date)}</span></td>`);
         $row.append(`<td>${task.status}</td>`);
-        $row.append(`<td>${task.priority}</td>`);
+        $row.append(`<td>${taskpriority}</td>`);
 
         return $row;
     }
@@ -1028,7 +1018,7 @@ session_start();
 
         // Set the priority select option
         var prioritySelect = $('#editPriority');
-        
+
         // Check if the "Select priority" option already exists
         if (prioritySelect.find('option[value="0"]').length === 0) {
             // If it doesn't exist, add "Select priority" option
@@ -1122,7 +1112,7 @@ session_start();
 
         // Validate Task Description
         if (taskdescription === '') {
-            $("#task_description-error").text("Task_description is required.");
+            $("#task_description-error").text("Task description is required.");
             return false;
         }
 

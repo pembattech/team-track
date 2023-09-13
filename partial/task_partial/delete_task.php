@@ -1,6 +1,9 @@
 <?php
 require_once '../../config/connect.php';
 
+// Start the session to access session data
+session_start();
+
 // Check if the task_id parameter is present in the POST request
 if (isset($_POST['task_id']) && is_numeric($_POST['task_id'])) {
     $task_id = $_POST['task_id'];
@@ -15,6 +18,7 @@ if (isset($_POST['task_id']) && is_numeric($_POST['task_id'])) {
     if ($taskCreatorResult->num_rows > 0) {
         $taskCreatorData = $taskCreatorResult->fetch_assoc();
         $taskCreatorId = $taskCreatorData['task_creator_id'];
+
     }
 
     // Check if the user is the project owner or the task creator

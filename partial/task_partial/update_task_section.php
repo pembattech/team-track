@@ -7,11 +7,13 @@ ini_set('display_errors', 1);
 <?php
 require_once '../../config/connect.php';
 
+include '../../partial/utils.php';
+
 
 // Get the task ID and the destination section from the AJAX request
 if (isset($_POST['task_id']) && isset($_POST['section']) && isset($_POST['projectowner_id'])) {
     $taskId = $_POST['task_id'];
-    $section = $_POST['section'];
+    $section = removeParenthesesWithNumber($_POST['section']);
     $projectowner_id = $_POST['projectowner_id'];
 
     $loggedInUserId = $_SESSION['user_id'];

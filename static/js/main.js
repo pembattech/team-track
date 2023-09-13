@@ -1,9 +1,57 @@
+
 // JavaScript function to add ellipsis
 function addEllipsis(text, maxLength) {
     if (text.length > maxLength) {
         text = text.substring(0, maxLength) + '...';
     }
     return text;
+}
+
+function initializeDateRangePicker(startDateField, endDateField) {
+    // Get reference to the date input fields
+    const startDateInput = document.getElementById(startDateField);
+    const endDateInput = document.getElementById(endDateField);
+
+    // Function to disable past dates in the date input fields
+    function disablePastDates() {
+        const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+        startDateInput.setAttribute('min', today);
+        endDateInput.setAttribute('min', today);
+    }
+
+    // Function to update the minimum date for the end date input based on the start date
+    function updateEndDateMin() {
+        const startDate = new Date(startDateInput.value);
+        endDateInput.setAttribute('min', startDateInput.value);
+        if (endDateInput.value && new Date(endDateInput.value) < startDate) {
+            endDateInput.value = startDateInput.value;
+        }
+    }
+
+    // Function to update the maximum date for the start date input based on the end date
+    function updateStartDateMax() {
+        const endDate = new Date(endDateInput.value);
+        startDateInput.setAttribute('max', endDateInput.value);
+        if (startDateInput.value && new Date(startDateInput.value) > endDate) {
+            startDateInput.value = endDateInput.value;
+        }
+    }
+
+    // Initialize the calendar and set the end date min attribute based on start date
+    disablePastDates();
+    updateEndDateMin();
+    updateStartDateMax();
+
+    // Listen for changes in the start date and end date and update attributes accordingly
+    startDateInput.addEventListener('change', () => {
+        updateEndDateMin();
+        updateStartDateMax();
+    });
+
+    endDateInput.addEventListener('change', () => {
+        updateEndDateMin();
+        updateStartDateMax();
+    });
 }
 
 function openTab(event, tabId) {

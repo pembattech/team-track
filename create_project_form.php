@@ -33,7 +33,7 @@
             <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
             <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>
 
-            <script>
+            <!-- <script>
                 $(document).ready(function () {
                     $("#datepicker, #datepickerEnd").datepicker({
                         firstDay: 1,
@@ -51,7 +51,7 @@
                         $(".ui-datepicker").addClass("active");
                     });
                 });
-            </script>
+            </script> -->
 
             <div class="text-input">
                 <input type="submit" class="button-style" value="Submit">

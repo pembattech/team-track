@@ -5,6 +5,9 @@ ini_set('display_errors', 1);
 
 require_once '../../config/connect.php';
 
+// Start the session to access session data
+session_start();
+
 function getUserName($user_id) {
     global $connection;
 
@@ -32,7 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $end_date = $_POST["end_date"];
     $status = $_POST["status"];
     $priority = $_POST["priority"];
-    $assignee = $_POST["task_assignee"];
+    $assignee = $_POST["assignee"];
 
     $loggedInUserId = $_SESSION['user_id'];
 
