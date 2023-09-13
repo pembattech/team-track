@@ -1,123 +1,39 @@
+<?php include 'access_denied.php'; ?>
+
 <?php
 session_start();
 ?>
 
 <?php include 'partial/navbar.php'; ?>
 
-<?php
-// Display all errors
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-?>
-
 <style>
-    .members-list {
-        display: flex;
-        flex-wrap: wrap;
-    }
-
-    .member {
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-    }
-
-    .member span {
-        color: var(--color-text);
-    }
-
-    .userrole-popup-container {
-        color: var(--color-text);
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 300px;
-        z-index: 1000;
-    }
-
-    .userole-close-popup {
-        position: absolute;
-        top: -5;
-        right: 110;
-        font-size: 20px;
-        color: var(--color-text);
-        cursor: pointer;
-        z-index: 999;
-    }
-
-    .userole-close-popup:hover {
-        color: var(--color-text-weak);
-    }
-
-    .member #popup-btn {
-        margin-left: 0;
-        margin-right: 0;
-    }
-
-    #updateRoleButton {
-        display: none;
-    }
-
-    .update_userrole .button-style {
-        margin-left: 5px;
-        padding: 0 1px;
-    }
-
-    .member .user-role {
-        margin-top: -10px;
-        padding: 0;
-        font-size: 12px;
-        color: var(--color-text-weak);
-    }
-
-    .userrole-popup-container .error-message {
-        font-size: 13px;
-        font-family: inherit;
-    }
-
-    .project-dropdown {
-        margin-left: 10px;
+    /* Add this CSS to your existing styles */
+    .tooltip {
         position: relative;
-        font-size: 16px;
-        font-family: inherit;
+        cursor: pointer;
     }
 
-    .project-dropdown-menu {
-        display: none;
+    .tooltip .tooltiptext {
+        visibility: hidden;
+        width: 200px;
+        background-color: #fff;
+        color: #000;
+        text-align: left;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 5px;
         position: absolute;
-        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-        border: 1px solid var(--color-border);
-        border-radius: 5px;
-        top: 100%;
-        left: 0;
-        padding: 5px 5px;
         z-index: 1;
-        background-color: var(--sidebar-bgcolor);
+        top: 100%;
+        /* Position the tooltip below the cell */
+        left: 0;
+        opacity: 0;
+        transition: opacity 0.3s;
     }
 
-    li.project-dropdown-menu-item p {
-        margin-left: 10px;
-        align-items: center;
-    }
-
-    .project-dropdown-menu-item:hover {
-        background-color: var(--color-background-weak);
-        border-radius: 5px;
-    }
-
-    .project_menu_toggle,
-    .project-dropdown-menu {
-        width: 120px;
-    }
-
-    .is-active .project-dropdown-menu {
-        display: block;
-    }
-
-    .active-task {
-        background-color: var(--color-background-active-two);
-        font-weight: 900;
+    .tooltip:hover .tooltiptext {
+        visibility: visible;
+        opacity: 1;
     }
 </style>
 <title>Project - TeamTrack</title>
@@ -130,6 +46,26 @@ ini_set('display_errors', 1);
         $project_id = $_GET['project_id'];
         $user_id = $_SESSION['user_id'];
 
+        include 'partial/validation_check/check_user_exists_inproject.php';
+        $userAssociated = check_user_exists_inproject($project_id);
+
+        if (isset($_GET['invite']) && isset($_GET['verify'])) {
+
+
+            if ($_GET['verify'] == 'false' && !$userAssociated && $userAssociated == 0 && $_GET['invite'] == 'true') { ?>
+                <script>
+                    $(document).ready(function () {
+                        openOtpPopup(); // Opens the OTP verification popup$user_id = $_SESSION['user_id'];
+                    });
+                </script>
+
+                <?php
+            }
+        } elseif (!$userAssociated && $userAssociated == 0) {
+            echo '<h1 class="warning-style">Project not located or access is restricted.</h1>';
+            exit();
+        }
+
         // Query to fetch project details from the 'Projects' table
         $sql_project = "SELECT * FROM Projects WHERE project_id = $project_id";
         $result_project = mysqli_query($connection, $sql_project);
@@ -138,7 +74,6 @@ ini_set('display_errors', 1);
         $sql_owner = "SELECT Users.*, ProjectUsers.is_projectowner, ProjectUsers.user_role FROM Users INNER JOIN ProjectUsers ON Users.user_id = ProjectUsers.user_id WHERE ProjectUsers.project_id = $project_id AND ProjectUsers.is_projectowner = 1";
         $result_owner = mysqli_query($connection, $sql_owner);
         $project_owner = mysqli_fetch_assoc($result_owner);
-        echo $project_owner['user_id'];
 
         // Query to fetch other users associated with the project from the 'ProjectUsers' table (excluding the owner)
         $sql_users = "SELECT Users.user_id, Users.username, ProjectUsers.is_projectowner, ProjectUsers.user_role
@@ -182,16 +117,16 @@ ini_set('display_errors', 1);
     <div class='main-content'>
         <div class='heading-content sticky-heading'>
             <div class='heading-style'>
-                <div class='project-link'>
+                <div class='project-link project-wrapper project_menu_toggle'>
                     <?php
                     if (mysqli_num_rows($result_project) > 0) {
                         $project = mysqli_fetch_assoc($result_project);
-                        echo '<div class="square" style="background-color:' . $project['background_color'] . '"></div>';
-                        echo "<p>" . $project['project_name'] . "</p>";
+                        echo '<div class="square project-wrapper" style="background-color:' . $project['background_color'] . '"><img src="static/image/project.svg" alt="Image" class="overlay-image"></div>';
+                        echo "<p class='project-name'>" . capitalizeEachWord($project['project_name']) . "</p>";
                     }
                     ?>
                     <div class="project-dropdown">
-                        <div class="project_menu_toggle svg-img">
+                        <div class="svg-img">
                             <img src="static/image/arrow-down.svg" alt="">
                         </div>
                         <ul class="project-dropdown-menu popup-style">
@@ -204,6 +139,21 @@ ini_set('display_errors', 1);
                             </li>
                         </ul>
                     </div>
+                </div>
+            </div>
+            <div id="otpPopup" class="otp-popup popup-style" style="display:none;">
+                <div id="otpPopupContent" class="otp-popup-content">
+                    <p class="heading-style">OTP Verification '
+                        <?php echo $project['project_name'] ?>'
+                    </p>
+                    <div class="bottom-line"></div>
+                    <div class="div-space-top"></div>
+                    <form id="otpForm">
+                        <input type="text" class="input-style" id="otpInput" name="otpInput" placeholder="Enter OTP">
+
+                        <button type="button" class="button-style" id="verifyOtpButton">Verify OTP</button>
+                    </form>
+                    <p id="otpStatus"></p>
                 </div>
             </div>
             <div class="tab-btns">
@@ -231,6 +181,7 @@ ini_set('display_errors', 1);
                         echo $project['description'];
                     }
                     ?></textarea>
+                    <div class="div-space-top"></div>
 
                 </div>
                 <div class="project-role-container">
@@ -249,7 +200,6 @@ ini_set('display_errors', 1);
                             $isProjectOwner = $row['is_projectowner'];
                             $userRole = $row['user_role'];
 
-                            echo $project_id;
                             echo '<div class="member user-content" data-project-id="' . $project_id . '">';
                             display_profile_picture($userId);
                             echo '<div class="user-role-flex">';
@@ -262,11 +212,12 @@ ini_set('display_errors', 1);
                                 echo "<p class='user-role'>$user_role</p>";
                             } elseif ($isProjectOwner) {
                                 echo "<p class='user-role'>Project Owner</p>";
-                            } else {
+                            } elseif ($project_owner['user_id'] == $user_id) {
                                 echo "<p class='user-role'>+ Add role</p>";
                             }
 
                             echo '</div>';
+                            // }
                             echo '</div>';
                         }
                         echo '</div>';
@@ -301,27 +252,31 @@ ini_set('display_errors', 1);
                             </div>
                         </div>
 
-
-
                         <div class="invite-popup" id="invite-popup">
                             <div class="invite-popup-content">
                                 <span class="invite-popup-close" onclick="addmember_popup_toggle()">&times;</span>
                                 <p class="heading-style">Share '
                                     <?php echo $project['project_name'] ?>'
                                 </p>
+                                <div class="bottom-line"></div>
+                                <div class="div-space-top"></div>
+                                <form id="invite-form">
 
-                                <form>
+                                    <p>Invite with email</p>
+                                    <input type="email" class="input-style" id="email" name="email"
+                                        placeholder="Add members by email...">
+                                    <p id="email-exists-message" class="indicate-danger"></p>
+
                                     <div class="form-group">
-                                        <p>Invite with email</p>
-                                        <input type="email" id="email" name="email"
-                                            placeholder="Add members by email...">
+                                        <label for="message">Message <p
+                                                style="display:inline; color: var(--color-text-weak);">(optional)</p>
+                                        </label>
+                                        <div class="textarea-style">
+                                            <textarea id="message" name="message" rows="4"
+                                                placeholder="Add a message"></textarea>
+                                        </div>
                                     </div>
-                                    <div class="form-group">
-                                        <label for="message">Message (optional)</label>
-                                        <textarea id="message" name="message" rows="4"
-                                            placeholder="Add a message"></textarea>
-                                    </div>
-                                    <button type="submit" class="invite-submit-btn">Send Invite</button>
+                                    <button type="submit" class="button-style">Send Invite</button>
                                 </form>
                             </div>
                         </div>
@@ -360,6 +315,27 @@ ini_set('display_errors', 1);
                 </div>
                 <div class="lst-of-tasks div-space-top">
                     <?php
+
+                    function formatDateRange1($startDate, $endDate)
+                    {
+                        if (!empty($startDate) && !empty($endDate)) {
+                            $start = new DateTime($startDate);
+                            $end = new DateTime($endDate);
+
+                            $startYear = $start->format('Y');
+                            $endYear = $end->format('Y');
+
+                            $formattedStart = $start->format('M j');
+                            $formattedEnd = $end->format('M j');
+
+                            if ($startYear === $endYear) {
+                                return "{$formattedStart} - {$formattedEnd}, {$startYear}";
+                            } else {
+                                return "{$formattedStart}, {$startYear} - {$formattedEnd}, {$endYear}";
+                            }
+                        }
+                        return "n/a";
+                    }
                     // Check if the 'project_id' parameter is present in the URL
                     if (isset($_GET['project_id']) && is_numeric($_GET['project_id'])) {
                         $project_id = $_GET['project_id'];
@@ -389,15 +365,6 @@ ini_set('display_errors', 1);
                         $stmt->close();
                     }
 
-                    // Function to update the task's status based on the completion status
-                    function getTaskStatusClass($status)
-                    {
-                        if ($status === 'Done') {
-                            return 'completed';
-                        } else {
-                            return 'incomplete';
-                        }
-                    }
                     ?>
                     <?php if (isset($tasksBySection)): ?>
                         <?php if (!empty($tasksBySection)): ?>
@@ -405,6 +372,9 @@ ini_set('display_errors', 1);
                                 <div class="collapsible">
                                     <h2>
                                         <?php echo $section; ?>
+                                        <span class="section-task-count">(
+                                            <?php echo count($tasks); ?>)
+                                        </span>
                                     </h2>
                                     <table class="sortable show" data-section="<?php echo $section; ?>">
                                         <thead>
@@ -412,8 +382,7 @@ ini_set('display_errors', 1);
                                                 <th>Task Name</th>
                                                 <th>Task Description</th>
                                                 <th>Assignee</th>
-                                                <th>Start Date</th>
-                                                <th>End Date</th>
+                                                <th>Due Date</th>
                                                 <th>Status</th>
                                                 <th>Priority</th>
                                             </tr>
@@ -421,21 +390,25 @@ ini_set('display_errors', 1);
                                         <tbody>
                                             <?php foreach ($tasks as $task): ?>
                                                 <tr data-task-id="<?php echo $task['task_id']; ?>"
-                                                    class="<?php echo getTaskStatusClass($task['status']); ?>">
+                                                    class="<?php echo $task['status'] === 'Done' ? 'completed' : 'incomplete'; ?>">
                                                     <td>
                                                         <?php echo $task['task_name']; ?>
                                                     </td>
-                                                    <td>
-                                                        <?php echo $task['task_description']; ?>
+                                                    <td class="tooltip">
+                                                        <span>
+                                                            <?php echo $task['task_description']; ?>
+                                                        </span>
+                                                        <div class="tooltiptext">
+                                                            <?php echo $task['task_description']; ?>
+                                                        </div>
                                                     </td>
                                                     <td>
                                                         <?php echo $task['assignee']; ?>
                                                     </td>
                                                     <td>
-                                                        <?php echo $task['start_date']; ?>
-                                                    </td>
-                                                    <td>
-                                                        <?php echo $task['end_date']; ?>
+                                                        <span class="due-date">
+                                                            <?php echo formatDateRange1($task['start_date'], $task['end_date']); ?>
+                                                        </span>
                                                     </td>
                                                     <td>
                                                         <?php echo $task['status']; ?>
@@ -443,9 +416,6 @@ ini_set('display_errors', 1);
                                                     <td>
                                                         <?php echo $task['priority']; ?>
                                                     </td>
-                                                    <!-- <td>
-                                        <button class="delete-btn" data-task-id="<?php echo $task['task_id']; ?>">Delete</button>
-                                    </td> -->
                                                 </tr>
                                             <?php endforeach; ?>
                                         </tbody>
@@ -473,17 +443,16 @@ ini_set('display_errors', 1);
                         <div class="div-space-top"></div>
                         <form id="editTaskForm">
                             <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
-                            <input type="hidden" name="projectowner_id" value="<?php echo $project_owner['user_id']; ?>">
+                            <input type="hidden" name="projectowner_id"
+                                value="<?php echo $project_owner['user_id']; ?>">
                             <input type="hidden" id="editTaskId" name="task_id">
                             <input class="input-style" type="text" id="editTaskName" name="task_name">
                             <span id="editTaskName-error" class="error-message"></span>
                             <br>
-
                             <div class="div-space-top"></div>
-                            <?php include 'partial/project_partial/lst_of_members.php'; ?>
-                            <select id="editAssignee" name="task_assignee" class="select-style">
-                                <?php echo $selectOptions; ?>
-                            </select>
+                            <?php include 'partial/project_partial/populate_assignee.php';
+                            populateAssigneeOptions($project_id);
+                            ?>
                             <span id="editAssignee-error" class="error-message"></span>
 
                             <div class="div-space-top"></div>
@@ -513,7 +482,7 @@ ini_set('display_errors', 1);
                                 <option value="On Hold">On Hold</option>
                                 <option value="Cancelled">Cancelled</option>
                                 <option value="Blocked">Blocked</option>
-                                <option value="Waiting for Approval">Waiting for Approval</option>
+                                <option value="Pending Approval">Pending Approval</option>
                                 <option value="In Review">In Review</option>
                             </select>
                             <br>
@@ -590,6 +559,8 @@ ini_set('display_errors', 1);
             <p>This is the content of Tab 2.</p>
         </div>
 
+        <!-- Include jQuery library -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     </div>
 
 </div>
@@ -628,7 +599,8 @@ ini_set('display_errors', 1);
             connectWith: '.sortable', // Enable sorting between sections
             placeholder: 'ui-state-highlight', // Style for the placeholder during drag-and-drop
             items: 'tr', // Limit sorting to rows only within the current section
-
+            scroll: true, // Enable scrolling
+            scrollSensitivity: 50, // Adjust the value as needed
             update: function (event, ui) {
                 // Get the dragged task's ID
                 const taskId = ui.item.attr('data-task-id');
@@ -689,8 +661,8 @@ ini_set('display_errors', 1);
                 const taskName = $(this).find('td:nth-child(1)').text();
                 const taskDescription = $(this).find('td:nth-child(2)').text();
                 const assingee = $(this).find('td:nth-child(3)').text();
-                const startDate = $(this).find('td:nth-child(4)').text();
-                const endDate = $(this).find('td:nth-child(5)').text();
+                const startDate = $(this).find('td:nth-child(4) .due-date').text();
+                const endDate = $(this).find('td:nth-child(5) .due-date').text();
                 const status = $(this).find('td:nth-child(6)').text();
                 const priority = $(this).find('td:nth-child(7)').text();
 
@@ -700,9 +672,10 @@ ini_set('display_errors', 1);
                 // Add the active class to the clicked task row
                 $(this).addClass('active-task');
 
-                console.log("**")
-                console.log("**")
-                console.log(assingee);
+                console.log("1");
+                console.log(taskId);
+                console.log(taskName);
+                console.log("1");
 
                 // Set the task details in the edit popup form
                 $('#editTaskId').val(taskId);
@@ -717,12 +690,14 @@ ini_set('display_errors', 1);
                 // Store the task ID in the variable
                 currentTaskId = taskId;
 
-                // Show the popup with animation
-                $('#taskPopup').addClass('active');
-
-
-                // Fetch task details and populate the edit form
-                fetchTaskDetails(taskId);
+                if (taskName !== '') {
+                    // Show the popup with animation
+                    $('#taskPopup').addClass('active');
+                    // Fetch task details and populate the edit form
+                    fetchTaskDetails(taskId);
+                } else if (taskName === '') {
+                    $('#taskPopup').removeClass('active');
+                }
             }
         });
 
@@ -749,7 +724,7 @@ ini_set('display_errors', 1);
 
                     // Handle the response if needed
                     console.log('Task updated successfully.');
-                    
+
                     if (response.status == 'success') {
                         console.log(response.message);
                         displayPopupMessage(response.message, 'success');
@@ -864,8 +839,8 @@ ini_set('display_errors', 1);
                 method: 'POST',
                 data: {
                     projectowner_id: <?php echo $project_owner['user_id']; ?>,
-                    task_id: taskId
-                },
+                task_id: taskId
+            },
                 success: function (response) {
                     // Handle the response if needed
                     console.log('Task deleted successfully.');
@@ -888,7 +863,7 @@ ini_set('display_errors', 1);
                     console.error('Error deleting task:', error);
                 }
             });
-        });
+    });
     });
 
     // Function to fetch tasks from the server using AJAX
@@ -906,41 +881,89 @@ ini_set('display_errors', 1);
             method: 'GET',
             data: { project_id: project_id },
             success: function (response) {
-                // Clear the existing tasks
-                $('.collapsible table tbody').empty();
+                console.log(response);
+                // Handle the response and update the task tables here
+                const tasksBySection = response.tasksBySection;
+                const project_id = response.project_id;
+                updateTaskTables(tasksBySection);
 
-                $.each(response, function (section, tasks) {
-                    const tableBody = $('.collapsible table[data-section="' + section + '"] tbody');
-                    $.each(tasks, function (index, task) {
-                        const MAX_DESCRIPTION_LENGTH = 50; // Set the maximum length you want to display
-                        const taskDescription = task.task_description.length > MAX_DESCRIPTION_LENGTH
-                            ? task.task_description.substring(0, MAX_DESCRIPTION_LENGTH) + '...'
-                            : task.task_description;
-                        const assigneeName = task.assignee_name ? task.assignee_name : 'Not Assigned';
-                        const start_date = task.start_date ? task.start_date : '-';
-                        const end_date = task.end_date ? task.end_date : '-';
-                        const status = task.status ? task.status : '-';
-                        const priority = task.priority ? task.priority : '-';
+                // // Clear the existing tasks
+                // $('.collapsible table tbody').empty();
 
-                        const statusClass = task.status === 'Done' ? 'completed' : 'incomplete';
-                        const row = `
-                                <tr data-task-id="${task.task_id}" class="${statusClass}">
-                                    <td>${task.task_name}</td>
-                                    <td>${taskDescription}</td>
-                                    <td>${assigneeName}</td>
-                                    <td>${start_date}</td>
-                                    <td>${end_date}</td>
-                                    <td>${status}</td>
-                                    <td>${priority}</td>
-                                </tr>`;
-                        tableBody.append(row);
-                    });
-                });
+                // $.each(response, function (section, tasks) {
+                //     const tableBody = $('.collapsible table[data-section="' + section + '"] tbody');
+                //     $.each(tasks, function (index, task) {
+                //         const assigneeName = task.assignee_name || 'Not Assigned';
+                //         const statusClass = task.status === 'Done' ? 'completed' : 'incomplete';
+                //         const row = `
+                //         <tr data-task-id="${task.task_id}" class="${statusClass}">
+                //             <td>${task.task_name}</td>
+                //             <td class="tooltip">
+                //                 <span>
+                //                     ${task.task_description}
+                //                 </span>
+                //                 <div class="tooltiptext">
+                //                     ${task.task_description}
+                //                 </div>
+                //             </td>
+                //             <td>${assigneeName}</td>
+                //             <td>${task.due_date}</td> <!-- Updated to display "Due Date" -->
+                //             <td>${task.status}</td>
+                //             <td>${task.priority}</td>
+                //         </tr>`;
+                //         tableBody.append(row);
+                //     });
+                // });
             },
             error: function (xhr, status, error) {
                 console.error('Error fetching tasks:', error);
             }
         });
+    }
+
+    // Function to update the task tables with fetched data
+    function updateTaskTables(tasksBySection) {
+        // Loop through each section and update the corresponding table
+        for (const section in tasksBySection) {
+            if (tasksBySection.hasOwnProperty(section)) {
+                // Get the corresponding table
+                const $table = $(`.sortable[data-section="${section}"]`);
+                const $tbody = $table.find('tbody');
+
+                // Clear the table body
+                $tbody.empty();
+
+                // Loop through tasks in the section and append rows to the table
+                tasksBySection[section].forEach(task => {
+                    const $row = createTaskRow(task);
+                    $tbody.append($row);
+                });
+            }
+        }
+    }
+
+    // Function to create a table row for a task
+    function createTaskRow(task) {
+        const $row = $('<tr>');
+        $row.attr('data-task-id', task.task_id);
+        const assigneeName = task.assignee_name || 'Not Assigned'; // Use 'Not Assigned' if assignee is empty
+        $row.addClass(task.status === 'Done' ? 'completed' : 'incomplete');
+
+        // Add task columns
+        const taskName = task.task_name.length > 17 ? addTooltip(task.task_name) : task.task_name;
+        $row.append(`<td class="task-name">${taskName}</td>`);
+        $row.append(`<td class="tooltip"><span>${task.task_description}</span><div class="tooltiptext">${task.task_description}</div></td>`);
+        $row.append(`<td>${assigneeName}</td>`);
+        $row.append(`<td><span class="due-date">${formatDateRange(task.start_date, task.end_date)}</span></td>`);
+        $row.append(`<td>${task.status}</td>`);
+        $row.append(`<td>${task.priority}</td>`);
+
+        return $row;
+    }
+
+    // Function to add a tooltip for long task names
+    function addTooltip(taskName) {
+        return `<span class="tooltip">${taskName}<div class="tooltiptext">${taskName}</div></span>`;
     }
 
     // Function to fetch task details using AJAX
@@ -952,24 +975,125 @@ ini_set('display_errors', 1);
             url: 'partial/task_partial/fetch_task_details.php', // Replace with the URL to your fetch task details PHP file
             method: 'GET',
             data: { task_id: taskId },
-            dataType: 'json',
             success: function (response) {
                 console.log("--")
                 console.log(response);
                 console.log("--")
-                // Populate the form fields with the fetched task details
-                $('#editTaskId').val(response.task_id);
-                $('#editTaskName').val(response.task_name);
-                $('#editTaskDescription').val(response.task_description);
-                $('#editAssignee').val(response.assingee);
-                $('#editStartDate').val(response.start_date);
-                $('#editEndDate').val(response.end_date);
-                $('#editStatus').val(response.status);
-                $('#editPriority').val(response.priority);
+
+                // Handle the response and populate the edit form here
+                const taskDetails = JSON.parse(response);
+                populateEditForm(taskDetails);
+                // // Populate the form fields with the fetched task details
+                // $('#editTaskId').val(response.task_id);
+                // $('#editTaskName').val(response.task_name);
+                // $('#editTaskDescription').val(response.task_description);
+
+
+                // // Set the assignee select option
+                // var assigneeSelect = $('#editAssignee');
+
+                // // Check if the "Select Assignee" option already exists
+                // if (assigneeSelect.find('option[value="0"]').length === 0) {
+                //     // If it doesn't exist, add "Select Assignee" option
+                //     assigneeSelect.append($('<option>', {
+                //         value: '0',
+                //         text: 'Select Assignee',
+                //         hidden: "hidden"
+                //     }));
+                // }
+
+                // // Check if the "User not found" option already exists
+                // if (assigneeSelect.find('option[value="-1"]').length === 0) {
+                //     // If it doesn't exist, add "Select Assignee" option
+                //     assigneeSelect.append($('<option>', {
+                //         value: '-1',
+                //         text: 'Assignee not found',
+                //         hidden: "hidden"
+                //     }));
+                // }
+
+                // // Set the selected option based on response
+                // if (response.assignee == null) {
+                //     // If assignee is null, select "Select Assignee"
+                //     $('#editAssignee').val('0');
+                // } else {
+                //     check_assignee_exists(taskId, response);
+                // }
+
+                // $('#editStartDate').val(response.start_date);
+                // $('#editEndDate').val(response.end_date);
+                // $('#editStatus').val(response.status);
+                // $('#editPriority').val(response.priority);
             },
             error: function (xhr, status, error) {
                 // Handle the error if needed
                 console.error('Error fetching task details:', error);
+            }
+        });
+    }
+
+    // Function to populate the edit form with task details
+    function populateEditForm(taskDetails) {
+        $('#editTaskName').val(taskDetails.task_name);
+        $('#editTaskDescription').val(taskDetails.task_description);
+        $('#editAssignee').val(taskDetails.assignee);
+        $('#editStartDate').val(taskDetails.start_date);
+        $('#editEndDate').val(taskDetails.end_date);
+        $('#editStatus').val(taskDetails.status);
+        $('#editPriority').val(taskDetails.priority);
+    }
+
+    // Function to format a date range
+    function formatDateRange(startDate, endDate) {
+        if (!startDate || !endDate) {
+            return "n/a";
+        }
+
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+
+        const startYear = start.getFullYear();
+        const endYear = end.getFullYear();
+
+        const formattedStart = start.toLocaleString('en-US', {
+            month: 'short',
+            day: 'numeric'
+        });
+
+        const formattedEnd = end.toLocaleString('en-US', {
+            month: 'short',
+            day: 'numeric'
+        });
+
+        if (startYear === endYear) {
+            return `${formattedStart} - ${formattedEnd}`;
+        } else {
+            return `${formattedStart}, ${startYear} - ${formattedEnd}, ${endYear}`;
+        }
+    }
+
+    function check_assignee_exists(taskId, response) {
+        $.ajax({
+            url: 'partial/project_partial/check_assignee_exists_inproject.php', // Replace with the URL to your fetch task details PHP file
+            method: 'GET',
+            data: { project_id: <?php echo $project_id; ?>, task_id: taskId
+        },
+            dataType: 'json',
+            success: function (exists_assignee_response) {
+                console.log(exists_assignee_response.result);
+                if (exists_assignee_response.result == true) {
+                    // Assign the response.assignee value
+                    $('#editAssignee').val(response.assignee);
+                } else {
+                    // If assignee is not found, select "Assignee not found"
+                    $('#editAssignee').val('-1');
+                }
+            },
+            error: function (xhr, status, error) {
+                // Handle the error if needed
+                console.error('Error fetching task details:', xhr.responseText);
+                console.error('Status:', status);
+                console.error('Error:', error);
             }
         });
     }
@@ -1011,8 +1135,8 @@ ini_set('display_errors', 1);
                     console.log(response.message);
                     displayPopupMessage(response.message, 'success');
                 } else if (response.status === 'error') {
-                        $("#taskname-error").text(response.message)
-                        displayPopupMessage(response.message, 'error');
+                    $("#taskname-error").text(response.message)
+                    displayPopupMessage(response.message, 'error');
                 }
 
                 // Reset form fields after successful submission
@@ -1043,6 +1167,9 @@ ini_set('display_errors', 1);
 
     members.forEach(member => {
         member.addEventListener('click', function () {
+            const errorMessage = document.getElementById('error-message'); // Get the error message element
+            // Reset error message if there are no errors
+            errorMessage.textContent = '';
 
             // Remove 'active' class from all usernames
             const usernames = document.querySelectorAll('.username');
@@ -1090,14 +1217,6 @@ ini_set('display_errors', 1);
                                         userRolePopup.style.top = rect.bottom + 10 + 'px';
 
                                         userRolePopup.style.display = 'block';
-
-                                        // userRoleInput.addEventListener('focus', function () {
-                                        //     updateRoleButton.style.display = 'block';
-                                        // });
-
-                                        // userRoleInput.addEventListener('blur', function () {
-                                        //     updateRoleButton.style.display = 'none';
-                                        // });
                                     } else {
                                         alert('Error fetching user role.');
                                     }
@@ -1145,13 +1264,14 @@ ini_set('display_errors', 1);
         const newRole = userRoleInput.value.trim(); // Trim whitespace
 
         const errorMessage = document.getElementById('error-message'); // Get the error message element
+        console.log(errorMessage);
 
         // Reset error message if there are no errors
         errorMessage.textContent = '';
 
 
         if (newRole === '') {
-            errorMessage.textContent = 'Please select a valid role.'; // Display error message
+            errorMessage.textContent = 'Please enter a valid role.'; // Display error message
             return;
         }
 
@@ -1169,12 +1289,13 @@ ini_set('display_errors', 1);
         })
             .then(response => response.text())
             .then(result => {
-                if (response.status == 'success') {
-                        console.log(response.message);
-                        displayPopupMessage(response.message, 'success');
-                    } else if (response.status === 'error') {
-                        displayPopupMessage(response.message, 'error');
-                    }
+                console.log(result.status);
+                if (result.status == 'success') {
+                    console.log(result.message);
+                    displayPopupMessage(result.message, 'success');
+                } else if (result.status === 'error') {
+                    displayPopupMessage(result.message, 'error');
+                }
             })
             .catch(error => {
                 console.log('An error occurred while updating user role.');
@@ -1217,20 +1338,133 @@ ini_set('display_errors', 1);
     $(document).ready(function () {
         const $menu = $('.project-dropdown');
 
-        const onMouseUp = e => {
-            if (!$menu.is(e.target) && $menu.has(e.target).length === 0) {
-                $menu.removeClass('is-active');
+        const onClick = e => {
+            if ($menu.hasClass('is-active')) {
+                if (!$menu.is(e.target) && $menu.has(e.target).length === 0) {
+                    $menu.removeClass('is-active');
+                    $(document).off('click', onClick);
+                }
             }
         };
 
         $('.project_menu_toggle').on('click', () => {
             $menu.toggleClass('is-active').promise().done(() => {
                 if ($menu.hasClass('is-active')) {
-                    $(document).on('mouseup', onMouseUp);
+                    $(document).on('click', onClick);
                 } else {
-                    $(document).off('mouseup', onMouseUp);
+                    $(document).off('click', onClick);
                 }
             });
+        });
+    });
+</script>
+
+
+<script>
+    $(document).ready(function () {
+        var emailInput = $("#email");
+
+        emailInput.keyup(function () {
+            var email = emailInput.val();
+
+            // Frontend validation
+            if (email === "") {
+                $("#email-exists-message").text("");
+                return;
+            }
+
+            // AJAX request to check if the email exists in the project
+            $.ajax({
+                type: "POST",
+                url: "partial/project_partial/is_exist_user.php", // Your existing email checking script
+                data: { email: email, project_id: <?php echo $project_id ?> },
+                dataType: "json",
+                success: function (response) {
+                    if (response.exists) {
+                        $("#email-exists-message").text("A user with this email is already part of the project.");
+                    } else {
+                        $("#email-exists-message").text("");
+                    }
+                },
+                error: function () {
+                    alert("An error occurred while checking the email.");
+                }
+            });
+        });
+
+        $("#invite-form").submit(function (event) {
+            event.preventDefault();
+
+            var email = emailInput.val();
+            var message = $("#message").val();
+
+            console.log(email);
+            console.log(message);
+
+            // Frontend validation
+            if (email === "") {
+                alert("Please enter an email address.");
+                return;
+            }
+
+            // Proceed with inviting the user to the project
+            inviteUserToProject(email, message);
+
+            // Clear input fields after successful submission
+            $("#email").val("");
+            $("#message").val("");
+        });
+
+        function inviteUserToProject(email, message) {
+            // AJAX request to invite the user to the project
+            $.ajax({
+                type: "POST",
+                url: "partial/project_partial/invite_to_project.php", // Backend processing script
+                data: { email: email, message: message, project_id: <?php echo $project_id ?> },
+                dataType: "json",
+                success: function (response) {
+                    console.log("hello");
+                    console.log(response);
+                    console.log("hello");
+                    if (response.status == 'success') {
+                        console.log(response.message);
+                        displayPopupMessage(response.message, 'success');
+                    } else if (response.status === 'error') {
+                        displayPopupMessage(response.message, 'error');
+                    }
+                }
+            });
+
+            addmember_popup_toggle()
+        }
+    });
+
+</script>
+<script>
+    function openOtpPopup() {
+        $("#otpPopup").show();
+    }
+
+    function closeOtpPopup() {
+        $("#otpPopup").hide();
+    }
+
+    $(document).ready(function () {
+        $("#verifyOtpButton").click(function () {
+            var enteredOtp = $("#otpInput").val();
+
+            $.ajax({
+                type: "POST",
+                url: "partial/verify_addmember_otp.php",
+                data: { otp: enteredOtp, project_id: "<?php echo $project_id ?>", },
+                success: function (response) {
+                    $("#otpStatus").html(response);
+                }
+            });
+
+            closeOtpPopup()
+            location.reload();
+
         });
     });
 </script>

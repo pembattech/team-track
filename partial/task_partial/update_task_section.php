@@ -86,7 +86,7 @@ if (isset($_POST['task_id']) && isset($_POST['section']) && isset($_POST['projec
 
                     if ($previousSection == 'Done') {
                         // If the previous section was "Done," update the status to "Review"
-                        $updateStatusSql = "UPDATE Tasks SET section='$section', status='Waiting for Approval' WHERE task_id='$taskId'";
+                        $updateStatusSql = "UPDATE Tasks SET section='$section', status='Pending Approval' WHERE task_id='$taskId'";
 
                         if ($connection->query($updateStatusSql) === TRUE) {
                             // Return a success response if the update is successful

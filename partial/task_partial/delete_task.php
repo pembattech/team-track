@@ -1,10 +1,4 @@
 <?php
-// Enable error reporting
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-?>
-
-<?php
 require_once '../../config/connect.php';
 
 // Check if the task_id parameter is present in the POST request

@@ -115,7 +115,7 @@ if (isset($_POST['message_id']) && is_numeric($_POST['message_id'])) {
                         <option value="On Hold">On Hold</option>
                         <option value="Cancelled">Cancelled</option>
                         <option value="Blocked">Blocked</option>
-                        <option value="Waiting for Approval">Waiting for Approval</option>
+                        <option value="Pending Approval">Pending Approval</option>
                         <option value="In Review">In Review</option>
                     </select>
                     <br>

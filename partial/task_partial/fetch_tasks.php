@@ -1,10 +1,4 @@
 <?php
-// Enable error reporting
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-?>
-
-<?php
 require_once '../../config/connect.php';
 
 // Check if the 'project_id' parameter is present in the request
@@ -41,4 +35,4 @@ $connection->close();
 
 // Return the tasks data as JSON
 header('Content-Type: application/json');
-echo json_encode($tasksBySection);
+echo json_encode(array('tasksBySection' => $tasksBySection, 'project_id' => $project_id));

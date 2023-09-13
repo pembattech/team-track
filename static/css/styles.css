@@ -107,7 +107,6 @@ button.indicate-danger {
 .textarea-style textarea {
     outline: none;
     border: 0;
-    resize: none;
     background-color: inherit;
     padding-left: 5px;
     color: var(--color-text);
@@ -118,6 +117,12 @@ button.indicate-danger {
     border: 1px solid var(--color-border);
     border-radius: 5px;
 }
+
+.textarea-style textarea::-webkit-resizer {
+    background-color: var(--sidebar-bgcolor);
+    border: 1px solid var(--sidebar-bgcolor);
+    border-radius: 5px 0 0 0;
+  }
 
 .textarea-style textarea:focus {
     border: 1px solid var(--color-text);
@@ -191,6 +196,7 @@ button.indicate-danger {
     top: 67;
     background-color: inherit;
     transition: top 0.3s ease;
+    z-index: 999;
 }
 
 /* Custom Scrollbar Styles */
@@ -755,7 +761,6 @@ li.project-dropdown-menu-item p {
 }
 
 .lst-of-tasks th {
-    cursor: pointer;
     font-size: 14px;
     color: var(--color-text-disabled);
 }
@@ -769,10 +774,9 @@ li.project-dropdown-menu-item p {
 
 .lst-of-tasks td {
     color: var(--color-text);
-}
-
-.lst-of-tasks td {
-    width: 1000px;
+    cursor: pointer;
+    max-width: 45px;
+    font-size: 14.5px;
 }
 
 .collapsible {
@@ -805,10 +809,10 @@ li.project-dropdown-menu-item p {
 /* Styles for the slide-in popup */
 .task-popup {
     position: fixed;
-    top: 90;
+    top: 145;
     right: -440px;
     width: 400px;
-    max-height: 540px;
+    max-height: 500px;
     overflow-y: auto;
     background-color: var(--sidebar-bgcolor);
     color: var(--color-text);

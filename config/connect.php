@@ -13,7 +13,7 @@ if ($connection->connect_error) {
     die("Connection failed: " . $connection->connect_error);
 } else {
     // Start a session to access session variables (if needed)
-    session_start();
+    // session_start();
 
     // Check if the user ID is set in the session
     if (isset($_SESSION['user_id'])) {

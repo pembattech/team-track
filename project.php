@@ -6,12 +6,39 @@ session_start();
 
 <?php include 'partial/navbar.php'; ?>
 
-<?php
-// Display all errors
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-?>
+<style>
+    .tooltip {
+        position: relative;
+        cursor: pointer;
+    }
 
+    .tooltip .tooltiptext {
+        visibility: hidden;
+        width: fit-content;
+        background-color: var(--bg-color);
+        color: var(--color-text-weak);
+        text-align: left;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 5px;
+        position: absolute;
+        z-index: 1;
+        top: 100%;
+        left: 0;
+        opacity: 0;
+        transition: opacity 0.3s;
+        overflow-wrap: anywhere;
+    }
+
+    .tooltip:hover .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+    }
+
+    .section-task-count {
+        font-size: 14px;
+    }
+</style>
 <title>Project - TeamTrack</title>
 <div class="container project-wrapper">
     <?php include 'partial/sidebar.php'; ?>
@@ -291,6 +318,27 @@ ini_set('display_errors', 1);
                 </div>
                 <div class="lst-of-tasks div-space-top">
                     <?php
+
+                    function formatDateRange1($startDate, $endDate)
+                    {
+                        if (!empty($startDate) && !empty($endDate)) {
+                            $start = new DateTime($startDate);
+                            $end = new DateTime($endDate);
+
+                            $startYear = $start->format('Y');
+                            $endYear = $end->format('Y');
+
+                            $formattedStart = $start->format('M j');
+                            $formattedEnd = $end->format('M j');
+
+                            if ($startYear === $endYear) {
+                                return "{$formattedStart} - {$formattedEnd}, {$startYear}";
+                            } else {
+                                return "{$formattedStart}, {$startYear} - {$formattedEnd}, {$endYear}";
+                            }
+                        }
+                        return "n/a";
+                    }
                     // Check if the 'project_id' parameter is present in the URL
                     if (isset($_GET['project_id']) && is_numeric($_GET['project_id'])) {
                         $project_id = $_GET['project_id'];
@@ -320,15 +368,6 @@ ini_set('display_errors', 1);
                         $stmt->close();
                     }
 
-                    // Function to update the task's status based on the completion status
-                    function getTaskStatusClass($status)
-                    {
-                        if ($status === 'Done') {
-                            return 'completed';
-                        } else {
-                            return 'incomplete';
-                        }
-                    }
                     ?>
                     <?php if (isset($tasksBySection)): ?>
                         <?php if (!empty($tasksBySection)): ?>
@@ -336,6 +375,8 @@ ini_set('display_errors', 1);
                                 <div class="collapsible">
                                     <h2>
                                         <?php echo $section; ?>
+                                        <span class="section-task-count">(<?php echo count($tasks); ?>)
+                                        </span>
                                     </h2>
                                     <table class="sortable show" data-section="<?php echo $section; ?>">
                                         <thead>
@@ -343,8 +384,7 @@ ini_set('display_errors', 1);
                                                 <th>Task Name</th>
                                                 <th>Task Description</th>
                                                 <th>Assignee</th>
-                                                <th>Start Date</th>
-                                                <th>End Date</th>
+                                                <th>Due Date</th>
                                                 <th>Status</th>
                                                 <th>Priority</th>
                                             </tr>
@@ -352,21 +392,25 @@ ini_set('display_errors', 1);
                                         <tbody>
                                             <?php foreach ($tasks as $task): ?>
                                                 <tr data-task-id="<?php echo $task['task_id']; ?>"
-                                                    class="<?php echo getTaskStatusClass($task['status']); ?>">
+                                                    class="<?php echo $task['status'] === 'Done' ? 'completed' : 'incomplete'; ?>">
                                                     <td>
                                                         <?php echo $task['task_name']; ?>
                                                     </td>
-                                                    <td>
-                                                        <?php echo $task['task_description']; ?>
+                                                    <td class="task_desc tooltip">
+                                                        <span>
+                                                            <?php echo $task['task_description']; ?>
+                                                        </span>
+                                                        <div class="task_desc tooltiptext">
+                                                            <?php echo $task['task_description']; ?>
+                                                        </div>
                                                     </td>
                                                     <td>
                                                         <?php echo $task['assignee']; ?>
                                                     </td>
                                                     <td>
-                                                        <?php echo $task['start_date']; ?>
-                                                    </td>
-                                                    <td>
-                                                        <?php echo $task['end_date']; ?>
+                                                        <span class="due-date">
+                                                            <?php echo formatDateRange1($task['start_date'], $task['end_date']); ?>
+                                                        </span>
                                                     </td>
                                                     <td>
                                                         <?php echo $task['status']; ?>
@@ -374,9 +418,6 @@ ini_set('display_errors', 1);
                                                     <td>
                                                         <?php echo $task['priority']; ?>
                                                     </td>
-                                                    <!-- <td>
-                                        <button class="delete-btn" data-task-id="<?php echo $task['task_id']; ?>">Delete</button>
-                                    </td> -->
                                                 </tr>
                                             <?php endforeach; ?>
                                         </tbody>
@@ -410,20 +451,11 @@ ini_set('display_errors', 1);
                             <input class="input-style" type="text" id="editTaskName" name="task_name">
                             <span id="editTaskName-error" class="error-message"></span>
                             <br>
-
                             <div class="div-space-top"></div>
-
-
                             <?php include 'partial/project_partial/populate_assignee.php';
                             populateAssigneeOptions($project_id);
                             ?>
-
-
-
-
-
                             <span id="editAssignee-error" class="error-message"></span>
-
 
                             <div class="div-space-top"></div>
                             <div class="textarea-style">
@@ -452,7 +484,7 @@ ini_set('display_errors', 1);
                                 <option value="On Hold">On Hold</option>
                                 <option value="Cancelled">Cancelled</option>
                                 <option value="Blocked">Blocked</option>
-                                <option value="Waiting for Approval">Waiting for Approval</option>
+                                <option value="Pending Approval">Pending Approval</option>
                                 <option value="In Review">In Review</option>
                             </select>
                             <br>
@@ -569,8 +601,9 @@ ini_set('display_errors', 1);
             connectWith: '.sortable', // Enable sorting between sections
             placeholder: 'ui-state-highlight', // Style for the placeholder during drag-and-drop
             items: 'tr', // Limit sorting to rows only within the current section
-            scroll: true, // Enable scrolling
-            scrollSensitivity: 50, // Adjust the value as needed
+            scroll: true,
+            scrollSensitivity: 80,
+            scrollSpeed: 3,
             update: function (event, ui) {
                 // Get the dragged task's ID
                 const taskId = ui.item.attr('data-task-id');
@@ -631,8 +664,8 @@ ini_set('display_errors', 1);
                 const taskName = $(this).find('td:nth-child(1)').text();
                 const taskDescription = $(this).find('td:nth-child(2)').text();
                 const assingee = $(this).find('td:nth-child(3)').text();
-                const startDate = $(this).find('td:nth-child(4)').text();
-                const endDate = $(this).find('td:nth-child(5)').text();
+                const startDate = $(this).find('td:nth-child(4) .due-date').text();
+                const endDate = $(this).find('td:nth-child(5) .due-date').text();
                 const status = $(this).find('td:nth-child(6)').text();
                 const priority = $(this).find('td:nth-child(7)').text();
 
@@ -641,8 +674,6 @@ ini_set('display_errors', 1);
 
                 // Add the active class to the clicked task row
                 $(this).addClass('active-task');
-
-                console.log(taskId);
 
                 // Set the task details in the edit popup form
                 $('#editTaskId').val(taskId);
@@ -657,12 +688,14 @@ ini_set('display_errors', 1);
                 // Store the task ID in the variable
                 currentTaskId = taskId;
 
-                // Show the popup with animation
-                $('#taskPopup').addClass('active');
-
-
-                // Fetch task details and populate the edit form
-                fetchTaskDetails(taskId);
+                if (taskName !== '') {
+                    // Show the popup with animation
+                    $('#taskPopup').addClass('active');
+                    // Fetch task details and populate the edit form
+                    fetchTaskDetails(taskId);
+                } else if (taskName === '') {
+                    $('#taskPopup').removeClass('active');
+                }
             }
         });
 
@@ -846,41 +879,60 @@ ini_set('display_errors', 1);
             method: 'GET',
             data: { project_id: project_id },
             success: function (response) {
-                // Clear the existing tasks
-                $('.collapsible table tbody').empty();
-
-                $.each(response, function (section, tasks) {
-                    const tableBody = $('.collapsible table[data-section="' + section + '"] tbody');
-                    $.each(tasks, function (index, task) {
-                        const MAX_DESCRIPTION_LENGTH = 50; // Set the maximum length you want to display
-                        const taskDescription = task.task_description.length > MAX_DESCRIPTION_LENGTH
-                            ? task.task_description.substring(0, MAX_DESCRIPTION_LENGTH) + '...'
-                            : task.task_description;
-                        const assigneeName = task.assignee_name ? task.assignee_name : 'Not Assigned';
-                        const start_date = task.start_date ? task.start_date : '-';
-                        const end_date = task.end_date ? task.end_date : '-';
-                        const status = task.status ? task.status : '-';
-                        const priority = task.priority ? task.priority : '-';
-
-                        const statusClass = task.status === 'Done' ? 'completed' : 'incomplete';
-                        const row = `
-                                <tr data-task-id="${task.task_id}" class="${statusClass}">
-                                    <td>${task.task_name}</td>
-                                    <td>${taskDescription}</td>
-                                    <td>${assigneeName}</td>
-                                    <td>${start_date}</td>
-                                    <td>${end_date}</td>
-                                    <td>${status}</td>
-                                    <td>${priority}</td>
-                                </tr>`;
-                        tableBody.append(row);
-                    });
-                });
+                console.log(response);
+                // Handle the response and update the task tables here
+                const tasksBySection = response.tasksBySection;
+                const project_id = response.project_id;
+                updateTaskTables(tasksBySection);
             },
             error: function (xhr, status, error) {
                 console.error('Error fetching tasks:', error);
             }
         });
+    }
+
+    // Function to update the task tables with fetched data
+    function updateTaskTables(tasksBySection) {
+        // Loop through each section and update the corresponding table
+        for (const section in tasksBySection) {
+            if (tasksBySection.hasOwnProperty(section)) {
+                // Get the corresponding table
+                const $table = $(`.sortable[data-section="${section}"]`);
+                const $tbody = $table.find('tbody');
+
+                // Clear the table body
+                $tbody.empty();
+
+                // Loop through tasks in the section and append rows to the table
+                tasksBySection[section].forEach(task => {
+                    const $row = createTaskRow(task);
+                    $tbody.append($row);
+                });
+            }
+        }
+    }
+
+    // Function to create a table row for a task
+    function createTaskRow(task) {
+        const $row = $('<tr>');
+        $row.attr('data-task-id', task.task_id);
+        const assigneeName = task.assignee_name || 'Not Assigned'; // Use 'Not Assigned' if assignee is empty
+        $row.addClass(task.status === 'Done' ? 'completed' : 'incomplete');
+
+        const taskName = task.task_name.length > 19 ? addTooltip(task.task_name) : task.task_name;
+        $row.append(`<td class="task-name">${taskName}</td>`);
+        $row.append(`<td class="task_desc tooltip"><span>${addEllipsis(task.task_description, 29)}</span><div class="tooltiptext">${task.task_description}</div></td>`);
+        $row.append(`<td>${assigneeName}</td>`);
+        $row.append(`<td><span class="due-date">${formatDateRange(task.start_date, task.end_date)}</span></td>`);
+        $row.append(`<td>${task.status}</td>`);
+        $row.append(`<td>${task.priority}</td>`);
+
+        return $row;
+    }
+
+    // Function to add a tooltip for long task names
+    function addTooltip(taskName) {
+        return `<span class="tooltip">${addEllipsis(taskName, 18)}<div class="tooltiptext">${taskName}</div></span>`;
     }
 
     // Function to fetch task details using AJAX
@@ -892,52 +944,14 @@ ini_set('display_errors', 1);
             url: 'partial/task_partial/fetch_task_details.php', // Replace with the URL to your fetch task details PHP file
             method: 'GET',
             data: { task_id: taskId },
-            dataType: 'json',
             success: function (response) {
                 console.log("--")
                 console.log(response);
                 console.log("--")
-                // Populate the form fields with the fetched task details
-                $('#editTaskId').val(response.task_id);
-                $('#editTaskName').val(response.task_name);
-                $('#editTaskDescription').val(response.task_description);
 
-
-                // Set the assignee select option
-                var assigneeSelect = $('#editAssignee');
-
-                // Check if the "Select Assignee" option already exists
-                if (assigneeSelect.find('option[value="0"]').length === 0) {
-                    // If it doesn't exist, add "Select Assignee" option
-                    assigneeSelect.append($('<option>', {
-                        value: '0',
-                        text: 'Select Assignee',
-                        hidden: "hidden"
-                    }));
-                }
-
-                // Check if the "User not found" option already exists
-                if (assigneeSelect.find('option[value="-1"]').length === 0) {
-                    // If it doesn't exist, add "Select Assignee" option
-                    assigneeSelect.append($('<option>', {
-                        value: '-1',
-                        text: 'Assignee not found',
-                        hidden: "hidden"
-                    }));
-                }
-
-                // Set the selected option based on response
-                if (response.assignee == null) {
-                    // If assignee is null, select "Select Assignee"
-                    $('#editAssignee').val('0');
-                } else {
-                    check_assignee_exists(taskId, response);
-                }
-
-                $('#editStartDate').val(response.start_date);
-                $('#editEndDate').val(response.end_date);
-                $('#editStatus').val(response.status);
-                $('#editPriority').val(response.priority);
+                // Handle the response and populate the edit form here
+                const taskDetails = JSON.parse(response);
+                populateEditForm(taskDetails);
             },
             error: function (xhr, status, error) {
                 // Handle the error if needed
@@ -946,7 +960,87 @@ ini_set('display_errors', 1);
         });
     }
 
-    function check_assignee_exists(taskId, response) {
+    // Function to populate the edit form with task details
+    function populateEditForm(taskDetails) {
+        console.log("pemba");
+        console.log(taskDetails);
+        console.log(taskDetails['task_id']);
+        console.log("pemba");
+        $('#editTaskName').val(taskDetails.task_name);
+        $('#editTaskDescription').val(taskDetails.task_description);
+
+
+
+        // Set the assignee select option
+        var assigneeSelect = $('#editAssignee');
+
+        // Check if the "Select Assignee" option already exists
+        if (assigneeSelect.find('option[value="0"]').length === 0) {
+            // If it doesn't exist, add "Select Assignee" option
+            assigneeSelect.append($('<option>', {
+                value: '0',
+                text: 'Select Assignee',
+                hidden: "hidden"
+            }));
+        }
+
+        // Check if the "User not found" option already exists
+        if (assigneeSelect.find('option[value="-1"]').length === 0) {
+            // If it doesn't exist, add "Select Assignee" option
+            assigneeSelect.append($('<option>', {
+                value: '-1',
+                text: 'Assignee not found',
+                hidden: "hidden"
+            }));
+        }
+
+        // Set the selected option based on response
+        if (taskDetails['assignee'] == null) {
+            // If assignee is null, select "Select Assignee"
+            $('#editAssignee').val('0');
+        } else {
+            check_assignee_exists(taskDetails['task_id'], taskDetails['assignee']);
+        }
+
+
+
+        // $('#editAssignee').val(taskDetails.assignee);
+        $('#editStartDate').val(taskDetails.start_date);
+        $('#editEndDate').val(taskDetails.end_date);
+        $('#editStatus').val(taskDetails.status);
+        $('#editPriority').val(taskDetails.priority);
+    }
+
+    // Function to format a date range
+    function formatDateRange(startDate, endDate) {
+        if (!startDate || !endDate) {
+            return "n/a";
+        }
+
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+
+        const startYear = start.getFullYear();
+        const endYear = end.getFullYear();
+
+        const formattedStart = start.toLocaleString('en-US', {
+            month: 'short',
+            day: 'numeric'
+        });
+
+        const formattedEnd = end.toLocaleString('en-US', {
+            month: 'short',
+            day: 'numeric'
+        });
+
+        if (startYear === endYear) {
+            return `${formattedStart} - ${formattedEnd}`;
+        } else {
+            return `${formattedStart}, ${startYear} - ${formattedEnd}, ${endYear}`;
+        }
+    }
+
+    function check_assignee_exists(taskId, assignee) {
         $.ajax({
             url: 'partial/project_partial/check_assignee_exists_inproject.php', // Replace with the URL to your fetch task details PHP file
             method: 'GET',
@@ -956,8 +1050,8 @@ ini_set('display_errors', 1);
             success: function (exists_assignee_response) {
                 console.log(exists_assignee_response.result);
                 if (exists_assignee_response.result == true) {
-                    // Assign the response.assignee value
-                    $('#editAssignee').val(response.assignee);
+                    // Assign the assignee value
+                    $('#editAssignee').val(assignee);
                 } else {
                     // If assignee is not found, select "Assignee not found"
                     $('#editAssignee').val('-1');
