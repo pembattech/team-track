@@ -34,7 +34,7 @@
     </a>
 
     <div class="search__container">
-        <input class="search__input" type="text" placeholder="Search">
+        <!-- <input class="search__input" type="text" placeholder="Search"> -->
     </div>
     <div class="navbar-right">
         <?php
