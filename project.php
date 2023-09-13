@@ -375,7 +375,8 @@ session_start();
                                 <div class="collapsible">
                                     <h2>
                                         <?php echo $section; ?>
-                                        <span class="section-task-count">(<?php echo count($tasks); ?>)
+                                        <span class="section-task-count">(
+                                            <?php echo count($tasks); ?>)
                                         </span>
                                     </h2>
                                     <table class="sortable show" data-section="<?php echo $section; ?>">
@@ -969,8 +970,6 @@ session_start();
         $('#editTaskName').val(taskDetails.task_name);
         $('#editTaskDescription').val(taskDetails.task_description);
 
-
-
         // Set the assignee select option
         var assigneeSelect = $('#editAssignee');
 
@@ -1002,13 +1001,52 @@ session_start();
             check_assignee_exists(taskDetails['task_id'], taskDetails['assignee']);
         }
 
-
-
         // $('#editAssignee').val(taskDetails.assignee);
         $('#editStartDate').val(taskDetails.start_date);
         $('#editEndDate').val(taskDetails.end_date);
-        $('#editStatus').val(taskDetails.status);
-        $('#editPriority').val(taskDetails.priority);
+
+        // Set the status select option
+        var statusSelect = $('#editStatus');
+
+        // Check if the "Select Status" option already exists
+        if (statusSelect.find('option[value="0"]').length === 0) {
+            // If it doesn't exist, add "Select Status" option
+            statusSelect.append($('<option>', {
+                value: '0',
+                text: 'Select Status',
+                hidden: "hidden"
+            }));
+        }
+
+        // Set the selected option based on response
+        if (taskDetails['status'] == null || taskDetails['status'] == 'New') {
+            // If status is null, select "Select Status"
+            $('#editStatus').val('0');
+        } else {
+            $('#editStatus').val(taskDetails.status);
+        }
+
+        // Set the priority select option
+        var prioritySelect = $('#editPriority');
+        
+        // Check if the "Select priority" option already exists
+        if (prioritySelect.find('option[value="0"]').length === 0) {
+            // If it doesn't exist, add "Select priority" option
+            prioritySelect.append($('<option>', {
+                value: '0',
+                text: 'Select Priority',
+                hidden: "hidden"
+            }));
+        }
+
+        // Set the selected option based on response
+        if (taskDetails['priority'] == null) {
+            // If priority is null, select "Select priority"
+            $('#editPriority').val('0');
+        } else {
+            $('#editPriority').val(taskDetails.priority);
+        }
+
     }
 
     // Function to format a date range

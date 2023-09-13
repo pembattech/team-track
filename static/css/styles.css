@@ -119,6 +119,8 @@ button.indicate-danger {
 }
 
 .textarea-style textarea::-webkit-resizer {
+    width: 300px;
+    height: 300px;
     background-color: var(--sidebar-bgcolor);
     border: 1px solid var(--sidebar-bgcolor);
     border-radius: 5px 0 0 0;
@@ -998,6 +1000,7 @@ button#closeButton:hover {
     left: 0;
     width: 100%;
     height: 100%;
+    z-index: 9999;
 }
 
 .addtask-popup-content {
