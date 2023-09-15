@@ -934,6 +934,7 @@ button#closeButton:hover {
     left: 0;
     width: 100%;
     height: 100%;
+    z-index: 9999;
 }
 
 .invite-popup-content {
@@ -968,9 +969,15 @@ button#closeButton:hover {
 
 .invite-popup input[type="email"],
 .invite-popup textarea {
+    outline: 0;
     width: 100%;
     padding: 8px 5px;
-    background-color: inherit;
+    background-color: var(--bg-color);
+    border-radius: 5px;
+}
+
+.email-exists-message {
+    font-size: 13px;
 }
 
 /* Styling for the "+" sign */

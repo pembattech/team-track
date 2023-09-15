@@ -86,20 +86,25 @@ function getUserName($user_id)
     }
 }
 
-function sendNotificationMessage_project_msg($recipientId, $messageText)
+function sendNotificationMessage_project_msg($recipientId, $messageText, $project_id)
 {
     global $connection;
 
-    $insert_message_query = "INSERT INTO Messages (recipient_id, text, is_project_msg) VALUES (?, ?, 1)";
-    $stmt = $connection->prepare($insert_message_query);
-    $stmt->bind_param("is", $recipientId, $messageText);
+    // Sanitize the inputs to prevent SQL injection
+    $recipientId = intval($recipientId); // Assuming recipientId is an integer
+    $messageText = mysqli_real_escape_string($connection, $messageText); // Sanitize the message text
+    $project_id = intval($project_id); // Assuming project_id is an integer
 
-    if ($stmt->execute()) {
+    $insert_message_query = "INSERT INTO Messages (recipient_id, text, project_id, is_project_msg) VALUES ($recipientId, '$messageText', $project_id, 1)";
+    echo $insert_message_query;
+
+    if ($connection->query($insert_message_query)) {
         return true;
     } else {
         return false;
     }
 }
+
 
 function get_project_owner_id($project_id)
 {

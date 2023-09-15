@@ -56,12 +56,12 @@ if ($project_id !== null) {
                     // Notify the project owner
                     $project_owner_id = get_project_owner_id($project_id);
                     $project_owner_message = "User '$username' has joined the project.";
-                    sendNotificationMessage_project_msg($project_owner_id, $project_owner_message);
+                    sendNotificationMessage_project_msg($project_owner_id, $project_owner_message, $project_id);
 
                     // Notify the invitation sender
                     $invitation_sender_id = $row['invitation_sender'];
-                    $invitation_sender_message = "User '$username' has joined the " . get_project_data($project_id) . "project using your invitation.";
-                    sendNotificationMessage_project_msg($invitation_sender_id, $invitation_sender_message);
+                    $invitation_sender_message = "User '$username' has joined the " . get_project_data($project_id)['project_name'] . "project using your invitation.";
+                    sendNotificationMessage_project_msg($invitation_sender_id, $invitation_sender_message, $project_id);
 
                     // Update the is_used column to mark the invitation as used
                     $update_used_query = "UPDATE ProjectInvitations SET is_used = 1 WHERE project_id = '$project_id' AND otp = '$receivedOtp' AND is_used = 0";

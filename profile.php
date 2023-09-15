@@ -415,7 +415,7 @@
 
                         <div class="form-group textarea-style">
                             <label for="about">About</label>
-                            <textarea id="about" name="about" rows="4"
+                            <textarea id="about" name="about" maxlength="255" rows="4"
                                 placeholder="Please provide a brief introduction about yourself."><?php if (get_user_data($user_id)['about'] !== null && get_user_data($user_id)['about'] !== "") {
                                     echo get_user_data($user_id)['about'];
                                 }

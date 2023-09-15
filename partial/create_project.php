@@ -11,7 +11,7 @@ require_once '../config/connect.php';
 
 function generateRandomColor()
 {
-    $colors = ["#f06a6a", "#ec8d71", "#f1bd6c", "#f8df72", "#aecf55", "#5da283", "#4ecbc4", "#9ee7e3", "#4573d2", "#8d84e8", "#b36bd4", "#f9aaef", "#f26fb2", "#fc979a"];
+    $colors = ["#E57373", "#F06292", "#BA68C8", "#9575CD", "#7986CB", "#64B5F6", "#4FC3F7", "#81C784", "#AED581", "#FFF176", "#FFB74D", "#FF8A65", "#A1887F", "#E0E0E0"];
     $randomIndex = array_rand($colors);
     return $colors[$randomIndex];
 }

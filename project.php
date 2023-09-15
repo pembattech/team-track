@@ -558,9 +558,6 @@ session_start();
             <h3>Tab 2 Content</h3>
             <p>This is the content of Tab 2.</p>
         </div>
-
-        <!-- Include jQuery library -->
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     </div>
 
 </div>
@@ -1459,7 +1456,7 @@ session_start();
             });
 
             closeOtpPopup()
-            location.reload();
+            // location.reload();
 
         });
     });

@@ -47,7 +47,7 @@
     }
 
     .inbox-right-side {
-        height: 62vh;
+        height: 61vh;
         width: 650px;
         position: sticky;
         top: 139;
@@ -212,6 +212,7 @@
             method: 'GET',
             data: { filter: currentFilter }, // Send the filter value to the server
             success: function (response) {
+                console.log(response);
                 const messageList = $('.message-list tbody');
                 messageList.empty();
 

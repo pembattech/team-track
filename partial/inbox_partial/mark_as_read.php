@@ -6,6 +6,9 @@ ini_set('display_errors', 1);
 
 require_once '../../config/connect.php';
 
+// Start the session to access session data
+session_start();
+
 if (isset($_POST['message_id'])) {
     $messageId = $_POST['message_id'];
     $user_id = $_SESSION['user_id'];

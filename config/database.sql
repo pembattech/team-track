@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS Users (
     password VARCHAR(255),
     profile_picture VARCHAR(255),
     background_color VARCHAR(7),
-    about VARCHAR(1000)
+    about VARCHAR(255)
 );
 
 CREATE TABLE IF NOT EXISTS Projects (
@@ -59,12 +59,14 @@ CREATE TABLE IF NOT EXISTS Messages (
     timestamp DATETIME CURRENT_TIMESTAMP,
     recipient_id INT,
     is_read INT DEFAULT 0,
-    is_task_msg INT DEFAULT 0,
+    is_task_msg INT DEFAULT 0,using your invitation.
     is_project_msg INT DEFAULT 0,
     is_newtask_msg INT DEFAULT 0,
+    project_id INT,
     FOREIGN KEY (task_id) REFERENCES Tasks(task_id),
     FOREIGN KEY (sender_id) REFERENCES Users(user_id),
-    FOREIGN KEY (recipient_id) REFERENCES Users(user_id)
+    FOREIGN KEY (recipient_id) REFERENCES Users(user_id),
+    FOREIGN KEY (project_id) REFERENCES Projects(project_id)
 );
 
 
