@@ -398,7 +398,7 @@ ini_set('display_errors', 1);
                             section: sectionId
                         },
                         success: function (response) {
-                            console.log(response);
+                            
                             // fetchTasks();
                             console.log('Task section updated successfully.');
                             if (response.status == 'success') {
@@ -641,7 +641,7 @@ ini_set('display_errors', 1);
                 method: 'GET',
                 data: { project_id: project_id },
                 success: function (response) {
-                    console.log(response);
+                    
                     // Handle the response and update the task tables here
                     const tasksBySection = response.tasksBySection;
                     const project_id = response.project_id;
@@ -709,7 +709,7 @@ ini_set('display_errors', 1);
                 data: { task_id: taskId },
                 success: function (response) {
                     console.log("--")
-                    console.log(response);
+                    
                     console.log("--")
 
                     // Handle the response and populate the edit form here

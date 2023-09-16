@@ -12,16 +12,6 @@ ini_set('display_errors', 1);
     <!-- Add jQuery UI library -->
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <style>
-        .task-name-cell::before {
-            content: '\2713';
-            /* Checkmark Unicode character */
-            color: green;
-            /* Color of the checkmark */
-            margin-right: 5px;
-            /* Spacing between checkmark and text */
-        }
-
-
         /* Add this CSS to your existing styles */
         .tooltip {
             position: relative;
@@ -412,7 +402,7 @@ ini_set('display_errors', 1);
                             section: sectionId
                         },
                         success: function (response) {
-                            console.log(response);
+                            
                             // fetchTasks();
                             console.log('Task section updated successfully.');
                             if (response.status == 'success') {
@@ -655,7 +645,7 @@ ini_set('display_errors', 1);
                 method: 'GET',
                 data: { project_id: project_id },
                 success: function (response) {
-                    console.log(response);
+                    
                     // Handle the response and update the task tables here
                     const tasksBySection = response.tasksBySection;
                     const project_id = response.project_id;
@@ -758,13 +748,45 @@ ini_set('display_errors', 1);
         $("#confirmDelete").click(function () {
             // Add your AJAX request to delete the selected tasks here
             console.log("Deleting tasks: " + selectedTasks.join(", "));
-            // Clear the selected tasks array
-            selectedTasks.length = 0;
-            updateDeletePopup();
-            $(".task-checkbox").prop("checked", false); // Uncheck all checkboxes
-            // Hide the delete button popup
-            $("#deletePopup").hide();
+
+            // Perform the AJAX request to delete tasks
+            $.ajax({
+                url: 'partial/task_partial/delete_selected_tasks.php', // Replace with the URL to your delete selected tasks PHP file
+                method: 'POST',
+                data: {
+                    task_id: selectedTasks,
+                    projectowner_id: <?php echo $project_owner['user_id']; ?>
+                },
+                success: function (response) {
+
+                    // Clear the selected tasks array
+                    selectedTasks.length = 0;
+
+                    // Update the delete button popup
+                    updateDeletePopup();
+
+                    // Hide the delete button popup
+                    $("#deletePopup").hide();
+
+                    if (response.status == 'success') {
+                        // Handle the success response here
+                        console.log('Selected tasks deleted successfully.');
+
+                        // Uncheck all checkboxes
+                        $(".task-checkbox").prop("checked", false);
+
+                        displayPopupMessage(response.message, 'success');
+                    } else if (response.status === 'error') {
+                        displayPopupMessage(response.message, 'error');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    // Handle the error if needed
+                    console.error('Error deleting selected tasks:', error);
+                }
+            });
         });
+
 
         // Cancel delete and hide the popup
         $("#cancelDelete").click(function () {
@@ -787,7 +809,7 @@ ini_set('display_errors', 1);
                 data: { task_id: taskId },
                 success: function (response) {
                     console.log("--")
-                    console.log(response);
+                    
                     console.log("--")
 
                     // Handle the response and populate the edit form here

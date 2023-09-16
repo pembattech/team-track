@@ -4,10 +4,6 @@
 
 
 <style>
-    .inbox-wrapper {
-        max-height: 60vh;
-    }
-
     .inbox-container {
         display: flex;
         gap: 10px;
@@ -34,7 +30,7 @@
     }
 
     .inbox-left-side {
-        max-height: 68vh;
+        max-height: 65vh;
         overflow-y: auto;
         background-color: var(--bg-color);
         border-radius: 5px;
@@ -47,7 +43,7 @@
     }
 
     .inbox-right-side {
-        height: 61vh;
+        height: 59vh;
         width: 650px;
         position: sticky;
         top: 139;
@@ -212,7 +208,7 @@
             method: 'GET',
             data: { filter: currentFilter }, // Send the filter value to the server
             success: function (response) {
-                console.log(response);
+                
                 const messageList = $('.message-list tbody');
                 messageList.empty();
 
@@ -315,7 +311,7 @@
             method: 'POST',
             data: { message_id: messageId },
             success: function (response) {
-                console.log(response);
+                
                 console.log('Marked read!');
                 console.log(response.unreadCount);
 

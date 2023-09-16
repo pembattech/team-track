@@ -35,7 +35,8 @@
 }
 
 body {
-    background-color: var(--sidebar-bgcolor);
+    background-color: var(--bg-color);
+    /* background-color: red; */
 }
 
 hr {
@@ -482,7 +483,7 @@ textarea::-webkit-scrollbar-track {
 
 .main-content {
     flex: 1;
-    min-height: 87.5vh;
+    /* min-height: 87.5vh; */
     /* width: 85%; */
     background-color: var(--bg-color);
     margin-left: 255px;
@@ -759,6 +760,10 @@ li.project-dropdown-menu-item p {
     color: red;
 }
 
+/* .lst-of-tasks .section-heading {
+
+} */
+
 .lst-of-tasks table {
     border-collapse: collapse;
     width: 100%;
@@ -789,12 +794,16 @@ li.project-dropdown-menu-item p {
 }
 
 .collapsible h2 {
+    position: sticky;
+    z-index: 99999;
+    top: 0;
     font-size: 20px;
-    margin: 0;
     padding: 10px;
     cursor: pointer;
     background-color: var(--color-background-active);
     color: var(--color-text);
+    backdrop-filter: blur(7px);
+    transition: top 0.3s ease, background-color 0.3s ease;
 }
 
 .collapsible h2.active {
@@ -813,6 +822,7 @@ li.project-dropdown-menu-item p {
 /* Styles for the slide-in popup */
 .task-popup {
     position: fixed;
+    z-index: 99999;
     top: 145;
     right: -440px;
     width: 400px;
@@ -980,7 +990,11 @@ button#closeButton:hover {
     font-size: 13px;
 }
 
-/* Styling for the "+" sign */
+.lst-of-tasks {
+    max-height: 67vh;
+    overflow-y: auto;
+}
+
 .border-around-plus {
     border: 1px solid #ccc;
     padding: 7px 11px;
@@ -1009,7 +1023,7 @@ button#closeButton:hover {
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 9999;
+    z-index: 999999;
 }
 
 .addtask-popup-content {

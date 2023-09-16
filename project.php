@@ -22,7 +22,7 @@ session_start();
         border-radius: 4px;
         padding: 5px;
         position: absolute;
-        z-index: 1;
+        z-index: 999999;
         top: 100%;
         left: 0;
         opacity: 0;
@@ -37,6 +37,10 @@ session_start();
 
     .section-task-count {
         font-size: 14px;
+    }
+
+    .checkbox-th {
+        width: 10px;
     }
 </style>
 <title>Project - TeamTrack</title>
@@ -290,6 +294,12 @@ session_start();
         <div class="tab-content div-space-top" id="tab2">
             <div class="tasks-section">
                 <button class="addtask-btn" onclick="addtask_popup_toggle()">+ Add Task</button>
+                <button id="toggleSelect" class="button-style selectall">Select All</button>
+                <button id="cancelselect-btn" class="button-style" style="display: none;">Cancel Select</button>
+
+                <div id="checkboxsButtons" style="display: none; gap: 5px;">
+                    <button id="confirmDelete" class="button-style">Delete Selected</button>
+                </div>
 
                 <div class="addtask-popup" id="addtask-popup">
                     <div class="addtask-popup-content">
@@ -373,20 +383,22 @@ session_start();
                         <?php if (!empty($tasksBySection)): ?>
                             <?php foreach ($tasksBySection as $section => $tasks): ?>
                                 <div class="collapsible">
-                                    <h2>
+                                    <h2 class="section-topic">
                                         <?php echo $section; ?>
-                                        <span class="section-task-count">(<?php echo countTasksBySectionAndProject($section, $project_id); ?>)
+                                        <span class="section-task-count">
+                                            (<?php echo countTasksBySectionAndProject($section, $project_id); ?>)
                                         </span>
                                     </h2>
                                     <table class="sortable show" data-section="<?php echo $section; ?>">
                                         <thead>
                                             <tr>
-                                                <th>Task Name</th>
-                                                <th>Task Description</th>
-                                                <th>Assignee</th>
-                                                <th>Due Date</th>
-                                                <th>Status</th>
-                                                <th>Priority</th>
+                                                <th id="task-th" class="checkbox-th"></th>
+                                                <th id="task-th">Task Name</th>
+                                                <th id="task-th">Task Description</th>
+                                                <th id="task-th">Assignee</th>
+                                                <th id="task-th">Due Date</th>
+                                                <th id="task-th">Status</th>
+                                                <th id="task-th">Priority</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -464,12 +476,16 @@ session_start();
                             <span id="editTaskDescription-error" class="error-message"></span>
 
                             <div class="div-space-top"></div>
-                            <input class="input-style" type="text" id="editStartDate" name="start_date" onfocus="this.type='date'" onblur="if(!this.value)this.type='text';" placeholder="Start Date">
+                            <input class="input-style" type="text" id="editStartDate" name="start_date"
+                                onfocus="this.type='date'" onblur="if(!this.value)this.type='text';"
+                                placeholder="Start Date">
                             <span id="editStartDate-error" class="error-message"></span>
                             <br>
 
                             <div class="div-space-top"></div>
-                            <input class="input-style" type="text" id="editEndDate" name="end_date" onfocus="(this.type='date')" onblur="if(!this.value)this.type='text';" placeholder="End Date">
+                            <input class="input-style" type="text" id="editEndDate" name="end_date"
+                                onfocus="(this.type='date')" onblur="if(!this.value)this.type='text';"
+                                placeholder="End Date">
                             <span id="editEndDate-error" class="error-message"></span>
                             <br>
 
@@ -610,8 +626,6 @@ session_start();
 
                 // Get the destination section's ID
                 const sectionId = ui.item.closest('.collapsible').find('h2').text().trim();
-                console.log(sectionId);
-
 
                 // Update the task's section in the database using an AJAX request
                 $.ajax({
@@ -623,7 +637,7 @@ session_start();
                         section: sectionId
                     },
                     success: function (response) {
-                        console.log(response);
+                        
                         // fetchTasks();
                         console.log('Task section updated successfully.');
                         if (response.status == 'success') {
@@ -634,6 +648,7 @@ session_start();
                         }
 
                         fetchTasks();
+
                     },
                     error: function (xhr, status, error) {
                         // Handle the error if needed
@@ -655,19 +670,30 @@ session_start();
             return !$(target).closest('#submitButton').length;
         }
 
+        // Check if the clicked element is not the "#checkbox_input"
+        function isNotcheckbox(target) {
+            return !$(target).closest('.checkbox-td').length;
+        }
+
+        // Check if the clicked element is not the "#task-th" button
+        function isNottask_th(target) {
+            return !$(target).closest('#task-th').length;
+        }
+
+
         // Use event delegation for the click event on task rows
         $(document).on('click', '.sortable tr', function (event) {
             // Check if the clicked element is not the "Save Changes" button
-            if (isNotSaveButton(event.target)) {
+            if (isNotSaveButton(event.target) && isNotcheckbox(event.target) && isNottask_th(event.target)) {
                 // Get the task details from the clicked row
                 const taskId = $(this).attr('data-task-id');
-                const taskName = $(this).find('td:nth-child(1)').text();
-                const taskDescription = $(this).find('td:nth-child(2)').text();
-                const assignee = $(this).find('td:nth-child(3)').text();
-                const startDate = $(this).find('td:nth-child(4) .due-date').text();
-                const endDate = $(this).find('td:nth-child(5) .due-date').text();
-                const status = $(this).find('td:nth-child(6)').text();
-                const priority = $(this).find('td:nth-child(7)').text();
+                const taskName = $(this).find('td:nth-child(2)').text();
+                const taskDescription = $(this).find('td:nth-child(3)').text();
+                const assignee = $(this).find('td:nth-child(4)').text();
+                const startDate = $(this).find('td:nth-child(5) .due-date').text();
+                const endDate = $(this).find('td:nth-child(6) .due-date').text();
+                const status = $(this).find('td:nth-child(7)').text();
+                const priority = $(this).find('td:nth-child(8)').text();
 
                 // Remove the active class from all task rows
                 $('.sortable tr').removeClass('active-task');
@@ -687,6 +713,8 @@ session_start();
 
                 // Store the task ID in the variable
                 currentTaskId = taskId;
+                console.log(currentTaskId);
+                console.log(taskName);
 
                 if (taskName !== '') {
                     // Show the popup with animation
@@ -866,11 +894,12 @@ session_start();
             method: 'GET',
             data: { project_id: project_id },
             success: function (response) {
-                console.log(response);
+                
                 // Handle the response and update the task tables here
                 const tasksBySection = response.tasksBySection;
                 const project_id = response.project_id;
                 updateTaskTables(tasksBySection);
+
             },
             error: function (xhr, status, error) {
                 console.error('Error fetching tasks:', error);
@@ -907,6 +936,22 @@ session_start();
         const taskpriority = task.priority || 'n/a'; // Use 'n/a' if priority is empty
         $row.addClass(task.status === 'Done' ? 'completed' : 'incomplete');
 
+        // Add a checkbox field for task selection
+        const $checkboxCell = $('<td>', {
+            class: 'checkbox-td'
+        });
+
+        const $checkbox = $('<input>', {
+            type: 'checkbox',
+            id: 'checkbox_input',
+            class: 'task-checkbox',
+            'data-task-id': task.task_id
+        });
+
+        $checkboxCell.append($checkbox);
+        $row.append($checkboxCell);
+
+
         const taskName = task.task_name.length > 19 ? addTooltip(task.task_name) : task.task_name;
         $row.append(`<td class="task-name">${taskName}</td>`);
         $row.append(`<td class="task_desc tooltip"><span>${addEllipsis(task.task_description, 29)}</span><div class="tooltiptext">${task.task_description}</div></td>`);
@@ -923,6 +968,163 @@ session_start();
         return `<span class="tooltip">${addEllipsis(taskName, 18)}<div class="tooltiptext">${taskName}</div></span>`;
     }
 
+    // Array to store selected task IDs
+    let selectedTasks = [];
+
+    // Function to toggle task selection
+    function toggleTaskSelection(taskId) {
+        const index = selectedTasks.indexOf(taskId);
+        if (index === -1) {
+            selectedTasks.push(taskId);
+        } else {
+            selectedTasks.splice(index, 1);
+        }
+    }
+
+    // Function to update the delete button popup
+    function updateDeletePopupandRespectiveButtons() {
+        if (selectedTasks.length > 0) {
+            $("#checkboxsButtons").css("display", "inline-flex");
+            $(".delete-button").show();
+        } else {
+            $("#checkboxsButtons").hide();
+            $(".delete-button").hide();
+        }
+    }
+
+    // Handle task checkbox click event by targeting the <td> element
+    $(document).on("change", ".checkbox-td input[type='checkbox']", function () {
+        const taskId = $(this).data("task-id");
+        toggleTaskSelection(taskId);
+
+        check_toggleSelectclass();
+
+        updateDeletePopupandRespectiveButtons();
+
+
+    });
+
+
+    // Confirm delete and send an AJAX request
+    $("#confirmDelete").click(function () {
+        // Add your AJAX request to delete the selected tasks here
+        console.log("Deleting tasks: " + selectedTasks.join(", "));
+
+        // Perform the AJAX request to delete tasks
+        $.ajax({
+            url: 'partial/task_partial/delete_selected_tasks.php', // Replace with the URL to your delete selected tasks PHP file
+            method: 'POST',
+            data: {
+                task_id: selectedTasks,
+                projectowner_id: <?php echo $project_owner['user_id']; ?>
+            },
+            success: function (response) {
+
+                // Clear the selected tasks array
+                selectedTasks.length = 0;
+
+                // Update the delete button popup
+                updateDeletePopupandRespectiveButtons();
+
+                // Hide the delete button popup
+                $("#checkboxsButtons").hide();
+
+                if (response.status == 'success') {
+                    // Handle the success response here
+                    console.log('Selected tasks deleted successfully.');
+
+                    // Uncheck all checkboxes
+                    $(".task-checkbox").prop("checked", false);
+
+                    fetchTasks();
+
+                    displayPopupMessage(response.message, 'success');
+                } else if (response.status === 'error') {
+                    displayPopupMessage(response.message, 'error');
+                }
+            },
+            error: function (xhr, status, error) {
+                // Handle the error if needed
+                console.error('Error deleting selected tasks:', error);
+            }
+        });
+    });
+
+    function toggleSelectAllCheckbox() {
+
+        var toggleSelect = $("#toggleSelect");
+        // var currentClass = toggleSelect.attr("class");
+        // console.log("The class of toggleSelect is: " + currentClass);
+
+
+        if (toggleSelect.hasClass("selectall")) {
+            toggleSelect.removeClass("selectall");
+            toggleSelect.text("Cancel Select");
+            toggleSelect.addClass("cancelselect");
+
+        } else {
+            toggleSelect.removeClass("cancelselect");
+            toggleSelect.text("Select All");
+            toggleSelect.addClass("selectall");
+        }
+    }
+
+    function check_toggleSelectclass() {
+        var toggleSelect = $("#toggleSelect");
+        var currentClass = toggleSelect.attr("class");
+        console.log("The class of toggleSelect is: " + currentClass);
+
+        if (selectedTasks.length > 0) {
+            console.log("p");
+            console.log(selectedTasks.length);
+            console.log("p");
+
+            $("#cancelselect-btn").show()
+        }
+    }
+
+    // Event delegation for "Cancel Select" and "Select All" buttons
+    $(document).on("click", ".cancelselect", function () {
+        // Clear the selected tasks array
+        selectedTasks.length = 0;
+        updateDeletePopupandRespectiveButtons();
+        $(".task-checkbox").prop("checked", false); // Uncheck all checkboxes
+        // Hide the delete button popup
+        $("#checkboxsButtons").hide();
+
+        toggleSelectAllCheckbox();
+    });
+
+    // Event delegation for "Cancel Select" and "Select All" buttons
+    $(document).on("click", "#cancelselect-btn", function () {
+        // Clear the selected tasks array
+        selectedTasks.length = 0;
+        updateDeletePopupandRespectiveButtons();
+        $(".task-checkbox").prop("checked", false); // Uncheck all checkboxes
+        // Hide the delete button popup
+        $("#checkboxsButtons").hide();
+
+        toggleSelectAllCheckbox();
+    });
+
+    $(document).on("click", ".selectall", function () {
+        // Get all task checkboxes and check them
+        $(".task-checkbox").prop("checked", true);
+
+        // Update the selectedTasks array with all task IDs
+        selectedTasks = $(".task-checkbox").map(function () {
+            return $(this).data("task-id");
+        }).get();
+
+        $("#cancelselect-btn").hide()
+
+        console.log(selectedTasks);
+        toggleSelectAllCheckbox();
+
+        updateDeletePopupandRespectiveButtons();
+    });
+
+
     // Function to fetch task details using AJAX
     function fetchTaskDetails(taskId) {
         // Clear previous error messages
@@ -934,7 +1136,7 @@ session_start();
             data: { task_id: taskId },
             success: function (response) {
                 console.log("--")
-                console.log(response);
+                
                 console.log("--")
 
                 // Handle the response and populate the edit form here
@@ -1069,8 +1271,9 @@ session_start();
         $.ajax({
             url: 'partial/project_partial/check_assignee_exists_inproject.php', // Replace with the URL to your fetch task details PHP file
             method: 'GET',
-            data: { project_id: <?php echo $project_id; ?>, task_id: taskId
-        },
+            data: {
+                project_id: <?php echo $project_id; ?>, task_id: taskId
+            },
             dataType: 'json',
             success: function (exists_assignee_response) {
                 console.log(exists_assignee_response.result);
@@ -1123,7 +1326,7 @@ session_start();
             },
             dataType: "json",
             success: function (response) {
-                console.log(response);
+                
                 if (response.status == 'success') {
                     console.log(response.message);
                     displayPopupMessage(response.message, 'success');
@@ -1211,18 +1414,18 @@ session_start();
 
                                         userRolePopup.style.display = 'block';
                                     } else {
-                                        alert('Error fetching user role.');
+                                        console.log('Error fetching user role.');
                                     }
                                 })
                                 .catch(error => {
-                                    alert('An error occurred while fetching user role.');
+                                    console.log('An error occurred while fetching user role.');
                                 });
                         } else {
                             console.log('You are not a project owner.');
                         }
                     })
                     .catch(error => {
-                        alert('An error occurred while checking project ownership.');
+                        console.log('An error occurred while checking project ownership.');
                     });
             } else {
                 console.log("bye");
@@ -1250,10 +1453,10 @@ session_start();
     document.getElementById('userRoleForm').addEventListener('submit', function (event) {
         event.preventDefault();
 
-        // alert("test1");
+        // console.log("test1");
 
         const userRoleInput = document.getElementById('userRoleInput');
-        // alert(userRoleInput);
+        // console.log(userRoleInput);
         const newRole = userRoleInput.value.trim(); // Trim whitespace
 
         const errorMessage = document.getElementById('error-message'); // Get the error message element
@@ -1380,7 +1583,7 @@ session_start();
                     }
                 },
                 error: function () {
-                    alert("An error occurred while checking the email.");
+                    console.log("An error occurred while checking the email.");
                 }
             });
         });
@@ -1396,7 +1599,7 @@ session_start();
 
             // Frontend validation
             if (email === "") {
-                alert("Please enter an email address.");
+                console.log("Please enter an email address.");
                 return;
             }
 
@@ -1417,7 +1620,7 @@ session_start();
                 dataType: "json",
                 success: function (response) {
                     console.log("hello");
-                    console.log(response);
+                    
                     console.log("hello");
                     if (response.status == 'success') {
                         console.log(response.message);

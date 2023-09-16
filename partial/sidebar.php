@@ -180,11 +180,11 @@
     // Add active class based on current page URL
     const links = document.querySelectorAll('.sidebar a.full-width');
     const currentPageFileName = window.location.pathname.split('/').pop(); // Extract the filename
-    console.log(currentPageFileName);
+    
     removeAllActive();
     removeAllProjectLstActive();
     links.forEach(link => {
-        console.log(link.getAttribute('href'));
+        
         if (link.getAttribute('href') === currentPageFileName) {
             link.classList.add('active');
         }
@@ -196,7 +196,7 @@
     projectLinks.forEach(projectLink => {
         const projectID = projectLink.getAttribute('href').split('=')[1];
         if (projectID === String(currentProjectID)) {
-            console.log(projectLink.closest('.project-lst'));
+            
             projectLink.closest('.project-lst').classList.add('active');
         }
     });
