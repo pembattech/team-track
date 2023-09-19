@@ -1,4 +1,5 @@
-<!-- <?php include 'access_denied.php'; ?> -->
+<?php include 'access_denied.php'; ?>
+
 
 <title>Tasks - TeamTrack</title>
 
@@ -38,11 +39,12 @@
             global $connection;
 
             $sql = "SELECT Tasks.*, Projects.project_name, Users.username 
-                    FROM Tasks
-                    INNER JOIN Projects ON Tasks.project_id = Projects.project_id
-                    INNER JOIN Users ON Tasks.user_id = Users.user_id
-                    WHERE Tasks.status != 'Completed' AND Tasks.user_id = $user_id
-                    ORDER BY Tasks.start_date DESC";
+                FROM Tasks
+                INNER JOIN ProjectUsers ON Tasks.projectuser_id = ProjectUsers.projectuser_id
+                INNER JOIN Projects ON ProjectUsers.project_id = Projects.project_id
+                INNER JOIN Users ON ProjectUsers.user_id = Users.user_id
+                WHERE Tasks.status != 'Complete' AND ProjectUsers.user_id = $user_id
+                ORDER BY Tasks.start_date DESC";
 
             $result = mysqli_query($connection, $sql);
             return $result;
@@ -69,38 +71,36 @@
         <div class="bottom-line"></div>
 
         <div class="div-space-top tab-content active" id="tab1">
-            <?php
-            if (mysqli_num_rows($incomplete_tasks) > 0) {
-
-                // Display the table with all incomplete tasks for the user
-                echo "<table class='incomplete-tasks-table'>";
-                echo "<thead>";
-                echo "<tr>";
-                echo "<th class='mytasks-heading'>Task Name</th>";
-                echo "<th class='mytasks-heading'>Project Name</th>";
-                echo "<th class='mytasks-heading'>Assignee</th>";
-                echo "<th class='mytasks-heading'>Due Date</th>";
-                echo "<th class='mytasks-heading'>Priority</th>";
-                echo "<th class='mytasks-heading'>Status</th>";
-                echo "</tr>";
-                echo "</thead>";
-                echo "<tbody id='task-list'>"; // Added ID for the tbody element
-                // Loop through all incomplete tasks
-                while ($task = mysqli_fetch_assoc($incomplete_tasks)) {
+            <div class="task-list-container">
+                <?php
+                if (mysqli_num_rows($incomplete_tasks) > 0) {
+                    echo "<table class='incomplete-tasks-table'>";
+                    echo "<thead>";
                     echo "<tr>";
-                    echo "<td data-task-id='" . $task['task_id'] . "'>" . $task['task_name'] . "</td>";
-                    echo "<td>" . $task['project_name'] . "</td>";
-                    echo "<td>" . $task['username'] . "</td>";
-                    echo "<td>" . $task['end_date'] . "</td>";
-                    echo "<td>" . $task['priority'] . "</td>";
-                    echo "<td>" . $task['status'] . "</td>";
+                    echo "<th class='mytasks-heading'>Task Name</th>";
+                    echo "<th class='mytasks-heading'>Project Name</th>";
+                    echo "<th class='mytasks-heading'>Assignee</th>";
+                    echo "<th class='mytasks-heading'>End Date</th>";
+                    echo "<th class='mytasks-heading'>Priority</th>";
                     echo "</tr>";
+                    echo "</thead>";
+                    echo "<tbody id='task-list'>";
+                    while ($task = mysqli_fetch_assoc($incomplete_tasks)) {
+                        echo "<tr class='$displayClass'>";
+                        echo "<td data-task-id='" . $task['task_id'] . "'>" . add_ellipsis($task['task_name'], 15) . "</td>";
+                        echo "<td>" . add_ellipsis($task['project_name'], 15) . "</td>";
+                        echo "<td>" . $task['username'] . "</td>";
+                        echo "<td>" . ($task['end_date'] ? $task['end_date'] : "n/a") . "</td>";
+                        echo "<td>" . ($task['priority'] ? $task['priority'] : "n/a") . "</td>";
+                        echo "</tr>";
+                    }
+                    echo "</tbody>";
+                    echo "</table>";
+                } else {
+                    echo "<p>No task assign to this user.</p>";
                 }
-                echo "</tbody>";
-                echo "</table>";
-
-            }
-            ?>
+                ?>
+            </div>
         </div>
 
         <div class="tab-content div-space-top" id="tab2">

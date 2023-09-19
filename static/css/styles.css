@@ -1352,3 +1352,300 @@ button#closeButton:hover {
 /* get message */
 
 /* profile */
+
+.userinfo-profilepic {
+    display: flex;
+    flex-direction: row;
+}
+
+.profile-picture img,
+.profile-picture #popup-btn {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    object-fit: cover;
+    font-size: 100px;
+}
+
+.form-group .profile-picture img {
+    width: 150px;
+    height: 150px;
+}
+
+.user-personal-info {
+    margin: 50px 0 0 20px;
+    justify-content: center;
+}
+
+.user-personal-info .user-name p {
+    font-size: 30px;
+    color: var(--color-text);
+}
+
+.user-personal-info .user-email p {
+    font-size: 14px;
+    color: var(--color-text-weak);
+}
+
+.user-other-info {
+    margin-top: 10px;
+}
+
+.user-other-info-grid {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+.user-about-project {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.user-other-info .about-section {
+    width: 400px;
+    height: 100%;
+    overflow-wrap: anywhere;
+}
+
+.user-other-info .project-section {
+    width: 400px;
+    max-width: 400px;
+}
+
+/* .user-other-info .user-tasks, .user-about-project { */
+.user-other-info .user-tasks,
+.about-section,
+.project-section {
+    padding: 0 5px;
+    background-color: var(--sidebar-bgcolor);
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+}
+
+.user-other-info .heading-style {
+    padding: 10px 0;
+    margin-bottom: 0;
+}
+
+.user-other-info .user-tasks {
+    width: 100%;
+    flex: 2;
+}
+
+.edit-profile-btn {
+    outline: 0;
+    padding: 3px;
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+    color: var(--color-text-weak);
+    background-color: var(--color-background-weak);
+}
+
+.edit-profile-btn:hover {
+    background-color: var(--color-background-hover);
+    color: var(--color-text);
+}
+
+input.d-none {
+    display: none;
+}
+
+.profile-picture-options {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+}
+
+.change-pic-lbl {
+    cursor: pointer;
+    padding: 8px 3px;
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+    color: var(--color-text-weak);
+    background-color: var(--color-background-weak);
+    font-size: 13.3333px;
+}
+
+.change-pic-lbl:hover {
+    background-color: var(--color-background-hover);
+    color: var(--color-text);
+}
+
+.editprofile-popup {
+    display: none;
+    background-color: var(--overlay-bgcolor);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9;
+}
+
+.remove-profile-picture .button-style-w-danger {
+    padding: 0 5px;
+}
+
+.editprofile-popup-content {
+    background-color: var(--color-background-weak);
+    color: var(--color-text);
+    max-width: 400px;
+    margin: 100px auto;
+    padding: 10px 20px;
+    border-radius: 4px;
+}
+
+.editprofile-popup-close {
+    font-size: 30px;
+    float: right;
+    cursor: pointer;
+}
+
+.editprofile-popup .form-group {
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+.editprofile-popup textarea {
+    width: 100%;
+    padding: 8px 5px;
+    border-radius: 4px;
+    background-color: var(--color-background-weak);
+    color: var(--color-text);
+}
+
+.editprofile-popup .editprofile-submit-btn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.user-other-info .project {
+    width: 100%;
+    overflow-wrap: anywhere;
+    overflow-y: auto;
+    max-height: 380px;
+}
+
+.user-other-info .project::-webkit-scrollbar {
+    width: 5px;
+}
+
+.user-project .project .project-lst {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    width: 100%;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-project .project .project-lst-name:hover {
+    border: 0;
+    border-radius: 5px;
+    background-color: var(--color-background-weak);
+}
+
+
+.user-project .project-options {
+    padding: 0 15px;
+}
+
+.user-project .project-options button {
+    outline: 0;
+    padding: 0 10px;
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+    color: var(--color-text-weak);
+    background-color: var(--color-background-weak);
+}
+
+.user-project .project-options button:hover {
+    background-color: var(--color-background-hover);
+    color: var(--color-text);
+}
+
+.editproject-popup {
+    display: none;
+    background-color: var(--overlay-bgcolor);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.editproject-popup-content {
+    background-color: var(--color-background-weak);
+    color: var(--color-text);
+    max-width: 400px;
+    margin: 100px auto;
+    padding: 10px 20px;
+    border-radius: 4px;
+}
+
+.editproject-popup-close {
+    font-size: 30px;
+    float: right;
+    cursor: pointer;
+}
+
+.editproject-popup .form-group {
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+.editproject-popup label {
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.editproject-popup textarea {
+    width: 100%;
+    border: 1px solid #ccc;
+    padding: 8px 5px;
+    border-radius: 4px;
+    background-color: var(--color-background-weak);
+    color: var(--color-text);
+}
+
+.editproject-popup .editproject-submit-btn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.task-list-container {
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.task-list-container th {
+    position: sticky;
+    top: -1;
+    background-color: var(--bg-color);
+    transition: top 0.3s ease;
+
+}
+
+.task-list-container th,
+.task-list-container td {
+    border: 1px solid var(--color-border);
+    padding: 5px;
+    text-align: left;
+}
+
+.task-list-container td {
+    font-size: 14px;
+    width: 20%;
+}
