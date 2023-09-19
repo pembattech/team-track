@@ -118,6 +118,7 @@
         border-radius: 5px;
         color: var(--color-text-weak);
         background-color: var(--color-background-weak);
+        font-size: 13.3333px;
     }
 
     .change-pic-lbl:hover {
