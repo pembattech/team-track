@@ -55,10 +55,15 @@
         height: 100%;
     }
 
-    .user-other-info .about-section,
-    .user-other-info .project-section {
+    .user-other-info .about-section {
         width: 400px;
         height: 100%;
+        overflow-wrap: anywhere;
+    }
+
+    .user-other-info .project-section {
+        width: 400px;
+        max-width: 400px;
     }
 
     /* .user-other-info .user-tasks, .user-about-project { */
@@ -152,7 +157,7 @@
 
     .editprofile-popup .form-group {
         margin-bottom: 10px;
-        font-size: 14px;
+        font-size: 16px;
     }
 
     .editprofile-popup textarea {
@@ -173,16 +178,31 @@
         font-size: 16px;
     }
 
-    .project {
+    .user-other-info .project {
         width: 100%;
+        overflow-wrap: anywhere;
+        overflow-y: auto;
+        max-height: 380px;
+    }
+
+    .user-other-info .project::-webkit-scrollbar {
+        width: 5px;
     }
 
     .user-project .project .project-lst {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr auto;
         width: 100%;
         align-items: center;
+        gap: 10px;
     }
+
+    .user-project .project .project-lst-name:hover {
+        border: 0;
+        border-radius: 5px;
+        background-color: var(--color-background-weak);
+    }
+
 
     .user-project .project-options {
         padding: 0 15px;
@@ -257,7 +277,7 @@
     }
 
     .task-list-container {
-        max-height: 310px;
+        max-height: 600px;
         overflow-y: auto;
     }
 
@@ -279,6 +299,9 @@
     .task-list-container td {
         font-size: 14px;
         width: 20%;
+    }
+
+    .user-other-info .project-section
     }
 </style>
 <div class="container userprofile-wrapper">
@@ -413,13 +436,14 @@
                             </div>
                         </div>
 
-                        <div class="form-group textarea-style">
+                        <div class="form-group textarea-style textarea-wrapper">
                             <label for="about">About</label>
                             <textarea id="about" name="about" maxlength="255" rows="4"
                                 placeholder="Please provide a brief introduction about yourself."><?php if (get_user_data($user_id)['about'] !== null && get_user_data($user_id)['about'] !== "") {
                                     echo get_user_data($user_id)['about'];
                                 }
                                 ?></textarea>
+                            <span id="charCount">0 / 255 characters used</span>
                         </div>
                         <button type="submit" name="submit" class="button-style">Submit</button>
                     </form>
@@ -446,24 +470,24 @@
                             echo "<th class='mytasks-heading'>Task Name</th>";
                             echo "<th class='mytasks-heading'>Project Name</th>";
                             echo "<th class='mytasks-heading'>Assignee</th>";
-                            echo "<th class='mytasks-heading'>Due Date</th>";
+                            echo "<th class='mytasks-heading'>End Date</th>";
                             echo "<th class='mytasks-heading'>Priority</th>";
-                            echo "<th class='mytasks-heading'>Status</th>";
                             echo "</tr>";
                             echo "</thead>";
                             echo "<tbody id='task-list'>";
                             while ($task = mysqli_fetch_assoc($incomplete_tasks)) {
                                 echo "<tr class='$displayClass'>";
-                                echo "<td data-task-id='" . $task['task_id'] . "'>" . $task['task_name'] . "</td>";
-                                echo "<td>" . $task['project_name'] . "</td>";
+                                echo "<td data-task-id='" . $task['task_id'] . "'>" . add_ellipsis($task['task_name'], 15) . "</td>";
+                                echo "<td>" . add_ellipsis($task['project_name'], 15) . "</td>";
                                 echo "<td>" . $task['username'] . "</td>";
-                                echo "<td>" . $task['end_date'] . "</td>";
-                                echo "<td>" . $task['priority'] . "</td>";
-                                echo "<td>" . $task['status'] . "</td>";
+                                echo "<td>" . ($task['end_date'] ? $task['end_date'] : "n/a") . "</td>";
+                                echo "<td>" . ($task['priority'] ? $task['priority'] : "n/a") . "</td>";
                                 echo "</tr>";
                             }
                             echo "</tbody>";
                             echo "</table>";
+                        } else {
+                            echo "<p>No task assign to this user.</p>";
                         }
                         ?>
                     </div>
@@ -522,15 +546,15 @@
                                             $background_color = $row['background_color'];
 
                                             echo '<div class="project-lst">';
-                                            echo '<div>';
+                                            echo '<div class="project-lst-name style="display: inline-block;">';
                                             echo '<a href="project.php?project_id=' . $project_id . '" class="project-link">';
                                             echo '    <div class="square" style="background-color:' . $background_color . '"></div>';
-                                            echo '    <p class="project-title">' . $project_name . '</p>';
+                                            echo '    <p class="project-title">' . add_ellipsis($project_name, 25) . '</p>';
                                             echo '</a>';
                                             echo '</div>';
                                             echo '<div class="project-options">';
                                             echo '<button onclick="editproject_popup_toggle(' . $project_id . ')">Edit</button>';
-                                            echo '<a href="partial/delete_project.php?project_id=' . $project_id . '"><button>Delete</button></a>';
+                                            echo '<a style="margin-left: 5px;" href="partial/delete_project.php?project_id=' . $project_id . '"><button>Delete</button></a>';
                                             echo '</div>';
                                             echo '</div>';
                                         }
@@ -669,4 +693,27 @@
                 .catch(error => console.error('Error removing profile picture:', error));
         }
     }
+</script>
+<script>
+    const textArea = document.getElementById('about');
+    const charCount = document.getElementById('charCount');
+
+    textArea.addEventListener('focus', function () {
+        charCount.style.display = 'block'; // Show the character count when the textarea is focused
+    });
+
+    textArea.addEventListener('blur', function () {
+        charCount.style.display = 'none'; // Hide the character count when the textarea loses focus
+    });
+
+    textArea.addEventListener('input', function () {
+        const currentText = textArea.value;
+        const currentLength = currentText.length;
+        charCount.textContent = `${currentLength} / 255 characters used`;
+    });
+
+    // Initialize the character count based on the initial value
+    const initialText = textArea.value;
+    const initialLength = initialText.length;
+    charCount.textContent = `${initialLength} / 255 characters used`;
 </script>

@@ -134,6 +134,18 @@ textarea::-webkit-scrollbar-track {
     border-radius: 5px;
 }
 
+.textarea-wrapper {
+    position: relative;
+}
+
+#charCount {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    color: var(--color-text-disabled);
+    display: none;
+}
+
 .select-style {
     outline: none;
     border: 0;
@@ -414,32 +426,6 @@ textarea::-webkit-scrollbar-track {
 }
 
 /* sidebar */
-
-
-
-/* 
-.sidebar-item {
-    font-size: 14px;
-    color: var(--color-text)
-}
-
-.sidebar ul {
-    list-style: none;
-    padding: 0;
-}
-
-.sidebar li {
-    margin-bottom: 15px;
-    padding: 0 5px;
-    color: var(--color-text);
-}
-
-.sidebar li:hover,
-.project-link:hover {
-    border-radius: 5px;
-    background-color: var(--color-background-weak);
-} */
-
 .project-lst {
     font-family: inherit;
     font-size: 14px;
@@ -571,6 +557,11 @@ textarea::-webkit-scrollbar-track {
 
 th.subhead-task {
     padding-left: 8px;
+}
+
+.incomplete-tasks-table {
+    border-collapse: collapse;
+    width: 100%
 }
 
 .tasks td,
@@ -999,20 +990,6 @@ button#closeButton:hover {
     border: 1px solid #ccc;
     padding: 7px 11px;
     margin-right: 5px;
-}
-
-.addtask-btn {
-    outline: 0;
-    padding: 3px;
-    border: 1px solid var(--color-border);
-    border-radius: 5px;
-    color: var(--color-text-weak);
-    background-color: var(--color-background-weak);
-}
-
-.addtask-btn:hover {
-    background-color: var(--color-background-hover);
-    color: var(--color-text);
 }
 
 .addtask-popup {

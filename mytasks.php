@@ -3,10 +3,6 @@
 <title>Tasks - TeamTrack</title>
 
 <style>
-    .incomplete-tasks-table {
-        border-collapse: collapse;
-    }
-
     .incomplete-tasks-table th,
     .incomplete-tasks-table td {
         padding: 8px;

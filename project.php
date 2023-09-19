@@ -293,7 +293,7 @@ session_start();
         </div>
         <div class="tab-content div-space-top" id="tab2">
             <div class="tasks-section">
-                <button class="addtask-btn" onclick="addtask_popup_toggle()">+ Add Task</button>
+                <button class="button-style" onclick="addtask_popup_toggle()">+ Add Task</button>
                 <button id="toggleSelect" class="button-style selectall">Select All</button>
                 <button id="cancelselect-btn" class="button-style" style="display: none;">Cancel Select</button>
 
@@ -317,8 +317,10 @@ session_start();
                             </div>
                             <div class="form-group">
                                 <label for="task_description">Description</label>
-                                <div class="textarea-style">
-                                    <textarea type="text" name="task_description" id="task_description"></textarea>
+                                <div class="textarea-style textarea-wrapper">
+                                    <textarea type="text" maxlength="255" name="task_description"
+                                        id="task_description"></textarea>
+                                    <span id="charCount">0 / 255 characters used</span>
                                     <span id="task_description-error" class="error-message"></span>
                                 </div>
                             </div>
@@ -386,7 +388,8 @@ session_start();
                                     <h2 class="section-topic">
                                         <?php echo $section; ?>
                                         <span class="section-task-count">
-                                            (<?php echo countTasksBySectionAndProject($section, $project_id); ?>)
+                                            (
+                                            <?php echo countTasksBySectionAndProject($section, $project_id); ?>)
                                         </span>
                                     </h2>
                                     <table class="sortable show" data-section="<?php echo $section; ?>">
@@ -637,7 +640,7 @@ session_start();
                         section: sectionId
                     },
                     success: function (response) {
-                        
+
                         // fetchTasks();
                         console.log('Task section updated successfully.');
                         if (response.status == 'success') {
@@ -894,7 +897,7 @@ session_start();
             method: 'GET',
             data: { project_id: project_id },
             success: function (response) {
-                
+
                 // Handle the response and update the task tables here
                 const tasksBySection = response.tasksBySection;
                 const project_id = response.project_id;
@@ -1136,7 +1139,7 @@ session_start();
             data: { task_id: taskId },
             success: function (response) {
                 console.log("--")
-                
+
                 console.log("--")
 
                 // Handle the response and populate the edit form here
@@ -1326,7 +1329,7 @@ session_start();
             },
             dataType: "json",
             success: function (response) {
-                
+
                 if (response.status == 'success') {
                     console.log(response.message);
                     displayPopupMessage(response.message, 'success');
@@ -1620,7 +1623,7 @@ session_start();
                 dataType: "json",
                 success: function (response) {
                     console.log("hello");
-                    
+
                     console.log("hello");
                     if (response.status == 'success') {
                         console.log(response.message);
@@ -1662,5 +1665,15 @@ session_start();
             // location.reload();
 
         });
+    });
+</script>
+<script>
+    const task_description = document.getElementById('task_description');
+    const charCount = document.getElementById('charCount');
+
+    task_description.addEventListener('input', function () {
+        const currentText = task_description.value;
+        const currentLength = currentText.length;
+        charCount.textContent = `${currentLength} / 255 characters used`;
     });
 </script>
