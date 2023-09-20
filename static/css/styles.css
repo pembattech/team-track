@@ -660,39 +660,18 @@ th.subhead-task {
 .project-dropdown {
     margin-left: 10px;
     position: relative;
+    display: inline-block;
     font-size: 16px;
     font-family: inherit;
 }
 
-.project-dropdown-menu {
-    display: none;
-    position: absolute;
-    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-    border: 1px solid var(--color-border);
-    border-radius: 5px;
-    top: 150%;
-    left: -98;
-    padding: 5px 5px;
-    z-index: 1;
-    background-color: var(--sidebar-bgcolor);
+.project-dropdown-menu-item {
+    font-size: 16px;
+    text-align: center;
 }
-
-li.project-dropdown-menu-item p {
-    margin-left: 10px;
-    align-items: center;
-}
-
 .project-dropdown-menu-item:hover {
     background-color: var(--color-background-weak);
     border-radius: 5px;
-}
-
-.project-dropdown-menu {
-    width: 150px;
-}
-
-.is-active .project-dropdown-menu {
-    display: block;
 }
 
 .active-task {
@@ -711,6 +690,8 @@ li.project-dropdown-menu-item p {
     height: 100%;
     backdrop-filter: blur(5px);
     z-index: 999999999999;
+    animation: fadeIn 0.3s ease-in-out forwards;
+
 }
 
 .otp-popup-content {
@@ -964,7 +945,7 @@ button#closeButton:hover {
 }
 
 .invite-popup label {
-    font-size: 14px;
+    font-size: 16px;
     margin-bottom: 5px;
 }
 

@@ -1,3 +1,13 @@
+$(document).ready(function () {
+    // Hide the popup when the Escape key is pressed
+    $(document).keydown(function (event) {
+        if (event.keyCode === 27) { // 27 is the key code for the Escape key
+            $(".popup-style").hide();
+            $("#popup-btn").blur(); // Remove focus from the button
+        }
+    });
+});
+
 
 // JavaScript function to add ellipsis
 function addEllipsis(text, maxLength) {

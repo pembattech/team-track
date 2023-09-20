@@ -61,7 +61,7 @@
                     <button class="edit-profile-btn" onclick="editprofile_popup_toggle()">Edit Profile</button>
                 </div>
             </div>
-            <div class="editprofile-popup popup-style" id="editprofile-popup">
+            <div class="editprofile-popup popup-style " id="editprofile-popup">
                 <div class="editprofile-popup-content">
                     <div class="heading-content">
                         <span class="editprofile-popup-close" onclick="editprofile_popup_toggle()">&times;</span>

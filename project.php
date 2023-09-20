@@ -22,7 +22,7 @@ session_start();
         border-radius: 4px;
         padding: 5px;
         position: absolute;
-        z-index: 999999;
+        z-index: 999998;
         top: 100%;
         left: 0;
         opacity: 0;
@@ -41,6 +41,30 @@ session_start();
 
     .checkbox-th {
         width: 10px;
+    }
+
+    .projectdropdown-popup {
+        display: none;
+        position: absolute;
+        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+        border: 1px solid var(--color-border);
+        border-radius: 5px;
+        top: 50%;
+        left: 30;
+        padding: 5px 5px;
+        width: 150px;
+        align-items: center;
+        z-index: 1;
+        background-color: var(--sidebar-bgcolor);
+        animation: fadeIn 0.3s ease-in-out forwards;
+    }
+
+    .svg-img {
+        cursor: pointer;
+    }
+
+    .svg-img:hover+.projectdropdown-popup {
+        display: block;
     }
 </style>
 <title>Project - TeamTrack</title>
@@ -136,19 +160,21 @@ session_start();
                         <div class="svg-img">
                             <img src="static/image/arrow-down.svg" alt="">
                         </div>
-                        <ul class="project-dropdown-menu popup-style">
-                            <li class="project-dropdown-menu-item indicate-danger">
-                                <?php
-                                echo '<a href="partial/project_partial/leave_project.php?project_id=' . $project_id . '">';
-                                ?>
-                                <p>Leave Project</p>
-                                </a>
-                            </li>
-                        </ul>
                     </div>
+
+                    <div class="projectdropdown-popup popup-style">
+                        <div class="project-dropdown-menu-item indicate-danger">
+                            <?php
+                            echo '<a href="partial/project_partial/leave_project.php?project_id=' . $project_id . '">';
+                            ?>
+                            <p>Leave Project</p>
+                            </a>
+                        </div>
+                    </div>
+
                 </div>
             </div>
-            <div id="otpPopup" class="otp-popup popup-style" style="display:none;">
+            <div id="otpPopup" class="otp-popup" style="display:none;">
                 <div id="otpPopupContent" class="otp-popup-content">
                     <p class="heading-style">OTP Verification '
                         <?php echo $project['project_name'] ?>'
@@ -259,7 +285,7 @@ session_start();
                             </div>
                         </div>
 
-                        <div class="invite-popup" id="invite-popup">
+                        <div class="invite-popup popup-style" id="invite-popup">
                             <div class="invite-popup-content">
                                 <span class="invite-popup-close" onclick="addmember_popup_toggle()">&times;</span>
                                 <p class="heading-style">Share '
@@ -276,7 +302,7 @@ session_start();
 
                                     <div class="form-group">
                                         <label for="message">Message <p
-                                                style="display:inline; color: var(--color-text-weak);">(optional)</p>
+                                                style="display:inline; color: var(--color-text-weak); font-size: 14px;">(optional)</p>
                                         </label>
                                         <div class="textarea-style">
                                             <textarea id="message" name="message" rows="4"
@@ -301,7 +327,7 @@ session_start();
                     <button id="confirmDelete" class="button-style">Delete Selected</button>
                 </div>
 
-                <div class="addtask-popup" id="addtask-popup">
+                <div class="addtask-popup popup-style" id="addtask-popup">
                     <div class="addtask-popup-content">
                         <form action="partial/addtask.php" method="post" enctype="multipart/form-data"
                             onsubmit="return task_validateForm()">
@@ -842,6 +868,17 @@ session_start();
             // Remove the active class from all task rows
             $('.sortable tr').removeClass('active-task');
 
+        });
+
+        // Hide the popup when the Escape key is pressed
+        $(document).keydown(function (event) {
+            if (event.keyCode === 27) { // 27 is the key code for the Escape key
+                // Hide the popup with animation
+                $('#taskPopup').removeClass('active');
+
+                // Remove the active class from all task rows
+                $('.sortable tr').removeClass('active-task');
+            }
         });
 
         // Delete the task when the delete button is clicked
@@ -1675,5 +1712,25 @@ session_start();
         const currentText = task_description.value;
         const currentLength = currentText.length;
         charCount.textContent = `${currentLength} / 255 characters used`;
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        // Show the projectdropdown-popup when the .svg-img is clicked
+        $(".svg-img").click(function () {
+            $(".projectdropdown-popup").toggle();
+        });
+
+        // Hide the projectdropdown-popup when clicking outside of it
+        $(document).click(function (event) {
+            if (!$(event.target).closest('.project-dropdown').length) {
+                $(".projectdropdown-popup").hide();
+            }
+        });
+
+        // Prevent the click on the projectdropdown-popup from closing it
+        $(".projectdropdown-popup").click(function (event) {
+            event.stopPropagation();
+        });
     });
 </script>
