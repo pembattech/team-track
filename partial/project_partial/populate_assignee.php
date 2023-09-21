@@ -57,12 +57,6 @@ function populateAssigneeOptions($project_id)
             echo '>' . $username . '</option>';
         }
 
-        // // Add an option for "Select Assignee" if no assignee is found
-        // if ($noAssignee) {
-        //     echo '<option value="-1" selected >Select Assignee</option>';
-        // } elseif ($notAssignedUserInProject) {
-        //     echo '<option value="-2" selected >User not found</option>';
-        // }
 
         echo '</select>';
     } else {

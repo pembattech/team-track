@@ -67,11 +67,11 @@ table {
     border-collapse: collapse;
 }
 
-option,
-select {
+option, select {
     border-radius: 5px;
     height: 35px;
     color: var(--color-text);
+    background-color: var(--color-background-weak);
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator {
@@ -85,11 +85,16 @@ button.indicate-danger {
     color: var(--danger-color);
 }
 
+.input-style, .textarea-style textarea, textarea#task_description, textarea#description, textarea#about, .select-style {
+    background-color: var(--color-background-weak-hover-deprecated);
+    border-radius: 5px;
+}
+
 .input-style {
     outline: none;
     border: 0;
+    width: 100%;
     resize: none;
-    background-color: inherit;
     padding-left: 5px;
     color: var(--color-text);
     font-family: inherit;
@@ -109,7 +114,7 @@ button.indicate-danger {
     resize: none;
     outline: 0;
     border: 0;
-    background-color: inherit;
+    width: 100%;
     padding-left: 5px;
     color: var(--color-text);
     font-family: inherit;
@@ -135,6 +140,7 @@ textarea::-webkit-scrollbar-track {
 }
 
 .textarea-wrapper {
+    border: 0;
     position: relative;
 }
 
@@ -150,7 +156,6 @@ textarea::-webkit-scrollbar-track {
     outline: none;
     border: 0;
     resize: none;
-    background-color: inherit;
     padding-left: 5px;
     color: var(--color-text);
     font-family: inherit;
@@ -999,7 +1004,6 @@ button#closeButton:hover {
     cursor: pointer;
 }
 
-
 .addtask-popup label {
     font-size: 14px;
     margin-bottom: 5px;
@@ -1333,6 +1337,9 @@ button#closeButton:hover {
 /* get message */
 
 /* profile */
+#editProjectForm .form-group > input, #editProjectForm .form-group > select {
+    width: 100%;
+}
 
 .userinfo-profilepic {
     display: flex;
@@ -1395,7 +1402,6 @@ button#closeButton:hover {
     max-width: 400px;
 }
 
-/* .user-other-info .user-tasks, .user-about-project { */
 .user-other-info .user-tasks,
 .about-section,
 .project-section {
@@ -1589,21 +1595,10 @@ input.d-none {
 
 .editproject-popup textarea {
     width: 100%;
-    border: 1px solid #ccc;
     padding: 8px 5px;
     border-radius: 4px;
     background-color: var(--color-background-weak);
     color: var(--color-text);
-}
-
-.editproject-popup .editproject-submit-btn {
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
 }
 
 .task-list-container {

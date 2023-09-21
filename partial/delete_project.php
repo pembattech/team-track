@@ -51,8 +51,8 @@ if (isset($_GET['project_id'])) {
 
     }
 
-    // Redirect to profile page after processing the form
-    header("Location: ../profile.php");
+    $response = array("message" => "Project deleted successfully");
+    echo json_encode($response);
 
 }
 

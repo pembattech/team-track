@@ -338,8 +338,7 @@ session_start();
                             <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
                             <div class="form-group">
                                 <span id="taskname-error" class="error-message"></span>
-                                <input class="input-style" type="text" name="taskname" id="taskname"
-                                    placeholder="Enter Task Name">
+                                <input class="input-style" type="text" name="taskname" id="taskname" placeholder="Enter Task Name">
                             </div>
                             <div class="form-group">
                                 <label for="task_description">Description</label>
@@ -489,7 +488,7 @@ session_start();
                             <input type="hidden" name="projectowner_id"
                                 value="<?php echo $project_owner['user_id']; ?>">
                             <input type="hidden" id="editTaskId" name="task_id">
-                            <input class="input-style" type="text" id="editTaskName" name="task_name">
+                            <input class="input-style" type="text" id="editTaskName" name="task_name" placeholder="Task name">
                             <span id="editTaskName-error" class="error-message"></span>
                             <br>
                             <div class="div-space-top"></div>
@@ -500,7 +499,7 @@ session_start();
 
                             <div class="div-space-top"></div>
                             <div class="textarea-style">
-                                <textarea id="editTaskDescription" name="task_description"></textarea>
+                                <textarea id="editTaskDescription" name="task_description" placeholder="Task Description"></textarea>
                             </div>
                             <span id="editTaskDescription-error" class="error-message"></span>
 
@@ -767,7 +766,6 @@ session_start();
 
             // Get the form data
             const formData = $(this).serialize();
-            console.log(formData);
 
             // Send an AJAX request to update the task details
             $.ajax({
@@ -1192,10 +1190,6 @@ session_start();
 
     // Function to populate the edit form with task details
     function populateEditForm(taskDetails) {
-        console.log("pemba");
-        console.log(taskDetails);
-        console.log(taskDetails['task_id']);
-        console.log("pemba");
         $('#editTaskName').val(taskDetails.task_name);
         $('#editTaskDescription').val(taskDetails.task_description);
 

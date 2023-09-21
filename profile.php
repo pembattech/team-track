@@ -1,6 +1,5 @@
 <?php include 'access_denied.php'; ?>
 
-
 <title>Profile - TeamTrack</title>
 
 <?php include 'partial/navbar.php'; ?>
@@ -248,18 +247,22 @@
                                             $project_name = $row['project_name'];
                                             $background_color = $row['background_color'];
 
+                                            // Output each project listing using HTML templates
                                             echo '<div class="project-lst">';
-                                            echo '<div class="project-lst-name style="display: inline-block;">';
+                                            echo '<div class="project-lst-name" style="display: inline-block;">';
                                             echo '<a href="project.php?project_id=' . $project_id . '" class="project-link">';
-                                            echo '    <div class="square" style="background-color:' . $background_color . '"></div>';
-                                            echo '    <p class="project-title">' . add_ellipsis($project_name, 25) . '</p>';
+                                            echo '<div class="square" style="background-color:' . $background_color . '"></div>';
+                                            echo '<p class="project-title">' . add_ellipsis($project_name, 25) . '</p>';
                                             echo '</a>';
                                             echo '</div>';
-                                            echo '<div class="project-options">';
-                                            echo '<button onclick="editproject_popup_toggle(' . $project_id . ')">Edit</button>';
-                                            echo '<a style="margin-left: 5px;" href="partial/delete_project.php?project_id=' . $project_id . '"><button>Delete</button></a>';
+                                            if (get_project_owner_id($project_id) == $_SESSION['user_id']) {
+                                                echo '<div class="project-options">';
+                                                echo '<button class="edit-project-btn" id="edit-project-btn" data-project-id="' . $project_id . '">Edit</button>';
+                                                echo '<button class="delete-project-btn" id="delete-project-btn" data-project-id="' . $project_id . '">Delete</button>';
+                                                echo '</div>';
+                                            }
                                             echo '</div>';
-                                            echo '</div>';
+
                                         }
 
                                     } else {
@@ -272,41 +275,51 @@
                                     <div class="editproject-popup-content">
                                         <div class="heading-content">
                                             <span class="editproject-popup-close"
-                                                onclick="editproject_popup_toggle()">&times;</span>
+                                                onclick="editproject_popup_toggle()">&times;
+                                            </span>
                                             <p class="heading-style">Edit Project</p>
                                         </div>
                                         <div class="bottom-line"></div>
                                         <div class="div-space-top"></div>
-                                        <form action="partial/edit_project.php" method="post"
-                                            enctype="multipart/form-data">
+                                        <form id="editProjectForm" enctype="multipart/form-data">
+                                            <input type="hidden" name="project_id" id="project_id"
+                                                value="<?php echo $project_id; ?>">
                                             <div class="form-group">
-                                                <input type="hidden" name="project_id" id="project_id" value="">
-                                                <label for="project_name">project_name</label>
-                                                <input type="text" name="project_name" id="project_name"
+                                                <input class="input-style" type="text" name="project_name"
+                                                    id="project_name"
                                                     value="<?php echo get_project_data($project_id)['project_name'] ?>">
+                                                <span id="projectname-error" class="error-message"></span>
+                                            </div>
+                                            <div class="form-group textarea-style textarea-wrapper">
+                                                <textarea id="description" name="description" maxlength="255"
+                                                    rows="4"><?php get_project_data($project_id)['description'] ?></textarea>
+                                                <span id="charCount">0 / 255 characters used</span>
+                                                <span id="projectdescription-error" class="error-message"></span>
                                             </div>
                                             <div class="form-group">
-                                                <label for="description">description</label>
-                                                <textarea type="text" name="description"
-                                                    id="description"><?php echo get_project_data($project_id)['description'] ?></textarea>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="start_date">start_date</label>
-                                                <input type="text" name="start_date" id="start_date"
+                                                <input class="input-style" type="text" id="projectStartDate"
+                                                    name="start_date" onfocus="this.type='date'"
+                                                    onblur="if(!this.value)this.type='text';" placeholder="Start Date"
                                                     value="<?php echo get_project_data($project_id)['start_date'] ?>">
+                                                <span id="projectStartDate-error" class="error-message"></span>
                                             </div>
                                             <div class="form-group">
-                                                <label for="end_date">end_date</label>
-                                                <input type="text" name="end_date" id="end_date"
+                                                <input class="input-style" type="text" id="projectEndDate"
+                                                    name="end_date" onfocus="(this.type='date')"
+                                                    onblur="if(!this.value)this.type='text';" placeholder="End Date"
                                                     value="<?php echo get_project_data($project_id)['end_date'] ?>">
+                                                <span id="projectEndDate-error" class="error-message"></span>
                                             </div>
+
                                             <div class="form-group">
-                                                <label for="status">status</label>
-                                                <input type="text" name="status" id="status"
-                                                    value="<?php echo get_project_data($project_id)['status'] ?>">
+                                                <?php include 'partial/project_partial/selectproject_priority.php';
+                                                projectPrioritySelect($project_id);
+                                                ?>
+                                                <span id="projectPriority-error" class="error-message"></span>
                                             </div>
-                                            <button type="submit" name="submit"
-                                                class="editproject-submit-btn">Submit</button>
+
+                                            <button type="submit" id="submitEditProject"
+                                                class="button-style">Submit</button>
                                         </form>
                                     </div>
                                 </div>
@@ -320,11 +333,144 @@
 </div>
 </div>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     function editprofile_popup_toggle() {
         const popup = document.getElementById('editprofile-popup');
         popup.style.display = (popup.style.display === 'block') ? 'none' : 'block';
     }
+</script>
+<script>
+
+    // Event handler for clicking the "Edit" button
+    $(document).on("click", ".edit-project-btn", function () {
+        console.log("edit button clicked!");
+        var projectId = $(this).data("project-id");
+
+        editproject_popup_toggle(projectId)
+    });
+
+    function projectEditFormValidation() {
+        // Clear previous error messages
+        $('.error-message').text('');
+
+        // Perform validation for each input field
+        const projectName = $('#project_name').val();
+        const projectDescription = $('#description').val();
+        const startDate = $('#projectStartDate').val();
+        const endDate = $('#projectEndDate').val();
+        const priority = $('#project_priority').val();
+
+        console.log(projectName);
+        console.log(projectDescription);
+        console.log(startDate);
+        console.log(endDate);
+        console.log(priority);
+        // Add your validation rules here
+        if (projectName.trim() === '') {
+            $("#projectname-error").text("Project name is required.");
+            return false;
+        }
+
+        if (projectDescription.trim() === '') {
+            $("#projectdescription-error").text("Project description is required.");
+            return false;
+        }
+
+        if (startDate === '') {
+            $("#projectStartDate-error").text("Project start date is required.");
+            return false;
+        }
+
+        if (endDate === '') {
+            $("#projectEndDate-error").text("Project end date is required.");
+            return false;
+        }
+
+        if (priority === null || priority == 0) {
+            $("#projectPriority-error").text("Project priority is required.");
+            return false;
+        }
+
+        return true; // All validation passed
+    }
+
+    // Submit the edited task details when the form is submitted
+    // $(document).on("click", ".edit-project-btn", function () {
+
+    $('#editProjectForm').on("submit", function (event) {
+        event.preventDefault();
+
+        // Perform validation before submitting
+        if (!projectEditFormValidation()) {
+            return; // Stop form submission if validation fails
+        }
+
+        // Get the form data
+        const formData = $(this).serialize();
+
+        // Parse the formData string into an object
+        const formDataObject = {};
+        formData.split('&').forEach(function (pair) {
+            const keyValue = pair.split('=');
+            formDataObject[keyValue[0]] = decodeURIComponent(keyValue[1] || '');
+        });
+
+
+        // Use AJAX to fetch and display the edit form content
+        $.ajax({
+            url: "partial/project_partial/edit_project.php",
+            method: 'POST',
+            data: formData,
+            success: function (response) {
+                if (response.status == 'success') {
+                    console.log(response.message);
+                    displayPopupMessage(response.message, 'success');
+                } else if (response.status === 'error') {
+                    displayPopupMessage(response.message, 'error');
+                }
+
+                // Get the project_id from formDataObject
+                const project_id = formDataObject['project_id'];
+
+                // Closing the editproject popup
+                editproject_popup_toggle(project_id);
+            },
+            error: function (xhr, status, error) {
+                console.error("Error fetching edit form:", error);
+            }
+        });
+    });
+
+    // Event handler for clicking the "Delete" button
+    $(document).on("click", "#delete-project-btn", function () {
+        console.log("Hel");
+        var deleteButton = $(this); // Store a reference to the button that was clicked
+        var projectId = deleteButton.data("project-id");
+
+        // Confirm the deletion with the user (optional)
+        if (confirm("Are you sure you want to delete this project?")) {
+            // Use AJAX to delete the project
+            $.ajax({
+                type: "POST",
+                url: "partial/delete_project.php",
+                data: { project_id: projectId },
+                success: function (response) {
+                    // Handle the success response here (e.g., remove the project listing)
+                    console.log("Project deleted:", response);
+
+                    // Optionally, remove the deleted project listing from the DOM
+                    deleteButton.closest(".project-lst").remove();
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error deleting project:", error);
+                }
+            });
+        }
+    });
+
+
+
 </script>
 <script>
     function editproject_popup_toggle(projectId) {
@@ -341,19 +487,25 @@
     }
 
     function fetchProjectData(projectId) {
-        // Send an AJAX request to fetch project data
-        fetch('partial/fetch_project_data.php?project_id=' + projectId)
-            .then(response => response.json())
-            .then(data => {
+        $.ajax({
+            url: 'partial/fetch_project_data.php',
+            type: 'GET',
+            data: { project_id: projectId },
+            dataType: 'json',
+            success: function (data) {
                 // Populate the description field with the fetched data
-                document.getElementById('project_name').value = data.project_name;
-                document.getElementById('description').value = data.description;
-                document.getElementById('start_date').value = data.start_date;
-                document.getElementById('end_date').value = data.end_date;
-                document.getElementById('status').value = data.status;
-            })
-            .catch(error => console.error('Error fetching project data:', error));
+                $('#project_name').val(data.project_name);
+                $('#description').val(data.description);
+                $('#projectStartDate').val(data.start_date);
+                $('#projectEndDate').val(data.end_date);
+                $('#project_priority').val(data.priority);
+            },
+            error: function (xhr, status, error) {
+                console.error('Error fetching project data:', error);
+            }
+        });
     }
+
 </script>
 <script>
     function loadImgFile(event) {

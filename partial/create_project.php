@@ -28,7 +28,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $description = sanitize_input($_POST['description']);
     $start_date = sanitize_input($_POST['start_date']);
     $end_date = sanitize_input($_POST['end_date']);
-    $status = "Not Started";
+    $priority = sanitize_input($_POST['priority']);
     $background_color = generateRandomColor();
 
 
@@ -37,8 +37,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     echo $project_name;
 
     // Insert project into the Projects table
-    $insert_project_query = "INSERT INTO Projects (project_name, description, start_date, end_date, status, background_color)
-                               VALUES ('$project_name', '$description', '$start_date', '$end_date', '$status', '$background_color')";
+    $insert_project_query = "INSERT INTO Projects (project_name, description, start_date, end_date, $priority, background_color)
+                               VALUES ('$project_name', '$description', '$start_date', '$end_date', '$priority', '$background_color')";
 
     echo $insert_project_query;
 

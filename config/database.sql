@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS Projects (
     description VARCHAR(1000),
     start_date DATE,
     end_date DATE,
-    status VARCHAR(50),
+    priority VARCHAR(50),
     background_color VARCHAR(7)
 );
 
