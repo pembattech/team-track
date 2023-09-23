@@ -67,7 +67,8 @@ table {
     border-collapse: collapse;
 }
 
-option, select {
+option,
+select {
     border-radius: 5px;
     height: 35px;
     color: var(--color-text);
@@ -85,7 +86,12 @@ button.indicate-danger {
     color: var(--danger-color);
 }
 
-.input-style, .textarea-style textarea, textarea#task_description, textarea#description, textarea#about, .select-style {
+.input-style,
+.textarea-style textarea,
+textarea#task_description,
+textarea#description,
+textarea#about,
+.select-style {
     background-color: var(--color-background-weak-hover-deprecated);
     border-radius: 5px;
 }
@@ -674,6 +680,7 @@ th.subhead-task {
     font-size: 16px;
     text-align: center;
 }
+
 .project-dropdown-menu-item:hover {
     background-color: var(--color-background-weak);
     border-radius: 5px;
@@ -1116,12 +1123,46 @@ button#closeButton:hover {
 }
 
 /* create project form */
-#projectForm input, #projectForm textarea, #projectForm select {
+.project-container {
+    display: flex;
+    gap: 20px;
+}
+
+.project-container .right-container {
+    width: 100%;
+}
+
+.project-container .right-container .project {
+    max-height: 529px;
+    overflow-y: auto;
+}
+
+.project-container .right-container .project-section {
+    border: 0;
+    padding: 5px;
+    background-color: var(--sidebar-bgcolor);
+}
+
+.project-container .right-container .project::-webkit-scrollbar {
+    width: 5px;
+}
+
+.project-container .project_create_form {
+    padding: 10px;
+    border-radius: 5px;
+    background-color: var(--sidebar-bgcolor);
+}
+
+#projectForm input,
+#projectForm textarea,
+#projectForm select {
     width: 400px;
+    background-color: var(--bg-color);
 }
 
 /* profile */
-#editProjectForm .form-group > input, #editProjectForm .form-group > select {
+#editProjectForm .form-group>input,
+#editProjectForm .form-group>select {
     width: 100%;
 }
 
@@ -1386,8 +1427,12 @@ input.d-none {
 }
 
 .task-list-container {
-    max-height: 600px;
+    max-height: 457px;
     overflow-y: auto;
+}
+
+.task-list-container::-webkit-scrollbar {
+    width: 5px;
 }
 
 .task-list-container th {
