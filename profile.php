@@ -1,7 +1,7 @@
 <?php include 'access_denied.php'; ?>
 
 <title>Profile - TeamTrack</title>
-<?
+<?php
 // Enable error reporting
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
@@ -557,6 +557,29 @@ ini_set('display_errors', 1);
 </script>
 <script>
     const textArea = document.getElementById('about');
+    const charCount = document.getElementById('charCount');
+
+    textArea.addEventListener('focus', function () {
+        charCount.style.display = 'block'; // Show the character count when the textarea is focused
+    });
+
+    textArea.addEventListener('blur', function () {
+        charCount.style.display = 'none'; // Hide the character count when the textarea loses focus
+    });
+
+    textArea.addEventListener('input', function () {
+        const currentText = textArea.value;
+        const currentLength = currentText.length;
+        charCount.textContent = `${currentLength} / 255 characters used`;
+    });
+
+    // Initialize the character count based on the initial value
+    const initialText = textArea.value;
+    const initialLength = initialText.length;
+    charCount.textContent = `${initialLength} / 255 characters used`;
+</script>
+<script>
+    const textArea = document.getElementById('description');
     const charCount = document.getElementById('charCount');
 
     textArea.addEventListener('focus', function () {

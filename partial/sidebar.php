@@ -122,7 +122,7 @@
             <div class="collapsible-project">Project ▼</div>
             <div class="collapsible-content">
                 <div class="project-scroll-container">
-                    <div class="project-item sidebar-project">
+                    <div class="project-item sidebar-project" id="projectListContainer">
                         <?php
                         // Get the user ID of the logged-in user
                         $user_id = $_SESSION['user_id'];
