@@ -18,32 +18,46 @@ function addEllipsis(text, maxLength) {
 }
 
 function initializeDateRangePicker(startDateField, endDateField) {
-    // Get reference to the date input fields
-    const startDateInput = document.getElementById(startDateField);
-    const endDateInput = document.getElementById(endDateField);
+    // Get references to the date input fields
+    const startDateInput = $(startDateField);
+    const endDateInput = $(endDateField);
+
+    // Function to format a date as "yyyy-mm-dd"
+    function formatDate(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Add leading zero if needed
+        const day = String(date.getDate()).padStart(2, '0'); // Add leading zero if needed
+        return `${year}-${month}-${day}`;
+    }
 
     // Function to disable past dates in the date input fields
     function disablePastDates() {
-        const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
-        startDateInput.setAttribute('min', today);
-        endDateInput.setAttribute('min', today);
+        const today = new Date();
+        const formattedToday = formatDate(today); // Format today's date
+        $(startDateInput).attr('min', formattedToday);
+        $(endDateInput).attr('min', formattedToday);
     }
 
     // Function to update the minimum date for the end date input based on the start date
     function updateEndDateMin() {
-        const startDate = new Date(startDateInput.value);
-        endDateInput.setAttribute('min', startDateInput.value);
-        if (endDateInput.value && new Date(endDateInput.value) < startDate) {
-            endDateInput.value = startDateInput.value;
+        const startDateValue = $(startDateInput).val();
+        if (startDateValue) {
+            const startDate = new Date(startDateValue);
+            const formattedStartDate = formatDate(startDate); // Format start date
+            $(endDateInput).attr('min', formattedStartDate);
+            if ($(endDateInput).val() && new Date($(endDateInput).val()) < startDate) {
+                $(endDateInput).val(formattedStartDate);
+            }
         }
     }
 
     // Function to update the maximum date for the start date input based on the end date
     function updateStartDateMax() {
-        const endDate = new Date(endDateInput.value);
-        startDateInput.setAttribute('max', endDateInput.value);
-        if (startDateInput.value && new Date(startDateInput.value) > endDate) {
-            startDateInput.value = endDateInput.value;
+        const endDate = new Date($(endDateInput).val());
+        const formattedEndDate = formatDate(endDate); // Format end date
+        $(startDateInput).attr('max', formattedEndDate);
+        if ($(startDateInput).val() && new Date($(startDateInput).val()) > endDate) {
+            $(startDateInput).val(formattedEndDate);
         }
     }
 
@@ -53,15 +67,16 @@ function initializeDateRangePicker(startDateField, endDateField) {
     updateStartDateMax();
 
     // Listen for changes in the start date and end date and update attributes accordingly
-    startDateInput.addEventListener('change', () => {
+    $(startDateInput).on('change', function () {
         updateEndDateMin();
         updateStartDateMax();
     });
 
-    endDateInput.addEventListener('change', () => {
-        updateEndDateMin();
+    $(endDateInput).on('change', function () {
         updateStartDateMax();
+        updateEndDateMin();
     });
+
 }
 
 function openTab(event, tabId) {

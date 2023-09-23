@@ -1,11 +1,6 @@
 <?php include 'access_denied.php'; ?>
 
 <title>Profile - TeamTrack</title>
-<?
-// Enable error reporting
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-?>
 
 <?php include 'partial/navbar.php'; ?>
 <style>
@@ -291,27 +286,28 @@ ini_set('display_errors', 1);
                                                 value="<?php echo $project_id; ?>">
                                             <div class="form-group">
                                                 <input class="input-style" type="text" name="project_name"
-                                                    id="project_name">
+                                                    id="project_name"
+                                                    value="<?php echo get_project_data($project_id)['project_name'] ?>">
                                                 <span id="projectname-error" class="error-message"></span>
                                             </div>
                                             <div class="form-group textarea-style textarea-wrapper">
                                                 <textarea id="description" name="description" maxlength="255"
-                                                    rows="4"></textarea>
+                                                    rows="4"><?php get_project_data($project_id)['description'] ?></textarea>
                                                 <span id="charCount">0 / 255 characters used</span>
                                                 <span id="projectdescription-error" class="error-message"></span>
                                             </div>
                                             <div class="form-group">
                                                 <input class="input-style" type="text" id="projectStartDate"
                                                     name="start_date" onfocus="this.type='date'"
-                                                    onblur="if(!this.value) { this.type='text'; }"
-                                                    placeholder="Start Date">
+                                                    onblur="if(!this.value)this.type='text';" placeholder="Start Date"
+                                                    value="<?php echo get_project_data($project_id)['start_date'] ?>">
                                                 <span id="projectStartDate-error" class="error-message"></span>
                                             </div>
-
                                             <div class="form-group">
                                                 <input class="input-style" type="text" id="projectEndDate"
                                                     name="end_date" onfocus="(this.type='date')"
-                                                    onblur="if(!this.value)this.type='text';" placeholder="End Date">
+                                                    onblur="if(!this.value)this.type='text';" placeholder="End Date"
+                                                    value="<?php echo get_project_data($project_id)['end_date'] ?>">
                                                 <span id="projectEndDate-error" class="error-message"></span>
                                             </div>
 
@@ -338,23 +334,22 @@ ini_set('display_errors', 1);
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-
 <script>
     function editprofile_popup_toggle() {
         const popup = document.getElementById('editprofile-popup');
         popup.style.display = (popup.style.display === 'block') ? 'none' : 'block';
     }
-</script>
-<script>
 
-    // Call the function to initialize the date range picker
-    $(document).ready(function () {
-        initializeDateRangePicker('#projectStartDate', '#projectEndDate');
-    });
+
+</script>
+<script src="static/js/main.js"></script>
+<script>
 
     // Event handler for clicking the "Edit" button
     $(document).on("click", ".edit-project-btn", function () {
+
+        // Call the function to initialize the date range picker
+        initializeDateRangePicker('projectStartDate', 'projectEndDate');
         console.log("edit button clicked!");
         var projectId = $(this).data("project-id");
 
@@ -372,6 +367,11 @@ ini_set('display_errors', 1);
         const endDate = $('#projectEndDate').val();
         const priority = $('#project_priority').val();
 
+        console.log(projectName);
+        console.log(projectDescription);
+        console.log(startDate);
+        console.log(endDate);
+        console.log(priority);
         // Add your validation rules here
         if (projectName.trim() === '') {
             $("#projectname-error").text("Project name is required.");

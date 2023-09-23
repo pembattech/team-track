@@ -302,7 +302,8 @@ session_start();
 
                                     <div class="form-group">
                                         <label for="message">Message <p
-                                                style="display:inline; color: var(--color-text-weak); font-size: 14px;">(optional)</p>
+                                                style="display:inline; color: var(--color-text-weak); font-size: 14px;">
+                                                (optional)</p>
                                         </label>
                                         <div class="textarea-style">
                                             <textarea id="message" name="message" rows="4"
@@ -338,7 +339,8 @@ session_start();
                             <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
                             <div class="form-group">
                                 <span id="taskname-error" class="error-message"></span>
-                                <input class="input-style" type="text" name="taskname" id="taskname" placeholder="Enter Task Name">
+                                <input class="input-style" type="text" name="taskname" id="taskname"
+                                    placeholder="Enter Task Name">
                             </div>
                             <div class="form-group">
                                 <label for="task_description">Description</label>
@@ -488,7 +490,8 @@ session_start();
                             <input type="hidden" name="projectowner_id"
                                 value="<?php echo $project_owner['user_id']; ?>">
                             <input type="hidden" id="editTaskId" name="task_id">
-                            <input class="input-style" type="text" id="editTaskName" name="task_name" placeholder="Task name">
+                            <input class="input-style" type="text" id="editTaskName" name="task_name"
+                                placeholder="Task name">
                             <span id="editTaskName-error" class="error-message"></span>
                             <br>
                             <div class="div-space-top"></div>
@@ -499,7 +502,8 @@ session_start();
 
                             <div class="div-space-top"></div>
                             <div class="textarea-style">
-                                <textarea id="editTaskDescription" name="task_description" placeholder="Task Description"></textarea>
+                                <textarea id="editTaskDescription" name="task_description"
+                                    placeholder="Task Description"></textarea>
                             </div>
                             <span id="editTaskDescription-error" class="error-message"></span>
 
@@ -620,14 +624,15 @@ session_start();
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script>
+
+    // Initialize the date range picker when the document is ready
+    $(document).ready(function () {
+        initializeDateRangePicker('#editStartDate', '#editEndDate');
+    });
+
     // Call the fetchTasks function on page load
     $(document).ready(function () {
         fetchTasks();
-    });
-
-    // Call the function to initialize the date range picker
-    $(document).ready(function () {
-        initializeDateRangePicker('editStartDate', 'editEndDate');
     });
 
     // JavaScript for collapsible sections
@@ -749,6 +754,10 @@ session_start();
                     $('#taskPopup').addClass('active');
                     // Fetch task details and populate the edit form
                     fetchTaskDetails(taskId);
+
+                    // // Call the function to initialize the date range picker
+                    // initializeDateRangePicker('#editStartDate', '#editEndDate');
+
                 } else if (taskName === '') {
                     $('#taskPopup').removeClass('active');
                 }
@@ -766,6 +775,7 @@ session_start();
 
             // Get the form data
             const formData = $(this).serialize();
+            console.log(formData);
 
             // Send an AJAX request to update the task details
             $.ajax({
@@ -807,15 +817,6 @@ session_start();
             const endDate = $('#editEndDate').val();
             const status = $('#editStatus').val();
             const priority = $('#editPriority').val();
-
-            console.log(taskName);
-            console.log(assignee);
-            console.log(taskDescription);
-            console.log(startDate);
-            console.log(endDate);
-            console.log(status);
-            console.log(priority);
-
 
             // Add your validation rules here
             if (taskName.trim() === '') {
