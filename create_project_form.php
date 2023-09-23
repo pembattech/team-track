@@ -90,7 +90,9 @@
 
                 <div class="project-section">
                     <div class="user-project">
-                        <div class="project div-space-top" id="created_projects"></div>
+                        <div class="project div-space-top" id="created_projects">
+                            <!-- display list of created project dynamically -->
+                        </div>
 
                         <div class="editproject-popup popup-style" id="editproject-popup">
                             <div class="editproject-popup-content">
@@ -137,6 +139,24 @@
 
                                     <button type="submit" id="submitEditProject" class="button-style">Submit</button>
                                 </form>
+                            </div>
+                        </div>
+                        <div class="deleteproject-popup popup-style" id="deleteproject-popup">
+                            <div class="deleteproject-popup-content">
+                                <div class="heading-content">
+                                    <span class="deleteproject-popup-close"
+                                        onclick="deleteproject_popup_toggle()">&times;
+                                    </span>
+                                    <p class="heading-style">Delete Project</p>
+                                </div>
+                                <div class="bottom-line"></div>
+                                <div class="div-space-top"></div>
+
+                                <p style="color: var(--danger-color); font-weight: 900;">Are you sure to
+                                    delete project name?</p>
+                                <button class="button-style" id="confirmDeleteProject">Yes</button>
+                                <button class="button-style" id="cancelDeleteProject">Cancel</button>
+
                             </div>
                         </div>
                     </div>
@@ -376,6 +396,43 @@
                     // Get the project_id from formDataObject
                     const project_id = formDataObject['project_id'];
 
+                    // After successfully creating the project, update the project list
+                    $.ajax({
+                        type: "GET", // Use GET to fetch the updated list
+                        url: "partial/project_partial/fetch_projects.php", // URL to fetch the updated project list
+                        dataType: "json",
+                        success: function (projects) {
+                            // Call the function to populate the project list on the right side of create project form
+                            updateProjectList();
+
+                            // Clear the existing project list
+                            $("#projectListContainer").empty();
+
+                            // JavaScript function to truncate text
+                            function truncateText(text, maxLength) {
+                                if (text.length > maxLength) {
+                                    return text.substring(0, maxLength) + '...';
+                                }
+                                return text;
+                            }
+
+                            // Inside your success callback for fetching projects
+                            $.each(projects, function (index, project) {
+                                var projectLink = '<div class="project-lst">';
+                                projectLink += '<a href="project.php?project_id=' + project.id + '" class="project-link" id="link">';
+                                projectLink += '    <div class="square" style="background-color:' + project.color + '"></div>';
+                                projectLink += '    <p class="project-title">' + truncateText(project.name, 23) + '</p>';
+                                projectLink += '</a>';
+                                projectLink += '</div>';
+                                $("#projectListContainer").append(projectLink);
+                            });
+
+                        },
+                        error: function () {
+                            console.log("An error occurred while fetching the updated project list.");
+                        }
+                    });
+
                     // Closing the editproject popup
                     editproject_popup_toggle(project_id);
                 },
@@ -387,30 +444,98 @@
 
         // Event handler for clicking the "Delete" button
         $(document).on("click", "#delete-project-btn", function () {
-            console.log("Hel");
             var deleteButton = $(this); // Store a reference to the button that was clicked
             var projectId = deleteButton.data("project-id");
 
-            // Confirm the deletion with the user (optional)
-            if (confirm("Are you sure you want to delete this project?")) {
-                // Use AJAX to delete the project
+            deleteproject_popup_toggle();
+
+            // Pass projectId and deleteButton to deleteproject_popup_options
+            deleteproject_popup_options(projectId, deleteButton);
+        });
+
+        function deleteproject_popup_toggle() {
+            const popup = document.getElementById('deleteproject-popup');
+            popup.style.display = (popup.style.display === 'block') ? 'none' : 'block';
+        }
+
+        function deleteproject_popup_options(projectId, deleteButton) {
+            // Unbind any previously bound click event for #confirmDeleteProject
+            $("#confirmDeleteProject").off("click");
+
+            // Click event for confirming project deletion
+            $("#confirmDeleteProject").on("click", function (e) {
+                e.preventDefault();
+
+                // Send an AJAX request to delete the project
                 $.ajax({
                     type: "POST",
-                    url: "partial/delete_project.php",
+                    url: "partial/project_partial/delete_project.php",
                     data: { project_id: projectId },
                     success: function (response) {
-                        // Handle the success response here (e.g., remove the project listing)
-                        console.log("Project deleted:", response);
+                        // Close the popup and perform any additional actions
+                        deleteproject_popup_toggle();
 
-                        // Optionally, remove the deleted project listing from the DOM
-                        deleteButton.closest(".project-lst").remove();
+                        // Handle the response from the server
+                        if (response.status == 'success') {
+                            // Optionally, remove the deleted project listing from the DOM
+                            deleteButton.closest(".project-lst").remove();
+
+                            displayPopupMessage(response.message, 'success');
+                        } else if (response.status === 'error') {
+                            displayPopupMessage(response.message, 'error');
+                        }
+
+                        // After successfully creating the project, update the project list
+                        $.ajax({
+                            type: "GET", // Use GET to fetch the updated list
+                            url: "partial/project_partial/fetch_projects.php", // URL to fetch the updated project list
+                            dataType: "json",
+                            success: function (projects) {
+                                // Call the function to populate the project list on the right side of create project form
+                                updateProjectList();
+
+                                // Clear the existing project list
+                                $("#projectListContainer").empty();
+
+                                // JavaScript function to truncate text
+                                function truncateText(text, maxLength) {
+                                    if (text.length > maxLength) {
+                                        return text.substring(0, maxLength) + '...';
+                                    }
+                                    return text;
+                                }
+
+                                // Inside your success callback for fetching projects
+                                $.each(projects, function (index, project) {
+                                    var projectLink = '<div class="project-lst">';
+                                    projectLink += '<a href="project.php?project_id=' + project.id + '" class="project-link" id="link">';
+                                    projectLink += '    <div class="square" style="background-color:' + project.color + '"></div>';
+                                    projectLink += '    <p class="project-title">' + truncateText(project.name, 23) + '</p>';
+                                    projectLink += '</a>';
+                                    projectLink += '</div>';
+                                    $("#projectListContainer").append(projectLink);
+                                });
+
+                            },
+                            error: function () {
+                                console.log("An error occurred while fetching the updated project list.");
+                            }
+                        });
                     },
-                    error: function (xhr, status, error) {
-                        console.error("Error deleting project:", error);
+                    error: function () {
+                        // Handle the AJAX error
+                        console.log("An error occurred while deleting the project.");
                     }
                 });
-            }
+            });
+        }
+
+        // Click event for canceling project deletion
+        $("#cancelDeleteProject").click(function (e) {
+            e.preventDefault();
+            deleteproject_popup_toggle(); // Close the popup
         });
+
     </script>
     <script>
         function editproject_popup_toggle(projectId) {

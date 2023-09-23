@@ -779,7 +779,7 @@ th.subhead-task {
 
 .collapsible h2 {
     position: sticky;
-    z-index: 99999;
+    z-index: 998;
     top: 0;
     font-size: 20px;
     padding: 10px;
@@ -1367,6 +1367,8 @@ input.d-none {
 
 .user-project .project-options {
     padding: 0 15px;
+    display: flex;
+    gap: 10px;
 }
 
 .user-project .project-options button {
@@ -1424,6 +1426,36 @@ input.d-none {
     border-radius: 4px;
     background-color: var(--color-background-weak);
     color: var(--color-text);
+}
+
+#deleteproject-popup {
+    display: none;
+    background-color: var(--overlay-bgcolor);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.deleteproject-popup-content {
+    background-color: var(--color-background-weak);
+    color: var(--color-text);
+    max-width: 400px;
+    margin: 100px auto;
+    padding: 10px 20px;
+    border-radius: 4px;
+}
+
+.deleteproject-popup-close {
+    font-size: 30px;
+    float: right;
+    cursor: pointer;
+}
+
+.deleteproject-popup .form-group {
+    margin-bottom: 15px;
+    font-size: 14px;
 }
 
 .task-list-container {

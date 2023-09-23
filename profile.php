@@ -1,11 +1,6 @@
 <?php include 'access_denied.php'; ?>
 
 <title>Profile - TeamTrack</title>
-<?php
-// Enable error reporting
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-?>
 
 <?php include 'partial/navbar.php'; ?>
 <style>
@@ -183,7 +178,7 @@ ini_set('display_errors', 1);
                             echo "</thead>";
                             echo "<tbody id='task-list'>";
                             while ($task = mysqli_fetch_assoc($incomplete_tasks)) {
-                                echo "<tr class='$displayClass'>";
+                                echo "<tr>";
                                 echo "<td data-task-id='" . $task['task_id'] . "'>" . add_ellipsis($task['task_name'], 15) . "</td>";
                                 echo "<td>" . add_ellipsis($task['project_name'], 15) . "</td>";
                                 echo "<td>" . $task['username'] . "</td>";
@@ -327,7 +322,27 @@ ini_set('display_errors', 1);
                                         </form>
                                     </div>
                                 </div>
+
+
                             </div>
+                        </div>
+                    </div>
+
+                    <div class="deleteproject-popup popup-style" id="deleteproject-popup">
+                        <div class="deleteproject-popup-content">
+                            <div class="heading-content">
+                                <span class="deleteproject-popup-close" onclick="deleteproject_popup_toggle()">&times;
+                                </span>
+                                <p class="heading-style">Delete Project</p>
+                            </div>
+                            <div class="bottom-line"></div>
+                            <div class="div-space-top"></div>
+
+                            <p style="color: var(--danger-color); font-weight: 900;">Are you sure to
+                                delete project name?</p>
+                            <button class="button-style" id="confirmDeleteProject">Yes</button>
+                            <button class="button-style" id="cancelDeleteProject">Cancel</button>
+
                         </div>
                     </div>
                 </div>
@@ -401,8 +416,6 @@ ini_set('display_errors', 1);
         return true; // All validation passed
     }
 
-    // Submit the edited task details when the form is submitted
-    // $(document).on("click", ".edit-project-btn", function () {
 
     $('#editProjectForm').on("submit", function (event) {
         event.preventDefault();
@@ -450,30 +463,62 @@ ini_set('display_errors', 1);
 
     // Event handler for clicking the "Delete" button
     $(document).on("click", "#delete-project-btn", function () {
-        console.log("Hel");
         var deleteButton = $(this); // Store a reference to the button that was clicked
         var projectId = deleteButton.data("project-id");
 
-        // Confirm the deletion with the user (optional)
-        if (confirm("Are you sure you want to delete this project?")) {
-            // Use AJAX to delete the project
+        deleteproject_popup_toggle();
+
+        // Pass projectId and deleteButton to deleteproject_popup_options
+        deleteproject_popup_options(projectId, deleteButton);
+    });
+
+    function deleteproject_popup_toggle() {
+        const popup = document.getElementById('deleteproject-popup');
+        popup.style.display = (popup.style.display === 'block') ? 'none' : 'block';
+    }
+
+    function deleteproject_popup_options(projectId, deleteButton) {
+
+        // Unbind any previously bound click event for #confirmDeleteProject
+        $("#confirmDeleteProject").off("click");
+
+        // Click event for confirming project deletion
+        $("#confirmDeleteProject").on("click", function (e) {
+            e.preventDefault();
+
+            // Send an AJAX request to delete the project
             $.ajax({
                 type: "POST",
-                url: "partial/delete_project.php",
+                url: "partial/project_partial/delete_project.php",
                 data: { project_id: projectId },
                 success: function (response) {
-                    // Handle the success response here (e.g., remove the project listing)
-                    console.log("Project deleted:", response);
+                    // Close the popup and perform any additional actions
+                    deleteproject_popup_toggle();
 
-                    // Optionally, remove the deleted project listing from the DOM
-                    deleteButton.closest(".project-lst").remove();
+                    // Handle the response from the server
+                    if (response.status == 'success') {
+                        // Optionally, remove the deleted project listing from the DOM
+                        deleteButton.closest(".project-lst").remove();
+
+                        displayPopupMessage(response.message, 'success');
+                    } else if (response.status === 'error') {
+                        displayPopupMessage(response.message, 'error');
+                    }
                 },
-                error: function (xhr, status, error) {
-                    console.error("Error deleting project:", error);
+                error: function () {
+                    // Handle the AJAX error
+                    console.log("An error occurred while deleting the project.");
                 }
             });
-        }
+        });
+    }
+
+    // Click event for canceling project deletion
+    $("#cancelDeleteProject").click(function (e) {
+        e.preventDefault();
+        deleteproject_popup_toggle(); // Close the popup
     });
+
 
 
 
@@ -486,6 +531,8 @@ ini_set('display_errors', 1);
         if (popup.style.display === 'block') {
             // If the popup is being displayed, set the value of the hidden input field to the project ID
             document.getElementById('project_id').value = projectId;
+
+            initializeCharacterCount();
 
             // Fetch project data using AJAX
             fetchProjectData(projectId);
@@ -579,25 +626,29 @@ ini_set('display_errors', 1);
     charCount.textContent = `${initialLength} / 255 characters used`;
 </script>
 <script>
-    const textArea = document.getElementById('description');
-    const charCount = document.getElementById('charCount');
+    function initializeCharacterCount() {
+        const textArea1 = document.getElementById('description');
+        console.log(textArea1);
+        const charCount1 = document.getElementById('charCount');
+        console.log(charCount1);
 
-    textArea.addEventListener('focus', function () {
-        charCount.style.display = 'block'; // Show the character count when the textarea is focused
-    });
+        textArea1.addEventListener('focus', function () {
+            charCount1.style.display = 'block'; // Show the character count when the textarea is focused
+        });
 
-    textArea.addEventListener('blur', function () {
-        charCount.style.display = 'none'; // Hide the character count when the textarea loses focus
-    });
+        textArea1.addEventListener('blur', function () {
+            charCount1.style.display = 'none'; // Hide the character count when the textarea loses focus
+        });
 
-    textArea.addEventListener('input', function () {
-        const currentText = textArea.value;
-        const currentLength = currentText.length;
-        charCount.textContent = `${currentLength} / 255 characters used`;
-    });
+        textArea1.addEventListener('input', function () {
+            const currentText1 = textArea1.value;
+            const currentLength1 = currentText1.length;
+            charCount1.textContent = `${currentLength1} / 255 characters used`;
+        });
 
-    // Initialize the character count based on the initial value
-    const initialText = textArea.value;
-    const initialLength = initialText.length;
-    charCount.textContent = `${initialLength} / 255 characters used`;
+        // Initialize the character count based on the initial value
+        const initialText1 = textArea1.value;
+        const initialLength1 = initialText1.length;
+        charCount1.textContent = `${initialLength1} / 255 characters used`;
+    }
 </script>

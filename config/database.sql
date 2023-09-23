@@ -30,8 +30,8 @@ CREATE TABLE IF NOT EXISTS ProjectUsers (
     user_id INT,
     is_projectowner INT DEFAULT 0,
     user_role VARCHAR(50),
-    FOREIGN KEY (project_id) REFERENCES Projects(project_id),
-    FOREIGN KEY (user_id) REFERENCES Users(user_id)
+    FOREIGN KEY (project_id) REFERENCES Projects(project_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS Tasks (
@@ -46,9 +46,9 @@ CREATE TABLE IF NOT EXISTS Tasks (
     status VARCHAR(50),
     section VARCHAR(50),
     priority VARCHAR(50),
-    FOREIGN KEY (projectuser_id) REFERENCES ProjectUsers(projectuser_id),
-    FOREIGN KEY (task_creator_id) REFERENCES Users(user_id),
-    FOREIGN KEY (assignee) REFERENCES Users(user_id)
+    FOREIGN KEY (projectuser_id) REFERENCES ProjectUsers(projectuser_id) ON DELETE CASCADE,
+    FOREIGN KEY (task_creator_id) REFERENCES Users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (assignee) REFERENCES Users(user_id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS Messages (
@@ -56,19 +56,18 @@ CREATE TABLE IF NOT EXISTS Messages (
     task_id INT,
     sender_id INT,
     text VARCHAR(1000),
-    timestamp DATETIME CURRENT_TIMESTAMP,
+    `timestamp` DATETIME DEFAULT CURRENT_TIMESTAMP,
     recipient_id INT,
     is_read INT DEFAULT 0,
-    is_task_msg INT DEFAULT 0,using your invitation.
+    is_task_msg INT DEFAULT 0,
     is_project_msg INT DEFAULT 0,
     is_newtask_msg INT DEFAULT 0,
     project_id INT,
-    FOREIGN KEY (task_id) REFERENCES Tasks(task_id),
-    FOREIGN KEY (sender_id) REFERENCES Users(user_id),
-    FOREIGN KEY (recipient_id) REFERENCES Users(user_id),
-    FOREIGN KEY (project_id) REFERENCES Projects(project_id)
+    FOREIGN KEY (task_id) REFERENCES Tasks(task_id) ON DELETE CASCADE,
+    FOREIGN KEY (sender_id) REFERENCES Users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (recipient_id) REFERENCES Users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (project_id) REFERENCES Projects(project_id) ON DELETE CASCADE
 );
-
 
 CREATE TABLE IF NOT EXISTS ProjectInvitations (
     invitation_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -78,6 +77,6 @@ CREATE TABLE IF NOT EXISTS ProjectInvitations (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     is_used TINYINT(1) DEFAULT 0,
     invitation_sender INT,
-    FOREIGN KEY (invitation_sender) REFERENCES Users(user_id),
-    FOREIGN KEY (project_id) REFERENCES Projects(project_id)
+    FOREIGN KEY (invitation_sender) REFERENCES Users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (project_id) REFERENCES Projects(project_id) ON DELETE CASCADE
 );
