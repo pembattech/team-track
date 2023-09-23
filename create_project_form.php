@@ -25,7 +25,6 @@
                 </div>
                 <div class="project_create_form">
                     <form id="projectForm">
-                        <div class="div-space-top"></div>
                         <div class="form-group">
                             <input type="text" class="input-style" name="project_name" id="projectname"
                                 placeholder="Name your Project">
@@ -90,7 +89,7 @@
 
                 <div class="project-section">
                     <div class="user-project">
-                        <div class="project div-space-top" id="created_projects">
+                        <div class="project" id="created_projects">
                             <!-- display list of created project dynamically -->
                         </div>
 

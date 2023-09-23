@@ -22,7 +22,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $row = $result->fetch_assoc();
         $member_count = $row['member_count'];
 
-        if ($member_count == 1) {
+        if ($member_count === '1') {
             // If there is only one member (the owner), proceed with deletion
 
             // Delete project users
