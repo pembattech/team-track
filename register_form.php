@@ -15,8 +15,6 @@ include 'base.php'; ?>
 <title>User Registration Form</title>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-
-
 <div class="loginregister-form-container">
     <div class="heading-content">
         <div class="heading-style">
@@ -31,20 +29,28 @@ include 'base.php'; ?>
             <?php } ?>
             <div class="form-group">
                 <input type="text" placeholder="Name" id="name" name="name" required>
+                <div id="nameError" class="error-message lr_error"></div>
             </div>
+            <div class="div-space-top"></div>
 
             <div class="form-group">
                 <input type="text" placeholder="Username" id="username" name="username" required>
+                <div id="usernameError" class="error-message lr_error"></div>
             </div>
+            <div class="div-space-top"></div>
 
             <div class="form-group">
-                <!-- <p class="status" id="emailStatus"></p> -->
                 <input type="email" placeholder="Email" id="email" name="email" required>
+                <!-- <div id="emailError" class="error-message lr_error"></div>  -->
             </div>
+            <div class="div-space-top"></div>
 
             <div class="form-group">
                 <input type="password" placeholder="Password" id="password" name="password" required>
+                <div id="passwordError" class="error-message lr_error"></div> <!-- Error message for password -->
             </div>
+            <div class="div-space-top"></div>
+
 
             <input type="submit" placeholder="" id="submitButton" value="Register" disabled>
             <div class="div-space-top"></div>
@@ -73,6 +79,20 @@ include 'base.php'; ?>
 
     // Front-end validation using JavaScript (AJAX)
     $(document).ready(function () {
+        // Function to validate name (at least two words)
+        function validateName() {
+            const name = $('#name').val();
+            const nameWords = name.split(/\s+/).filter(word => word.match(/[a-zA-Z]/)); // Split by spaces and filter out non-alphabetic characters
+            if (nameWords.length < 2) {
+                $('#nameError').text('Name must contain at least two words');
+                return false;
+            } else {
+                $('#nameError').text('');
+                return true;
+            }
+        }
+
+
         // Function to validate username
         function validateUsername() {
             const username = $('#username').val();
@@ -118,29 +138,67 @@ include 'base.php'; ?>
             });
         }
 
+        // Function to validate password
+        function validatePassword() {
+            const password = $('#password').val();
+            const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+            if (!passwordPattern.test(password)) {
+                $('#passwordError').text('Password: 8+ chars, lowercase, uppercase, number, special char required.');
+                return false;
+            } else {
+                $('#passwordError').text('');
+                return true;
+            }
+        }
+
+        // Attach event listener to the name field
+        $('#name').on('input', function () {
+            if (validateName() == true) {
+                updateInputStatus($('#name'), 'available');
+            } else {
+                updateInputStatus($('#name'), 'taken');
+            }
+            enableDisableSubmitButton(); // Call the function to enable/disable the submit button
+        });
+
+
         // Attach event listeners to input fields
         $('#username').on('input', function () {
+            const username = $('#username').val();
             validateUsername();
+
+            // Check username availability
             checkUsernameAvailability().done(function (response) {
                 if (response === 'taken') {
-                    $('#usernameStatus').text('Username is already taken');
-                    updateInputStatus($('#username'), 'taken');
+                    if (username.length >= 4) {
+                        $('#usernameStatus').text('Username is already taken');
+                        updateInputStatus($('#username'), 'taken');
+                    } else {
+                        $('#usernameStatus').text('');
+                        updateInputStatus($('#username'), 'invalid');
+                    }
                 } else {
-                    $('#usernameStatus').text('Username is available');
-                    updateInputStatus($('#username'), 'available');
+                    if (username.length >= 4) {
+                        $('#usernameStatus').text('Username is available');
+                        updateInputStatus($('#username'), 'available');
+                    } else {
+                        $('#usernameStatus').text('');
+                        updateInputStatus($('#username'), 'invalid');
+                    }
                 }
                 enableDisableSubmitButton(); // Call the function to enable/disable the submit button
             });
         });
 
+
         $('#email').on('input', function () {
             validateEmail();
             checkEmailAvailability().done(function (response) {
                 if (response === 'taken') {
-                    $('#emailStatus').text('Email is already registered');
+                    $('#emailError').text('Email is already registered');
                     updateInputStatus($('#email'), 'taken');
                 } else {
-                    $('#emailStatus').text('Email is available');
+                    // $('#emailError').text('Email is available');
                     updateInputStatus($('#email'), 'available');
 
                 }
@@ -148,14 +206,26 @@ include 'base.php'; ?>
             });
         });
 
+        // Attach an event listener to the password field
+        $('#password').on('input', function () {
+            if (validatePassword() == true) {
+                updateInputStatus($('#password'), 'available');
+            } else {
+                updateInputStatus($('#password'), 'taken');
+            }
+
+            enableDisableSubmitButton(); // Call the function to enable/disable the submit button
+        });
+
+
         function enableDisableSubmitButton() {
             const username = $('#username').val();
             const email = $('#email').val();
 
             // Enable the submit button only if both username and email are available and valid
-            if (username.length >= 4 && validateEmail()) {
+            if (username.length >= 4 && validateEmail() && validatePassword() && validateName()) {
                 // Check the availability of username and email
-                $.when(checkUsernameAvailability(), checkEmailAvailability()).done(function (usernameResponse, emailResponse) {
+                $.when(checkUsernameAvailability(), checkEmailAvailability(), validatePassword(), validateName()).done(function (usernameResponse, emailResponse) {
                     if (usernameResponse[0] === 'available' && emailResponse[0] === 'available') {
                         $('#submitButton').prop('disabled', false);
                     } else {

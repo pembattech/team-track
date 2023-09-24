@@ -99,6 +99,10 @@
         padding: 25px;
     }
 
+    .LR-form .error-message {
+        font-size: 12px;
+    }
+
 
     .LR-form input[type="text"],
     .LR-form input[type="text"],
@@ -111,7 +115,6 @@
         border-radius: 5px;
         width: 100%;
         padding: 20px;
-        margin-bottom: 25px;
         height: 40px;
         -moz-outline-style: none;
     }
@@ -132,13 +135,15 @@
     }
 
     .LR-form input[type="text"].available,
-    .LR-form input[type="email"].available {
+    .LR-form input[type="email"].available,
+    .LR-form input[type="password"].available {
         border-color: green;
         /* Change to your preferred green color */
     }
 
     .LR-form input[type="text"].taken,
-    .LR-form input[type="email"].taken {
+    .LR-form input[type="email"].taken,
+    .LR-form input[type="password"].taken {
         border-color: red;
         /* Change to your preferred green color */
     }
@@ -150,6 +155,7 @@
     }
 
     .LR-form input[type="submit"] {
+        width: 100%;
         outline: 0;
         padding: 3px;
         border: 1px solid var(--color-border);
