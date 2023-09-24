@@ -248,7 +248,7 @@
                                             $background_color = $row['background_color'];
 
                                             // Output each project listing using HTML templates
-                                            echo '<div class="project-lst">';
+                                            echo '<div class="project-lst" style="margin-bottom:8px;">';
                                             echo '<div class="project-lst-name" style="display: inline-block;">';
                                             echo '<a href="project.php?project_id=' . $project_id . '" class="project-link">';
                                             echo '<div class="square" style="background-color:' . $background_color . '"></div>';
