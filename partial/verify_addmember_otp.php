@@ -5,12 +5,11 @@ ini_set('display_errors', 1);
 ?>
 
 <?php
-// Start the session to access user data
-session_start();
 
 require_once '../config/connect.php';
 include '../partial/utils.php';
 
+$response = array(); // Initialize an empty array to store the response
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $receivedOtp = $_POST['otp'];
@@ -19,11 +18,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 $user_id = $_SESSION['user_id'];
 
-// Fetching the loggedin user's username and email
+// Validate OTP length
+if (strlen($receivedOtp) !== 6 || !ctype_digit($receivedOtp)) {
+    $response['status'] = 'error';
+    $response['message'] = "OTP must be 6 digits and contain only numbers.";
+    // Return the response as JSON
+    header('Content-Type: application/json');
+    echo json_encode($response);
+    exit; // Exit the script to prevent further execution
+}
+
+// Fetching the logged-in user's username and email
 $username = get_user_data($user_id)['username'];
 $user_email = get_user_data($user_id)['email'];
-echo $user_email;
-
+$response['user_email'] = $user_email;
 
 if ($project_id !== null) {
     // Your existing code related to fetching the email and OTP
@@ -43,15 +51,17 @@ if ($project_id !== null) {
             $user_result = $connection->query($check_user_query);
 
             if ($user_result->num_rows > 0) {
-                echo $username . " already exists in the project.";
+                $response['status'] = 'error';
+                $response['message'] = $username . " already exists in the project.";
             } else {
-                echo "Match OTP";
-                // Insert that user to that project
+                $response['status'] = 'success';
+                $response['message'] = "Match OTP";
+                // Insert that user into that project
                 $insert_projectuser_query = "INSERT INTO ProjectUsers (project_id, user_id, is_projectowner) VALUES ('$project_id', '$user_id', '0')";
 
                 // Execute the query to insert the project user into the database
                 if (mysqli_query($connection, $insert_projectuser_query)) {
-                    echo "Project user inserted successfully.";
+                    $response['message'] = "Project user inserted successfully.";
 
                     // Notify the project owner
                     $project_owner_id = get_project_owner_id($project_id);
@@ -60,33 +70,40 @@ if ($project_id !== null) {
 
                     // Notify the invitation sender
                     $invitation_sender_id = $row['invitation_sender'];
-                    $invitation_sender_message = "User '$username' has joined the " . get_project_data($project_id)['project_name'] . "project using your invitation.";
+                    $invitation_sender_message = "User '$username' has joined the " . get_project_data($project_id)['project_name'] . " project using your invitation.";
                     sendNotificationMessage_project_msg($invitation_sender_id, $invitation_sender_message, $project_id);
 
                     // Update the is_used column to mark the invitation as used
                     $update_used_query = "UPDATE ProjectInvitations SET is_used = 1 WHERE project_id = '$project_id' AND otp = '$receivedOtp' AND is_used = 0";
 
                     if ($connection->query($update_used_query)) {
-                        echo "Invitation verified and marked as used.";
-
+                        $response['message'] = "Invitation verified and marked as used.";
                     } else {
-                        echo "Error updating invitation: " . mysqli_error($connection);
+                        $response['status'] = 'error';
+                        $response['message'] = "Error updating invitation: " . mysqli_error($connection);
                     }
-
                 } else {
-                    echo "Error inserting project user: " . mysqli_error($connection);
+                    $response['status'] = 'error';
+                    $response['message'] = "Error inserting project user: " . mysqli_error($connection);
                 }
             }
         } else {
-            echo "Invalid OTP or invitation already used.";
+            $response['status'] = 'error';
+            $response['message'] = "Invalid OTP or invitation already used.";
         }
     } else {
-        echo "Invalid OTP or invitation already used.";
+        $response['status'] = 'error';
+        $response['message'] = "Invalid OTP or invitation already used.";
     }
-
 } else {
-    echo "Project ID is not defined.";
+    $response['status'] = 'error';
+    $response['message'] = "Project ID is not defined.";
 }
+
 // Close the database connection
 $connection->close();
+
+// Return the response as JSON
+header('Content-Type: application/json');
+echo json_encode($response);
 ?>

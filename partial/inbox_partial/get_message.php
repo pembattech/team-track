@@ -32,10 +32,9 @@ if (isset($_POST['message_id']) && is_numeric($_POST['message_id'])) {
         $is_project_msg = $row['is_project_msg'];
         $is_newtask_msg = $row['is_newtask_msg'];
 
-        echo $task_id;
-
         include '../../partial/utils.php';
         if (!empty($task_id)) {
+            echo "empty!";
             $projectName = getProjectNameByTaskId($task_id);
         } else {
             $projectName = get_project_data($project_id)['project_name'];

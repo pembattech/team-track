@@ -9,6 +9,12 @@ $(document).ready(function () {
 });
 
 
+// Function to validate an email address
+function isValidEmail(email) {
+    var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
 // JavaScript function to add ellipsis
 function addEllipsis(text, maxLength) {
     if (text.length > maxLength) {

@@ -91,7 +91,8 @@ button.indicate-danger {
 textarea#task_description,
 textarea#description,
 textarea#about,
-.select-style {
+.select-style,
+.invite-popup .input-style {
     background-color: var(--color-background-weak-hover-deprecated);
     border-radius: 5px;
 }
@@ -440,7 +441,6 @@ textarea::-webkit-scrollbar-track {
 .project-lst {
     font-family: inherit;
     font-size: 14px;
-    margin-bottom: 8px;
 }
 
 
@@ -615,6 +615,10 @@ th.subhead-task {
 
 .member span {
     color: var(--color-text);
+}
+
+.project-desc-textarea  textarea {
+    width: 450px;
 }
 
 .userrole-popup-container {
@@ -966,7 +970,6 @@ button#closeButton:hover {
     outline: 0;
     width: 100%;
     padding: 8px 5px;
-    background-color: var(--bg-color);
     border-radius: 5px;
 }
 

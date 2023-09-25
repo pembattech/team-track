@@ -82,7 +82,6 @@ session_start();
 
         if (isset($_GET['invite']) && isset($_GET['verify'])) {
 
-
             if ($_GET['verify'] == 'false' && !$userAssociated && $userAssociated == 0 && $_GET['invite'] == 'true') { ?>
                 <script>
                     $(document).ready(function () {
@@ -100,6 +99,7 @@ session_start();
         // Query to fetch project details from the 'Projects' table
         $sql_project = "SELECT * FROM Projects WHERE project_id = $project_id";
         $result_project = mysqli_query($connection, $sql_project);
+        $project = mysqli_fetch_assoc($result_project);
 
         // Query to fetch project owner's details from the 'Users' table
         $sql_owner = "SELECT Users.*, ProjectUsers.is_projectowner, ProjectUsers.user_role FROM Users INNER JOIN ProjectUsers ON Users.user_id = ProjectUsers.user_id WHERE ProjectUsers.project_id = $project_id AND ProjectUsers.is_projectowner = 1";
@@ -144,17 +144,13 @@ session_start();
         echo "Project not found.";
     }
     ?>
-
     <div class='main-content'>
         <div class='heading-content sticky-heading'>
             <div class='heading-style'>
                 <div class='project-link project-wrapper project_menu_toggle'>
                     <?php
-                    if (mysqli_num_rows($result_project) > 0) {
-                        $project = mysqli_fetch_assoc($result_project);
-                        echo '<div class="square project-wrapper" style="background-color:' . $project['background_color'] . '"></div>';
-                        echo "<p class='project-name'>" . capitalizeEachWord($project['project_name']) . "</p>";
-                    }
+                    echo '<div class="square project-wrapper" style="background-color:' . $project['background_color'] . '"></div>';
+                    echo "<p class='project-name'>" . capitalizeEachWord($project['project_name']) . "</p>";
                     ?>
                     <div class="project-dropdown">
                         <div class="svg-img">
@@ -177,16 +173,16 @@ session_start();
             <div id="otpPopup" class="otp-popup" style="display:none;">
                 <div id="otpPopupContent" class="otp-popup-content">
                     <p class="heading-style">OTP Verification '
-                        <?php echo $project['project_name'] ?>'
+                        <?php echo $project['project_name']; ?>'
                     </p>
                     <div class="bottom-line"></div>
                     <div class="div-space-top"></div>
                     <form id="otpForm">
                         <input type="text" class="input-style" id="otpInput" name="otpInput" placeholder="Enter OTP">
-
-                        <button type="button" class="button-style" id="verifyOtpButton">Verify OTP</button>
+                        <div class="div-space-top"></div>
+                        <p id="otpStatus" class="indicate-danger" style="font-size: 14px;"></p>
+                        <button type="submit" class="button-style" id="verifyOtpButton">Verify OTP</button>
                     </form>
-                    <p id="otpStatus"></p>
                 </div>
             </div>
             <div class="tab-btns">
@@ -269,8 +265,6 @@ session_start();
                                                 <input type="hidden" name="user_id" value="">
                                                 <input type="text" name="user-role" class="input-style"
                                                     id="userRoleInput" placeholder="Enter role">
-                                                <!-- <button type="submit" name="update_userrole" class="button-style"
-                                                    id="updateRoleButton">Update</button> -->
                                             </div>
                                         </form>
                                     <li>
@@ -293,11 +287,11 @@ session_start();
                                 </p>
                                 <div class="bottom-line"></div>
                                 <div class="div-space-top"></div>
-                                <form id="invite-form">
+                                <form id="invite-form" novalidate>
 
                                     <p>Invite with email</p>
                                     <input type="email" class="input-style" id="email" name="email"
-                                        placeholder="Add members by email...">
+                                        placeholder="Add members by email.">
                                     <p id="email-exists-message" class="indicate-danger"></p>
 
                                     <div class="form-group">
@@ -612,6 +606,9 @@ session_start();
 <script>
     function addmember_popup_toggle() {
         const popup = document.getElementById('invite-popup');
+        $("#email").val(""); // Clear the email input field
+        $("#message").val(""); // Clear the message textarea
+        $("#email-exists-message").text(""); // Clear the error message
         popup.style.display = (popup.style.display === 'block') ? 'none' : 'block';
     }
 </script>
@@ -754,9 +751,6 @@ session_start();
                     $('#taskPopup').addClass('active');
                     // Fetch task details and populate the edit form
                     fetchTaskDetails(taskId);
-
-                    // // Call the function to initialize the date range picker
-                    // initializeDateRangePicker('#editStartDate', '#editEndDate');
 
                 } else if (taskName === '') {
                     $('#taskPopup').removeClass('active');
@@ -1413,7 +1407,10 @@ session_start();
 
             const userId = username.getAttribute('data-user-id');
             const project_owner_value = <?php echo $project_owner['user_id']; ?>;
-            if (project_owner_value != userId) {
+            const loggedIn_user = <?php echo $user_id; ?>;
+            console.log(project_owner_value);
+            console.log(userId);
+            if (project_owner_value != userId && project_owner_value == loggedIn_user) {
                 console.log(project_owner_value != userId);
 
                 // Make an AJAX request to check if the user is a project owner
@@ -1485,54 +1482,49 @@ session_start();
     }
 
     // Add an event listener to the form submission
-    document.getElementById('userRoleForm').addEventListener('submit', function (event) {
+    $(document).on('submit', '#userRoleForm', function (event) {
         event.preventDefault();
 
-        // console.log("test1");
+        const userRoleInput = $('#userRoleInput');
+        const newRole = userRoleInput.val().trim(); // Trim whitespace
 
-        const userRoleInput = document.getElementById('userRoleInput');
-        // console.log(userRoleInput);
-        const newRole = userRoleInput.value.trim(); // Trim whitespace
-
-        const errorMessage = document.getElementById('error-message'); // Get the error message element
-        console.log(errorMessage);
+        const errorMessage = $('#error-message');
 
         // Reset error message if there are no errors
-        errorMessage.textContent = '';
-
+        errorMessage.text('');
 
         if (newRole === '') {
-            errorMessage.textContent = 'Please enter a valid role.'; // Display error message
+            errorMessage.text('Please enter a valid role.'); // Display error message
             return;
         }
 
-        const userId = document.querySelector('.username.active').getAttribute('data-user-id'); // Assuming you have a class 'active' for the selected member
-        const projectId = document.querySelector('.member').getAttribute('data-project-id'); // Get the project ID from the clicked member
+        const userId = $('.username.active').attr('data-user-id');
+        const projectId = $('.member').attr('data-project-id');
 
-        errorMessage.textContent = '';
         // Make an AJAX request to update the user role
-        fetch('partial/project_partial/update_userrole.php', {
-            method: 'POST',
-            body: new URLSearchParams({ project_id: projectId, user_id: userId, new_role: newRole }),
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            }
-        })
-            .then(response => response.text())
-            .then(result => {
-                console.log(result.status);
-                if (result.status == 'success') {
-                    console.log(result.message);
+        $.ajax({
+            type: 'POST',
+            url: 'partial/project_partial/update_userrole.php',
+            data: { project_id: projectId, user_id: userId, new_role: newRole },
+            dataType: 'json',
+            success: function (result) {
+                if (result.status === 'success') {
                     displayPopupMessage(result.message, 'success');
+                    // Update the user role displayed on the page if needed
+                    $('.username.active').siblings('.user-role').text(newRole);
                 } else if (result.status === 'error') {
                     displayPopupMessage(result.message, 'error');
                 }
-            })
-            .catch(error => {
+
+                closePopup();
+
+            },
+            error: function () {
                 console.log('An error occurred while updating user role.');
-            });
-        location.reload(); // Reload the page after successful update
+            }
+        });
     });
+
 
 </script>
 
@@ -1628,22 +1620,28 @@ session_start();
 
             var email = emailInput.val();
             var message = $("#message").val();
+            var emailExistsMessage = $("#email-exists-message");
 
-            console.log(email);
-            console.log(message);
 
-            // Frontend validation
-            if (email === "") {
-                console.log("Please enter an email address.");
-                return;
+            // Get the entered email value
+            var enteredEmail = emailInput.val().trim();
+
+            // Check if the entered email is valid
+            if (!isValidEmail(enteredEmail)) {
+                event.preventDefault(); // Prevent form submission
+                emailExistsMessage.text("Please enter a valid email address.");
+                emailInput.focus(); // Focus on the email input field
+            } else {
+                // Clear any previous error message
+                emailExistsMessage.text("");
+
+                // Proceed with inviting the user to the project
+                inviteUserToProject(email, message);
+
+                // Clear input fields after successful submission
+                $("#email").val("");
+                $("#message").val("");
             }
-
-            // Proceed with inviting the user to the project
-            inviteUserToProject(email, message);
-
-            // Clear input fields after successful submission
-            $("#email").val("");
-            $("#message").val("");
         });
 
         function inviteUserToProject(email, message) {
@@ -1681,23 +1679,62 @@ session_start();
     }
 
     $(document).ready(function () {
-        $("#verifyOtpButton").click(function () {
+        $("#otpForm").submit(function (event) {
+            event.preventDefault(); // Prevent the default form submission
             var enteredOtp = $("#otpInput").val();
+
+            // Validate OTP length
+            if (enteredOtp.length !== 6) {
+                $("#otpStatus").html("OTP must be 6 characters long.");
+                return; // Exit the function if OTP length is invalid
+            }
+
+            // Validate OTP to contain only numbers
+            var otpPattern = /^\d+$/; // Regular expression to match only digits
+            if (!otpPattern.test(enteredOtp)) {
+                $("#otpStatus").html("OTP must contain only numbers.");
+                return; // Exit the function if OTP contains non-numeric characters
+            }
 
             $.ajax({
                 type: "POST",
                 url: "partial/verify_addmember_otp.php",
-                data: { otp: enteredOtp, project_id: "<?php echo $project_id ?>", },
+                data: { otp: enteredOtp, project_id: "<?php echo $project_id ?>" },
+                dataType: 'json',
                 success: function (response) {
-                    $("#otpStatus").html(response);
+                    console.log(response); // Debugging line
+                    if (response.status == 'success') {
+                        closeOtpPopup();
+
+                        location.reload();
+
+                        // displayPopupMessage(response.message, 'success');
+
+                    } else if (response.status == 'error') {
+                        $("#otpStatus").text(response.message);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error(xhr.responseText); // Log any error response
                 }
             });
 
-            closeOtpPopup()
-            // location.reload();
+        });
 
+        // Add input event listener to validate OTP length as the user types
+        $("#otpInput").on('input', function () {
+            var enteredOtp = $(this).val();
+
+            // Clear previous error message
+            $("#otpStatus").html("");
+
+            // Validate OTP length
+            if (enteredOtp.length !== 6) {
+                $("#otpStatus").html("OTP must be 6 characters long.");
+            }
         });
     });
+
 </script>
 <script>
     const task_description = document.getElementById('task_description');

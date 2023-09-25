@@ -1,5 +1,6 @@
 <?php
 require_once '../../config/connect.php';
+include '../utils.php';
 
 // Display all errors
 error_reporting(E_ALL);
@@ -10,6 +11,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $projectId = $_POST['project_id'];
     $newRole = $_POST['new_role'];
 
+    $projectName = get_project_data($projectId)["project_name"];
+
     function isValidRole($role)
     {
         // Check if the role is not a number and doesn't start with a number or special character
@@ -19,55 +22,75 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!isValidRole($newRole)) {
         header('Content-Type: application/json');
         echo json_encode(array('status' => 'error', 'message' => 'Invalid user role format.'));
-
         return;
     } else {
+        $sql_fetch_userrole = "SELECT user_role FROM ProjectUsers WHERE project_id = ? AND user_id = ?";
+        $stmt = mysqli_prepare($connection, $sql_fetch_userrole);
 
+        if ($stmt) {
+            // Bind parameters to the statement
+            mysqli_stmt_bind_param($stmt, "ii", $projectId, $userId);
 
-        $sql_fetch_userrole = "SELECT user_role FROM ProjectUsers WHERE project_id = $projectId AND user_id = $userId";
+            // Execute the statement
+            mysqli_stmt_execute($stmt);
 
-        // Query the project name
-        $sql_fetch_projectname = "SELECT project_name FROM Projects WHERE project_id = $projectId";
-        $projectNameResult = mysqli_query($connection, $sql_fetch_projectname);
-        $projectNameRow = mysqli_fetch_assoc($projectNameResult);
-        $projectName = $projectNameRow['project_name'];
+            // Get the result
+            mysqli_stmt_bind_result($stmt, $old_userRole);
+            mysqli_stmt_fetch($stmt);
+            mysqli_stmt_close($stmt);
 
-        $result_old_userrole = mysqli_query($connection, $sql_fetch_userrole);
+            $sql_update_userrole = "UPDATE ProjectUsers SET user_role = ? WHERE project_id = ? AND user_id = ?";
+            $stmt = mysqli_prepare($connection, $sql_update_userrole);
 
-        if ($result_old_userrole) {
-            $row = mysqli_fetch_assoc($result_old_userrole);
-            $old_userRole = $row['user_role'];
+            if ($stmt) {
+                // Bind parameters to the statement
+                mysqli_stmt_bind_param($stmt, "sii", $newRole, $projectId, $userId);
 
-            $sql_update_userrole = "UPDATE ProjectUsers SET user_role = '$newRole' WHERE project_id = $projectId AND user_id = $userId";
-            $result = mysqli_query($connection, $sql_update_userrole);
+                // Execute the statement
+                if (mysqli_stmt_execute($stmt)) {
+                    // Construct the message text with htmlspecialchars to handle quotes and special characters
+                    $message_text = 'There has been an update to your role within the "' . htmlspecialchars($projectName, ENT_QUOTES) . '" project.';
 
-            if ($result) {
+                    if (!empty($old_userRole)) {
+                        $message_text .= ' Previously, you held the role of "' . htmlspecialchars($old_userRole, ENT_QUOTES) . '",';
+                    }
 
-                // Construct the message text
-                $message_text = 'There has been an update to your role within the "' . $projectName . '" project.';
+                    $message_text .= ' and now you have been assigned the role of "' . htmlspecialchars($newRole, ENT_QUOTES) . '".';
 
-                if (!empty($old_userRole)) {
-                    $message_text .= ' Previously, you held the role of "' . $old_userRole . '",';
+                    $is_project_msg_value = '1';
+
+                    $insert_message_query = "INSERT INTO Messages (recipient_id, text, project_id, is_project_msg) VALUES (?, ?, ?, ?)";
+                    $stmt = mysqli_prepare($connection, $insert_message_query);
+
+                    if ($stmt) {
+                        // Bind parameters to the statement
+                        mysqli_stmt_bind_param($stmt, "issi", $userId, $message_text, $projectId, $is_project_msg_value);
+
+                        // Execute the statement
+                        if (mysqli_stmt_execute($stmt)) {
+                            header('Content-Type: application/json');
+                            echo json_encode(array('status' => 'success', 'message' => 'User role updated successfully.'));
+                        } else {
+                            header('Content-Type: application/json');
+                            echo json_encode(array('status' => 'error', 'message' => 'Error inserting message.'));
+                        }
+                    } else {
+                        header('Content-Type: application/json');
+                        echo json_encode(array('status' => 'error', 'message' => 'Error preparing message insertion query.'));
+                    }
+                } else {
+                    header('Content-Type: application/json');
+                    echo json_encode(array('status' => 'error', 'message' => 'Error updating user role.'));
                 }
 
-                $message_text .= ' and now you have been assigned the role of "' . $newRole . '".';
-
-                $insert_message_query = "INSERT INTO Messages (recipient_id, text) VALUES ('$userId', '$message_text')";
-
-                // Execute the query to insert the message into the database
-                if (mysqli_query($connection, $insert_message_query)) {
-                    echo '';
-                }
-
-                header('Content-Type: application/json');
-                echo json_encode(array('status' => 'success', 'message' => 'User role updated successfully.'));
-
+                mysqli_stmt_close($stmt);
             } else {
-                echo 'Error'; // Return 'Error' if update fails
                 header('Content-Type: application/json');
-                echo json_encode(array('status' => 'error', 'message' => 'Error updating user role.'));
-
+                echo json_encode(array('status' => 'error', 'message' => 'Error preparing user role update query.'));
             }
+        } else {
+            header('Content-Type: application/json');
+            echo json_encode(array('status' => 'error', 'message' => 'Error preparing user role fetch query.'));
         }
     }
 }

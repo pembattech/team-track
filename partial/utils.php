@@ -96,7 +96,6 @@ function sendNotificationMessage_project_msg($recipientId, $messageText, $projec
     $project_id = intval($project_id); // Assuming project_id is an integer
 
     $insert_message_query = "INSERT INTO Messages (recipient_id, text, project_id, is_project_msg) VALUES ($recipientId, '$messageText', $project_id, 1)";
-    echo $insert_message_query;
 
     if ($connection->query($insert_message_query)) {
         return true;
