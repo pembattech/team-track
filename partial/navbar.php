@@ -66,8 +66,7 @@
             if ($profile_picture !== null && $profile_picture !== "") {
                 // Display the profile picture if it exists
                 echo '<img class="profpic" id="popup-btn" src="' . $profile_picture . '" alt="Profile Picture">';
-                // echo '<div class="profile-picture" id="popup-btn>';
-                // echo '</div>';
+                
             } else {
                 // Display the initials of the full name as the profile picture
                 $name_parts = explode(' ', $full_name);

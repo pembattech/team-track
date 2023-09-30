@@ -207,6 +207,9 @@
                             <p>
                                 <?php if (get_user_data($user_id)['about'] !== null && get_user_data($user_id)['about'] !== "") {
                                     echo get_user_data($user_id)['about'];
+                                } else {
+                                    ?> <span style="color: var(--color-text-weak);">No about yet!</span>
+                                    <?php
                                 }
                                 ?>
                             </p>
@@ -630,15 +633,16 @@
             dataType: 'json',
             success: function (response) {
                 if (response.status === "success") {
-                    // Handle success, e.g., display a success message
-                    console.log(response);
-
                     // Update the displayed profile picture using jQuery
-                    $(".profpic").attr("src", response.newProfilePicture); // Assuming "newProfilePicture" contains the updated URL
+                    $(".profpic").attr("src", response.newProfilePicture);
+
+                    // Close the edit profile popup
+                    editprofile_popup_toggle();
 
                 } else if (response.status === "error") {
                     // Handle error, e.g., display an error message
                     console.error(response.message);
+                    
                     document.getElementById("profilepic-error").textContent = response.message;
                 }
             },
@@ -684,10 +688,15 @@
                     $('#about').val(aboutText);
 
                     // Update the content in the <p> element
-                    $('.about-section .about p').text(aboutText);
+                    if (aboutText.length === 0) {
+                        $('.about-section .about p').html('<span style="color: var(--color-text-weak);">No about yet!</span>');
+                    } else {
+                        $('.about-section .about p').text(aboutText);
+                    }
 
-                    // Close the edit profile popup (if needed)
-                    editprofile_popup_toggle(); // You may need to adjust this function name
+                    // Close the edit profile popup
+                    editprofile_popup_toggle();
+
                     // Display a success message or perform other actions as needed
                     console.log('About section updated successfully.');
 
