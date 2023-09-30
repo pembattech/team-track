@@ -65,7 +65,7 @@
 
             if ($profile_picture !== null && $profile_picture !== "") {
                 // Display the profile picture if it exists
-                echo '<img id="popup-btn" src="' . $profile_picture . '" alt="Profile Picture">';
+                echo '<img class="profpic" id="popup-btn" src="' . $profile_picture . '" alt="Profile Picture">';
                 // echo '<div class="profile-picture" id="popup-btn>';
                 // echo '</div>';
             } else {
@@ -75,7 +75,7 @@
                 foreach ($name_parts as $part) {
                     $initials .= strtoupper(substr($part, 0, 1));
                 }
-                echo '<button id="popup-btn" style="color: black; background-color: ' . $user_data['background_color'] . ';">' . $initials . '</button>';
+                echo '<button class="profpic" id="popup-btn" style="color: black; background-color: ' . $user_data['background_color'] . ';">' . $initials . '</button>';
             }
         }
         ?>

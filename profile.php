@@ -68,7 +68,8 @@
                     </div>
                     <div class="bottom-line"></div>
                     <div class="div-space-top"></div>
-                    <form action="partial/update_profile.php" method="post" enctype="multipart/form-data">
+                    <form id="updateProfileForm" enctype="multipart/form-data">
+                        <!-- <form action="partial/update_profile.php" method="post" enctype="multipart/form-data"> -->
 
                         <div class="form-group">
                             <div class="profile-picture">
@@ -125,9 +126,12 @@
                                 <div class="div-space-top"></div>
                                 <div class="profile-picture-options">
                                     <div class="update-profile-picture">
-                                        <label class="change-pic-lbl" for="file">Change Profile Picture</label>
-                                        <input class="d-none" id="file" name="new-profilepic" type="file"
+                                        <label class="change-pic-lbl" for="new-profilepic">Change Profile
+                                            Picture</label>
+
+                                        <input class="d-none" id="new-profilepic" name="new-profilepic" type="file"
                                             onchange="loadImgFile(event)" />
+                                        <span id="profilepic-error" class="error-message"></span>
                                     </div>
                                     <div class="remove-profile-picture">
                                         <button type="button" class="button-style-w-danger indicate-danger"
@@ -147,7 +151,6 @@
                                 ?></textarea>
                             <span id="charCount">0 / 255 characters used</span>
                         </div>
-                        <button type="submit" name="submit" class="button-style">Submit</button>
                     </form>
                 </div>
             </div>
@@ -349,7 +352,6 @@
             </div>
         </div>
     </div>
-</div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -562,6 +564,9 @@
 </script>
 <script>
     function loadImgFile(event) {
+
+        validateProfilePicture()
+
         const imgPreview = document.getElementById("prof-pic");
         const fileInput = event.target;
 
@@ -577,30 +582,141 @@
     }
 </script>
 <script>
-    function removeProfilePicture() {
-        const confirmation = confirm("Are you sure you want to remove your profile picture?");
+    function validateProfilePicture() {
+        const fileInput = document.getElementById("new-profilepic");
+        const errorSpan = document.getElementById("profilepic-error");
 
-        if (confirmation) {
-            fetch('partial/profile_partial/remove_profile_picture.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ user_id: <?php echo $user_id; ?> }),
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status == 'success') {
-                        console.log(data.message);
-                        displayPopupMessage(data.message, 'success');
-                        location.reload();
-                    } else if (data.status === 'error') {
-                        displayPopupMessage(data.message, 'error');
-                    }
-                })
-                .catch(error => console.error('Error removing profile picture:', error));
+        // Check if a file is selected
+        if (!fileInput.files || fileInput.files.length === 0) {
+            errorSpan.textContent = "Please select a profile picture.";
+            return false;
         }
+
+        const allowedExtensions = ["jpg", "jpeg", "png", "gif"];
+        const maxFileSize = 5 * 1024 * 1024; // 5MB in bytes
+
+        const selectedFile = fileInput.files[0];
+        const fileName = selectedFile.name;
+        const fileExtension = fileName.split(".").pop().toLowerCase();
+
+        // Check file extension
+        if (!allowedExtensions.includes(fileExtension)) {
+            errorSpan.textContent = "Invalid file format. Please use jpg, jpeg, png, or gif.";
+            return false;
+        }
+
+        // Check file size
+        if (selectedFile.size > maxFileSize) {
+            errorSpan.textContent = "File size exceeds the maximum allowed (5MB).";
+            return false;
+        }
+
+        // Clear any previous error messages
+        errorSpan.textContent = "";
+
+        // Upload profile picture using AJAX
+        uploadProfilePicture(selectedFile);
+
+        // Prevent the form from submitting synchronously
+        return false;
     }
+
+    function uploadProfilePicture(file) {
+        const formData = new FormData();
+        formData.append("new-profilepic", file);
+
+        $.ajax({
+            url: "partial/upload_profile_picture.php",
+            type: "POST",
+            data: formData,
+            contentType: false,
+            processData: false,
+            dataType: 'json',
+            success: function (response) {
+                if (response.status === "success") {
+                    // Handle success, e.g., display a success message
+                    console.log(response);
+
+                    // Update the displayed profile picture using jQuery
+                    $(".profpic").attr("src", response.newProfilePicture); // Assuming "newProfilePicture" contains the updated URL
+
+                } else if (response.status === "error") {
+                    // Handle error, e.g., display an error message
+                    console.error(response.message);
+                    document.getElementById("profilepic-error").textContent = response.message;
+                }
+            },
+            error: function (xhr, status, error) {
+                // Handle AJAX error
+                console.error("AJAX Error:", error);
+            }
+        });
+    }
+
+    function removeProfilePicture() {
+        fetch('partial/profile_partial/remove_profile_picture.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ user_id: <?php echo $user_id; ?> }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status == 'success') {
+                    console.log(data.message);
+                    displayPopupMessage(data.message, 'success');
+                    location.reload();
+                } else if (data.status === 'error') {
+                    displayPopupMessage(data.message, 'error');
+                }
+            })
+            .catch(error => console.error('Error removing profile picture:', error));
+    }
+</script>
+<script>
+    // Function to update the "About" section via AJAX
+    function updateAbout(aboutText) {
+        $.ajax({
+            url: 'partial/update_profile.php',
+            type: 'POST',
+            data: { about: aboutText },
+            dataType: 'json',
+            success: function (response) {
+                if (response.status === 'success') {
+                    // Update the "About" section on the page
+                    $('#about').val(aboutText);
+
+                    // Update the content in the <p> element
+                    $('.about-section .about p').text(aboutText);
+
+                    // Close the edit profile popup (if needed)
+                    editprofile_popup_toggle(); // You may need to adjust this function name
+                    // Display a success message or perform other actions as needed
+                    console.log('About section updated successfully.');
+
+                    displayPopupMessage(response.message, 'success');
+                } else if (response.status === 'error') {
+                    // Handle errors or display error messages
+                    console.error('Error updating the About section.');
+                    displayPopupMessage(response.message, 'error');
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                // Handle AJAX errors
+                console.error('AJAX request failed:', textStatus, errorThrown);
+            }
+        });
+    }
+
+    // Listen for a change event on the "About" textarea
+    $('#about').on('change', function () {
+        // Get the updated "About" text
+        var updatedAboutText = $(this).val();
+        // Update the "About" section via AJAX
+        updateAbout(updatedAboutText);
+    });
+
 </script>
 <script>
     const textArea = document.getElementById('about');

@@ -6,8 +6,11 @@ ini_set('display_errors', 1);
 
 
 <?php
-// Include your database connection here
+
 require_once '../../config/connect.php';
+
+// Start the session to access session data
+session_start();
 
 // Get the user ID from the AJAX request
 $user_id = $_SESSION['user_id'];
