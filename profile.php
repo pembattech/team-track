@@ -69,8 +69,6 @@
                     <div class="bottom-line"></div>
                     <div class="div-space-top"></div>
                     <form id="updateProfileForm" enctype="multipart/form-data">
-                        <!-- <form action="partial/update_profile.php" method="post" enctype="multipart/form-data"> -->
-
                         <div class="form-group">
                             <div class="profile-picture">
                                 <?php
@@ -117,9 +115,7 @@
 
                                     // Display the SVG image using data URI
                                     echo '<img id="prof-pic" src="data:image/svg+xml;charset=utf-8,' . htmlspecialchars($svgImage) . '" />';
-
                                 }
-
                                 ?>
 
 
