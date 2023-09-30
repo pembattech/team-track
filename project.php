@@ -66,6 +66,34 @@ session_start();
     .svg-img:hover+.projectdropdown-popup {
         display: block;
     }
+
+    .project-desc_and_project-activities {
+        display: flex;
+        gap: 10px;
+    }
+
+    .recent-activities #activity-list {
+        background-color: var(--color-background-weak-hover-deprecated);
+        padding: 0 22px;
+        font-size: 15px;
+        border-radius: 5px;
+        border: 1px solid var(--color-border);
+        height: 191px;
+        overflow-y: auto;
+    }
+
+    .recent-activities #activity-list::-webkit-scrollbar {
+        width: 5px;
+    }
+
+
+    .recent-activities #activity-list li {
+        list-style-type: disc;
+    }
+
+    .recent-activities #activity-list .recentactivity_dt {
+        font-size: 14px;
+    }
 </style>
 <title>Project - TeamTrack</title>
 <div class="container project-wrapper">
@@ -95,7 +123,6 @@ session_start();
             echo '<h1 class="warning-style">Project not located or access is restricted.</h1>';
             exit();
         }
-
         // Query to fetch project details from the 'Projects' table
         $sql_project = "SELECT * FROM Projects WHERE project_id = $project_id";
         $result_project = mysqli_query($connection, $sql_project);
@@ -199,20 +226,34 @@ session_start();
 
         <div class="tab-content div-space-top active" id="tab1">
             <div class="overview-section">
-                <div class="heading-style">
-                    <p>Project description</p>
-                </div>
+                <div class="project-desc_and_project-activities">
+                    <div class="project-desc">
+                        <div class="heading-style">
+                            <p>Project description</p>
+                        </div>
 
-                <div class="project-desc-textarea textarea-style">
-                    <textarea name="" id="" cols="50" rows="6" placeholder="What's this project about?"><?php
-                    // Check if the description is not null and not an empty string before echoing
-                    if ($project['description'] !== null && $project['description'] !== "") {
-                        echo $project['description'];
-                    }
-                    ?></textarea>
-                    <div class="div-space-top"></div>
 
+                        <div class="project-desc-textarea textarea-style">
+                            <textarea name="" id="" cols="50" rows="6" placeholder="What's this project about?"><?php
+                            // Check if the description is not null and not an empty string before echoing
+                            if ($project['description'] !== null && $project['description'] !== "") {
+                                echo $project['description'];
+                            }
+                            ?></textarea>
+                        </div>
+                    </div>
+                    <div class="recent-activities">
+                        <div class="heading-style">
+                            <p>Recent Activities</p>
+                        </div>
+                        <ul id="activity-list">
+                            <!-- Recent activities will be displayed here -->
+                        </ul>
+                    </div>
                 </div>
+                <div class="div-space-top"></div>
+
+
                 <div class="project-role-container">
                     <div class="heading-style">
                         <p>Project roles</p>
@@ -664,7 +705,8 @@ session_start();
                     data: {
                         projectowner_id: <?php echo $project_owner['user_id']; ?>,
                         task_id: taskId,
-                        section: sectionId
+                        section: sectionId,
+                        project_id: <?php echo $project_id; ?>
                     },
                     success: function (response) {
 
@@ -885,7 +927,8 @@ session_start();
                 method: 'POST',
                 data: {
                     projectowner_id: <?php echo $project_owner['user_id']; ?>,
-                    task_id: taskId
+                    task_id: taskId,
+                    project_id: <?php echo $project_id; ?>
                 },
                 success: function (response) {
                     // Handle the response if needed
@@ -914,6 +957,10 @@ session_start();
 
     // Function to fetch tasks from the server using AJAX
     function fetchTasks() {
+        // Updating the list of recent activity in the overview section of the project page.
+        fetchRecentActivities();
+
+
         // Get the project_id from the URL
         const project_id = <?php echo isset($_GET['project_id']) ? $_GET['project_id'] : 'null'; ?>;
         if (project_id === null) {
@@ -1051,8 +1098,8 @@ session_start();
                 task_id: selectedTasks,
                 projectowner_id: <?php echo $project_owner['user_id']; ?>
             },
+            dataType: 'json',
             success: function (response) {
-
                 // Clear the selected tasks array
                 selectedTasks.length = 0;
 
@@ -1349,7 +1396,7 @@ session_start();
             method: "POST",
             url: "partial/addtask.php",
             data: {
-                project_id: <?php echo $project_id ?>,
+                project_id: <?php echo $project_id; ?>,
                 taskname: taskname,
                 task_description: taskdescription
             },
@@ -1518,6 +1565,10 @@ session_start();
 
                 closePopup();
 
+                // Updating the list of recent activity in the overview section of the project page.
+                fetchRecentActivities();
+
+
             },
             error: function () {
                 console.log('An error occurred while updating user role.');
@@ -1549,6 +1600,10 @@ session_start();
                 } else {
                     console.log('Error removing user.');
                 }
+
+                // Updating the list of recent activity in the overview section of the project page.
+                fetchRecentActivities();
+
             })
             .catch(error => {
                 console.log('An error occurred while removing user.');
@@ -1764,5 +1819,40 @@ session_start();
         $(".projectdropdown-popup").click(function (event) {
             event.stopPropagation();
         });
+    });
+</script>
+<script>
+    // Function to fetch recent activities using AJAX
+    function fetchRecentActivities() {
+        console.log('fetch!');
+        $.ajax({
+            type: 'POST',
+            url: 'partial/project_partial/get_recent_activities.php',
+            data: {project_id: <?php echo $project_id; ?>},
+            dataType: 'json',
+            success: function (response) {
+                console.log(response);
+                // Process and display the data
+                const activityList = $('#activity-list');
+                activityList.empty(); // Clear previous activities
+
+                $.each(response, function (_, activity) {
+                    // Create a new list item with date and time
+                    const listItem = $('<li>');
+                    const dateTime = new Date(activity.datetime);
+                    listItem.html(`${activity.activity_type}: ${activity.activity_description}<br><p class="recentactivity_dt">${dateTime.toLocaleString()}</p>`);
+
+                    activityList.append(listItem);
+                });
+            },
+            error: function (xhr, status, error) {
+                console.error('Error fetching recent activities:', error);
+            }
+        });
+    }
+
+    // Call the function to fetch and display recent activities when the page loads
+    $(document).ready(function () {
+        fetchRecentActivities();
     });
 </script>

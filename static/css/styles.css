@@ -618,6 +618,7 @@ th.subhead-task {
 }
 
 .project-desc-textarea  textarea {
+    border: 1px solid var(--color-border);
     width: 450px;
 }
 

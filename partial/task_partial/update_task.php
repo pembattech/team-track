@@ -4,24 +4,10 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 require_once '../../config/connect.php';
+include '../utils.php';
 
 // Start the session to access session data
 session_start();
-
-function getUserName($user_id)
-{
-    global $connection;
-
-    $sql = "SELECT name FROM Users WHERE user_id = $user_id";
-    $result = $connection->query($sql);
-
-    if ($result && $result->num_rows > 0) {
-        $row = $result->fetch_assoc();
-        return $row['name'];
-    } else {
-        return "Team member"; // Default if user not found
-    }
-}
 
 // Check if the form data has been submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {

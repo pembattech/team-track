@@ -80,3 +80,17 @@ CREATE TABLE IF NOT EXISTS ProjectInvitations (
     FOREIGN KEY (invitation_sender) REFERENCES Users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (project_id) REFERENCES Projects(project_id) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS RecentActivity (
+    activity_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    activity_type VARCHAR(255),
+    activity_description TEXT,
+    activity_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    project_id INT,
+    task_id INT,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (project_id) REFERENCES Projects(project_id) ON DELETE CASCADE,
+    FOREIGN KEY (task_id) REFERENCES Tasks(task_id) ON DELETE CASCADE
+);
+

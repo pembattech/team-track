@@ -1,21 +1,9 @@
 <?php
-// Start the session to access user data
-session_start();
-
-// Function to sanitize user inputs
-function sanitize_input($input)
-{
-    global $connection;
-    return mysqli_real_escape_string($connection, $input);
-}
 
 // Function to get user data from the database
 function get_user_data($user_id)
 {
     global $connection;
-
-    $user_id = sanitize_input($user_id);
-
     $sql = "SELECT * FROM Users WHERE user_id = '$user_id'";
     $result = mysqli_query($connection, $sql);
 
@@ -54,7 +42,6 @@ function get_project_data($project_id)
 {
     global $connection;
 
-    $project_id = sanitize_input($project_id);
 
     $sql = "SELECT * FROM Projects WHERE project_id = '$project_id'";
     $result = mysqli_query($connection, $sql);
@@ -71,9 +58,6 @@ function get_project_data($project_id)
 function getUserName($user_id)
 {
     global $connection;
-
-    $user_id = sanitize_input($user_id);
-
 
     $sql = "SELECT name FROM Users WHERE user_id = $user_id";
     $result = $connection->query($sql);
@@ -173,5 +157,61 @@ function countTasksBySectionAndProject($section, $projectId)
 
     return $taskCount;
 }
+
+function getTaskInfo($task_id)
+{
+    global $connection;
+
+    // Define an array to store the task information
+    $taskInfo = array();
+
+    // Prepare a SQL statement to select the task information
+    $select_task_query = "SELECT * FROM Tasks WHERE task_id = ?";
+    $select_task_stmt = $connection->prepare($select_task_query);
+
+    if ($select_task_stmt) {
+        $select_task_stmt->bind_param("i", $task_id);
+        $select_task_stmt->execute();
+
+        // Get the result set
+        $result = $select_task_stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            // Fetch the task information as an associative array
+            $taskInfo = $result->fetch_assoc();
+        }
+
+        $select_task_stmt->close();
+    } else {
+        // Handle the error if the statement preparation fails
+        die("Error preparing select task statement: " . $connection->error);
+    }
+
+    return $taskInfo;
+}
+
+// Function to add recent activity
+function addRecentActivity($user_id, $activity_type, $activity_description, $project_id, $task_id)
+{
+    global $connection;
+
+    $sql = "INSERT INTO RecentActivity (user_id, activity_type, activity_description, project_id, task_id) VALUES (?, ?, ?, ?, ?)";
+    $stmt = $connection->prepare($sql);
+
+    if ($stmt) {
+        $stmt->bind_param("issii", $user_id, $activity_type, $activity_description, $project_id, $task_id);
+
+        if ($stmt->execute()) {
+            return true; // Success
+        } else {
+            return false; // Error executing the query
+        }
+    } else {
+        return false; // Error preparing the query
+    }
+}
+
+
+
 
 ?>

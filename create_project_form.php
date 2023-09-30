@@ -216,7 +216,6 @@
 
                 // Serialize the form data
                 var formData = $(this).serialize();
-                console.log(formData);
 
                 // Send AJAX request
                 $.ajax({

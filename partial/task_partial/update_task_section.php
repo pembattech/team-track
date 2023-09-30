@@ -6,13 +6,16 @@ ini_set('display_errors', 1);
 
 <?php
 require_once '../../config/connect.php';
-
 include '../../partial/utils.php';
 
+
+// Start the session to access session data
+session_start();
 
 // Get the task ID and the destination section from the AJAX request
 if (isset($_POST['task_id']) && isset($_POST['section']) && isset($_POST['projectowner_id'])) {
     $taskId = $_POST['task_id'];
+    $project_id = $_POST['project_id'];
     $section = removeParenthesesWithNumber($_POST['section']);
     $projectowner_id = $_POST['projectowner_id'];
 
@@ -60,6 +63,11 @@ if (isset($_POST['task_id']) && isset($_POST['section']) && isset($_POST['projec
                 VALUES ('$taskId', '$messageText', '$projectowner_id', 1)";
 
                     if ($connection->query($insertMessageSql) === TRUE) {
+
+                        // Add recent activity for moving the task to "Done"
+                        $activity_description = "'" . getTaskInfo($taskId)['task_name'] . "' task moved to 'Done' section by user '" . getUserName($loggedInUserId) . "'";
+                        addRecentActivity($loggedInUserId, "Task Moved", $activity_description, $project_id, $taskId);
+
                         header('Content-Type: application/json');
                         echo json_encode(array('status' => 'success', 'message' => 'Task marked as Done and message sent to project owner.'));
                     } else {
@@ -91,6 +99,10 @@ if (isset($_POST['task_id']) && isset($_POST['section']) && isset($_POST['projec
                         $updateStatusSql = "UPDATE Tasks SET section='$section', status='Pending Approval' WHERE task_id='$taskId'";
 
                         if ($connection->query($updateStatusSql) === TRUE) {
+                            // Add recent activity for moving the task from "Done" to another section
+                            $activity_description = "'" . getTaskInfo($taskId)['task_name'] . "' task moved from 'Done' section to " . $section . " by user '" . getUserName($loggedInUserId) . "'";
+                            addRecentActivity($loggedInUserId, "Task Moved", $activity_description, $project_id, $taskId);
+
                             // Return a success response if the update is successful
                             header('Content-Type: application/json');
 
@@ -106,6 +118,10 @@ if (isset($_POST['task_id']) && isset($_POST['section']) && isset($_POST['projec
                         $updateSql = "UPDATE Tasks SET section='$section' WHERE task_id='$taskId'";
 
                         if ($connection->query($updateSql) === TRUE) {
+                            // Add recent activity for moving the task to a new section
+                            $activity_description = "'" . getTaskInfo($taskId)['task_name'] . "' task moved to '" . $section . "' section by user '" . getUserName($loggedInUserId) . "'";
+                            addRecentActivity($loggedInUserId, "Task Moved", $activity_description, $project_id, $taskId);
+
                             // Return a success response if the update is successful
                             header('Content-Type: application/json');
 

@@ -59,12 +59,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     $is_project_msg_value = '1';
 
-                    $insert_message_query = "INSERT INTO Messages (recipient_id, text, project_id, is_project_msg) VALUES (?, ?, ?, ?)";
-                    $stmt = mysqli_prepare($connection, $insert_message_query);
+                    // Insert a record into the RecentActivity table
+                    $activity_type = 'User Role Updated';
+                    $activity_description = 'User ' . getUserName($userId) . ' had their role updated to "' . $newRole . '" in project ' . get_project_data($projectId)['project_name'];
+                    $insert_activity_query = "INSERT INTO RecentActivity (user_id, activity_type, activity_description, project_id) VALUES (?, ?, ?, ?)";
+                    $stmt = mysqli_prepare($connection, $insert_activity_query);
 
                     if ($stmt) {
                         // Bind parameters to the statement
-                        mysqli_stmt_bind_param($stmt, "issi", $userId, $message_text, $projectId, $is_project_msg_value);
+                        mysqli_stmt_bind_param($stmt, "isss", $userId, $activity_type, $activity_description, $projectId);
 
                         // Execute the statement
                         if (mysqli_stmt_execute($stmt)) {
@@ -72,11 +75,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             echo json_encode(array('status' => 'success', 'message' => 'User role updated successfully.'));
                         } else {
                             header('Content-Type: application/json');
-                            echo json_encode(array('status' => 'error', 'message' => 'Error inserting message.'));
+                            echo json_encode(array('status' => 'error', 'message' => 'Error inserting activity.'));
                         }
                     } else {
                         header('Content-Type: application/json');
-                        echo json_encode(array('status' => 'error', 'message' => 'Error preparing message insertion query.'));
+                        echo json_encode(array('status' => 'error', 'message' => 'Error preparing activity insertion query.'));
                     }
                 } else {
                     header('Content-Type: application/json');
