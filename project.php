@@ -94,6 +94,10 @@ session_start();
     .recent-activities #activity-list .recentactivity_dt {
         font-size: 14px;
     }
+
+    .task_creator-th {
+        width: 95px;
+    }
 </style>
 <title>Project - TeamTrack</title>
 <div class="container project-wrapper">
@@ -218,8 +222,6 @@ session_start();
                 </div>
                 <div class="heading-nav between-verticle-line tab-btn" onclick="openTab(event, 'tab2')">List</div>
                 <div class="heading-nav between-verticle-line tab-btn" onclick="openTab(event, 'tab3')">Dashboard</div>
-                <div class="heading-nav between-verticle-line tab-btn" onclick="openTab(event, 'tab4')">Messages</div>
-                <div class="heading-nav between-verticle-line tab-btn" onclick="openTab(event, 'tab5')">Files</div>
             </div>
         </div>
         <div class="bottom-line"></div>
@@ -464,6 +466,8 @@ session_start();
                                                 <th id="task-th">Due Date</th>
                                                 <th id="task-th">Status</th>
                                                 <th id="task-th">Priority</th>
+                                                <th id="task-th" class="task_creator-th">Task Creator</th>
+
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -494,6 +498,9 @@ session_start();
                                                     </td>
                                                     <td>
                                                         <?php echo $task['priority']; ?>
+                                                    </td>
+                                                    <td>
+                                                        <?php echo $task['task_creator']; ?>
                                                     </td>
                                                 </tr>
                                             <?php endforeach; ?>
@@ -632,14 +639,6 @@ session_start();
 
                 </div>
             </div>
-        </div>
-        <div class="tab-content div-space-top" id="tab4">
-            <h3>Tab 2 Content</h3>
-            <p>This is the content of Tab 2.</p>
-        </div>
-        <div class="tab-content div-space-top" id="tab5">
-            <h3>Tab 2 Content</h3>
-            <p>This is the content of Tab 2.</p>
         </div>
     </div>
 
@@ -974,6 +973,9 @@ session_start();
             method: 'GET',
             data: { project_id: project_id },
             success: function (response) {
+                console.log('--');
+                console.log(response);
+                console.log('--');
 
                 // Handle the response and update the task tables here
                 const tasksBySection = response.tasksBySection;
@@ -1010,6 +1012,7 @@ session_start();
 
     // Function to create a table row for a task
     function createTaskRow(task) {
+        console.log(task);
         const $row = $('<tr>');
         $row.attr('data-task-id', task.task_id);
         const assigneeName = task.assignee_name || 'Not Assigned'; // Use 'Not Assigned' if assignee is empty
@@ -1034,11 +1037,12 @@ session_start();
 
         const taskName = task.task_name.length > 19 ? addTooltip(task.task_name) : task.task_name;
         $row.append(`<td class="task-name">${taskName}</td>`);
-        $row.append(`<td class="task_desc tooltip"><span>${addEllipsis(task.task_description, 29)}</span><div class="tooltiptext">${task.task_description}</div></td>`);
+        $row.append(`<td class="task_desc tooltip"><span>${addEllipsis(task.task_description, 25)}</span><div class="tooltiptext">${task.task_description}</div></td>`);
         $row.append(`<td>${assigneeName}</td>`);
         $row.append(`<td><span class="due-date">${formatDateRange(task.start_date, task.end_date)}</span></td>`);
         $row.append(`<td>${task.status}</td>`);
         $row.append(`<td>${taskpriority}</td>`);
+        $row.append(`<td>${task.task_creator_name}</td>`);
 
         return $row;
     }

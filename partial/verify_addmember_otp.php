@@ -11,6 +11,9 @@ include '../partial/utils.php';
 
 $response = array(); // Initialize an empty array to store the response
 
+// Start the session to access session data
+session_start();
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $receivedOtp = $_POST['otp'];
     $project_id = $_POST['project_id'];
