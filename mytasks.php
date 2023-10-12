@@ -38,8 +38,7 @@ include 'partial/navbar.php';
 
     // Start a session to access session variables (if needed)
     session_start();
-
-    <?php
+    
 // Include the access_denied.php file before any HTML output
 include 'access_denied.php';
 
