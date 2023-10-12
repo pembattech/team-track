@@ -238,17 +238,5 @@ include 'base.php'; ?>
             }
         }
 
-        // $('#registrationForm').submit(function (event) {
-        //     event.preventDefault();
-        //     // Validate both username and email before submitting the form
-        //     if (validateUsername() && validateEmail()) {
-        //         console.log("submit button clicked")
-        //     } else {
-        //         // If either username or email validation fails, prevent form submission
-        //         // You can display an error message or take appropriate action here
-        //         alert('Please fill in the required fields correctly.');
-        //     }
-        // });
-
     });
 </script>

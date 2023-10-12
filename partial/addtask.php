@@ -68,6 +68,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             $activity_type = "Task Created";
                             mysqli_stmt_bind_param($stmt, "ssi", $activity_type, $activity_description, $project_id);
                             if (mysqli_stmt_execute($stmt)) {
+
+                                if ($project_owner_id !== $user_id) {
+
+                                    // Now, insert a message into the "Messages" table to notify users about the new task.
+                                    $message_text = 'A new task, ' . $taskname . ', has been added to the project';
+                                    $insert_message_query = "INSERT INTO Messages (task_id, recipient_id, text, is_newtask_msg) VALUES ('$task_id', '$project_owner_id', '$message_text', '$is_newtask_msg')";
+
+                                    // Execute the query to insert the message into the database
+                                    if (mysqli_query($connection, $insert_message_query)) {
+                                        echo " ";
+
+                                    } else {
+                                        echo " ";
+                                    }
+                                } else {
+                                    echo " ";
+                                }
+
                                 header('Content-Type: application/json');
                                 echo json_encode(array('status' => 'success', 'message' => 'New task added successfully'));
                             } else {

@@ -135,6 +135,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 if ($stmt->execute()) {
                     // Check if any rows were affected
                     if ($stmt->affected_rows > 0) {
+
+                        // Define the recent activity data
+                        $activity_type = "Task Updated";
+                        $activity_description = "Task '" . $task_name . "' in project '" . get_project_data($project_id)['project_name'] . "' was updated by '" . getUserName($loggedInUserId) . "'";
+
+                        addRecentActivity($loggedInUserId, "Task Update", $activity_description, $project_id, $task_id);
+
                         header('Content-Type: application/json');
                         echo json_encode(array('status' => 'success', 'message' => "Task '$task_name' updated successfully."));
                     } else {

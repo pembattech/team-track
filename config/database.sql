@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS Messages (
     task_id INT,
     sender_id INT,
     text VARCHAR(1000),
-    `timestamp` DATETIME DEFAULT CURRENT_TIMESTAMP,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
     recipient_id INT,
     is_read INT DEFAULT 0,
     is_task_msg INT DEFAULT 0,
