@@ -23,14 +23,24 @@
             {
                 global $connection;
 
-                $sql = "SELECT Tasks.*, Projects.project_name, Users.username 
-                FROM Tasks
-                INNER JOIN ProjectUsers ON Tasks.projectuser_id = ProjectUsers.projectuser_id
-                INNER JOIN Projects ON ProjectUsers.project_id = Projects.project_id
-                INNER JOIN Users ON ProjectUsers.user_id = Users.user_id
-                WHERE Tasks.status != 'Complete' AND ProjectUsers.user_id = $user_id
-                ORDER BY Tasks.start_date DESC";
-
+                $sql = "SELECT
+                t.*,
+                u.username AS CreatorName,
+                p.project_name AS project_name
+            FROM
+                Tasks t
+            JOIN
+                Users u ON t.task_creator_id = u.user_id
+            JOIN
+                ProjectUsers pu ON t.projectuser_id = pu.projectuser_id
+            JOIN
+                Projects p ON pu.project_id = p.project_id
+            WHERE
+                t.status <> 'Complete'
+                AND t.status <> 'New'
+                AND t.assignee = $user_id
+            ORDER BY
+                t.task_id DESC";
                 $result = mysqli_query($connection, $sql);
                 return $result;
             }
@@ -170,9 +180,9 @@
                             echo "<tr>";
                             echo "<th class='mytasks-heading'>Task Name</th>";
                             echo "<th class='mytasks-heading'>Project Name</th>";
-                            echo "<th class='mytasks-heading'>Assignee</th>";
                             echo "<th class='mytasks-heading'>End Date</th>";
                             echo "<th class='mytasks-heading'>Priority</th>";
+                            echo "<th class='mytasks-heading'>Task Creator</th>";
                             echo "</tr>";
                             echo "</thead>";
                             echo "<tbody id='task-list'>";
@@ -180,9 +190,9 @@
                                 echo "<tr>";
                                 echo "<td data-task-id='" . $task['task_id'] . "'>" . add_ellipsis($task['task_name'], 15) . "</td>";
                                 echo "<td>" . add_ellipsis($task['project_name'], 15) . "</td>";
-                                echo "<td>" . $task['username'] . "</td>";
                                 echo "<td>" . ($task['end_date'] ? $task['end_date'] : "n/a") . "</td>";
                                 echo "<td>" . ($task['priority'] ? $task['priority'] : "n/a") . "</td>";
+                                echo "<td>" . $task['CreatorName'] . "</td>";
                                 echo "</tr>";
                             }
                             echo "</tbody>";
@@ -638,6 +648,8 @@
 
                     // Close the edit profile popup
                     editprofile_popup_toggle();
+
+                    location.reload();
 
                 } else if (response.status === "error") {
                     // Handle error, e.g., display an error message

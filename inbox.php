@@ -104,8 +104,8 @@
                 <div class="heading-nav between-verticle-line tab-btn active" onclick="openTab_inbox(event, 'tab1')">
                     Activity
                 </div>
-                <div class="heading-nav between-verticle-line tab-btn" onclick="openTab_inbox(event, 'tab2')">
-                    Message I've sent</div>
+                <!-- <div class="heading-nav between-verticle-line tab-btn" onclick="openTab_inbox(event, 'tab2')">
+                    Message I've sent</div> -->
             </div>
         </div>
         <div class="bottom-line"></div>
@@ -113,12 +113,12 @@
         <div class="tab-content active" id="tab1">
             <div class="div-space-top"></div>
             <div class="options-btn-inbox">
-                <div class="send-msg-content">
+                <!-- <div class="send-msg-content">
                     <div class="send-message-btn button-style related-btn-img overlay-border">
                         <img src="./static/image/sms.svg" alt="">
                         Send message
                     </div>
-                </div>
+                </div> -->
                 <div class="filter-btns">
                     <button class="filter-button button-style" data-filter="all">All</button>
                     <button class="filter-button button-style" data-filter="unread">Unread</button>
@@ -143,10 +143,10 @@
             </div>
         </div>
 
-        <div class="tab-content" id="tab2">
+        <!-- <div class="tab-content" id="tab2">
             <h3>Tab 2 Content</h3>
             <p>This is the content of Tab 2.</p>
-        </div>
+        </div> -->
     </div>
 </div>
 
