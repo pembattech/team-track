@@ -17,6 +17,9 @@ session_start();
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $receivedOtp = $_POST['otp'];
     $project_id = $_POST['project_id'];
+
+    $loggedInUserId = $_SESSION['user_id'];
+
 }
 
 $user_id = $_SESSION['user_id'];
@@ -37,8 +40,6 @@ $user_email = get_user_data($user_id)['email'];
 $response['user_email'] = $user_email;
 
 if ($project_id !== null) {
-    // Your existing code related to fetching the email and OTP
-
     // Fetch stored OTP from the database based on project and email
     $sql = "SELECT * FROM ProjectInvitations WHERE project_id = '$project_id' AND otp = '$receivedOtp' AND is_used = '0'";
     $result = $connection->query($sql);
@@ -80,7 +81,26 @@ if ($project_id !== null) {
                     $update_used_query = "UPDATE ProjectInvitations SET is_used = 1 WHERE project_id = '$project_id' AND otp = '$receivedOtp' AND is_used = 0";
 
                     if ($connection->query($update_used_query)) {
+
                         $response['message'] = "Invitation verified and marked as used.";
+
+                        $activity_type = "User Join";
+                        $activity_description = "User '" . getUserName($loggedInUserId) . "' joined the project.";
+
+                        $sql = "INSERT INTO RecentActivity (user_id, activity_type, activity_description, project_id) VALUES (?, ?, ?, ?)";
+                        $stmt = $connection->prepare($sql);
+
+                        if ($stmt) {
+                            $stmt->bind_param("isss", $loggedInUserId, $activity_type, $activity_description, $project_id);
+
+
+                            if ($stmt->execute()) {
+                                $response['status2'] = 'success';
+                            } else {
+                                $response['status2'] = 'error';
+                            }
+                        }
+
                     } else {
                         $response['status'] = 'error';
                         $response['message'] = "Error updating invitation: " . mysqli_error($connection);

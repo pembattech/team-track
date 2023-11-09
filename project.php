@@ -1537,7 +1537,8 @@ session_start();
         event.preventDefault();
 
         const userRoleInput = $('#userRoleInput');
-        const newRole = userRoleInput.val().trim(); // Trim whitespace
+        const newRole = capitalizeFirstLetter(userRoleInput.val().trim());
+
 
         const errorMessage = $('#error-message');
 

@@ -8,6 +8,9 @@ $(document).ready(function () {
     });
 });
 
+function capitalizeFirstLetter(inputString) {
+    return inputString.charAt(0).toUpperCase() + inputString.slice(1);
+}
 
 // Function to validate an email address
 function isValidEmail(email) {
