@@ -219,3 +219,29 @@ var initialCollapsedRows = document.getElementsByClassName('collapsed');
 for (var i = 0; i < initialCollapsedRows.length; i++) {
     initialCollapsedRows[i].style.display = "table-row";
 }
+
+function initializeCharacterCount() {
+    const textArea1 = document.getElementById('description');
+    console.log(textArea1);
+    const charCount1 = document.getElementById('charCount');
+    console.log(charCount1);
+
+    textArea1.addEventListener('focus', function () {
+        charCount1.style.display = 'block'; // Show the character count when the textarea is focused
+    });
+
+    textArea1.addEventListener('blur', function () {
+        charCount1.style.display = 'none'; // Hide the character count when the textarea loses focus
+    });
+
+    textArea1.addEventListener('input', function () {
+        const currentText1 = textArea1.value;
+        const currentLength1 = currentText1.length;
+        charCount1.textContent = `${currentLength1} / 255 characters used`;
+    });
+
+    // Initialize the character count based on the initial value
+    const initialText1 = textArea1.value;
+    const initialLength1 = initialText1.length;
+    charCount1.textContent = `${initialLength1} / 255 characters used`;
+}

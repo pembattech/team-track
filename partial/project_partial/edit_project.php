@@ -90,11 +90,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                  WHERE project_id = $project_id";
 
             if ($connection->query($edit_project_query)) {
-                $response = [
-                    'status' => 'success',
-                    'message' => "$project_name Project updated successfully.",
-                    'updated_fields' => $detailedChanges
-                ];
+
+                // Query to fetch the latest project details
+                $sql_project = "SELECT * FROM Projects WHERE project_id = $project_id";
+                $latest_project_details_query = mysqli_query($connection, $sql_project);
+
+                if ($latest_project_details_query) {
+                    $latest_project_details = mysqli_fetch_assoc($latest_project_details_query);
+                    $response = [
+                        'status' => 'success',
+                        'message' => "$project_name Project updated successfully.",
+                        'updated_fields' => $detailedChanges,
+                        'latest_project_details' => $latest_project_details,
+                    ];
+
+                }
 
                 // Send a message to all project members about the update
                 $message = 'Project update: The following changes have been made in the project "' . $project_name . '": ' . implode('', $detailedChanges);

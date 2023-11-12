@@ -245,7 +245,7 @@ session_start();
                         </div>
                     </div>
                 </div>
-                <div class="project-other-info">
+                <div class="project-other-info" id="project-other-info">
                     <div class="project-status">
                         <p>
                             <?php echo $project['status']; ?>
@@ -332,30 +332,8 @@ session_start();
                 <div class="heading-nav between-verticle-line tab-btn" onclick="openTab(event, 'tab2')">List</div>
                 <div class="heading-nav between-verticle-line tab-btn" onclick="openTab(event, 'tab3')">Dashboard
                 </div>
-                <div class="project-duedate" style="margin-left: auto;">
-                    <p>
-                        <?php
-                        $startDate = new DateTime($project['start_date']);
-                        $endDate = new DateTime($project['end_date']);
-
-                        // Check if the start and end dates have the same year as the current year
-                        $currentYear = date('Y');
-                        $sameYear = $startDate->format('Y') == $currentYear && $endDate->format('Y') == $currentYear;
-
-                        // Format the month to display as "M" (e.g., Oct)
-                        $startMonth = $startDate->format('M');
-                        $endMonth = $endDate->format('M');
-
-                        // Display the date range
-                        if ($sameYear) {
-                            echo $startMonth . ' ' . $startDate->format('d') . ' - ' . $endMonth . ' ' . $endDate->format('d');
-                        } else {
-                            echo $startDate->format('Y-m-d') . ' - ' . $endDate->format('Y-m-d');
-                        }
-                        ?>
-
-
-                    </p>
+                <div id="project-other-info" class="project-duedate" style="margin-left: auto;">
+                    <p></p>
                 </div>
             </div>
         </div>
@@ -364,12 +342,10 @@ session_start();
         <div class="tab-content div-space-top active" id="tab1">
             <div class="overview-section">
                 <div class="project-desc_and_project-activities">
-                    <div class="project-desc">
+                    <div class="project-desc" id="project-other-info">
                         <div class="heading-style">
                             <p>Project Description</p>
                         </div>
-
-
                         <div class="project-desc-textarea textarea-style">
                             <textarea name="" id="" cols="50" rows="6" placeholder="What's this project about?"><?php
                             // Check if the description is not null and not an empty string before echoing
@@ -495,292 +471,293 @@ session_start();
                 </div>
             </div>
         </div>
-    
-    <div class="tab-content div-space-top" id="tab2">
-        <div class="tasks-section">
-            <button class="button-style" onclick="addtask_popup_toggle()">+ Add Task</button>
-            <button id="toggleSelect" class="button-style selectall">Select All</button>
-            <button id="cancelselect-btn" class="button-style" style="display: none;">Cancel Select</button>
 
-            <div id="checkboxsButtons" style="display: none; gap: 5px;">
-                <button id="confirmDelete" class="button-style">Delete Selected</button>
-            </div>
+        <div class="tab-content div-space-top" id="tab2">
+            <div class="tasks-section">
+                <button class="button-style" onclick="addtask_popup_toggle()">+ Add Task</button>
+                <button id="toggleSelect" class="button-style selectall">Select All</button>
+                <button id="cancelselect-btn" class="button-style" style="display: none;">Cancel Select</button>
 
-            <div class="addtask-popup popup-style" id="addtask-popup">
-                <div class="addtask-popup-content">
-                    <form action="partial/addtask.php" method="post" enctype="multipart/form-data"
-                        onsubmit="return task_validateForm()">
-                        <span class="addtask-popup-close" onclick="addtask_popup_toggle()">&times;</span>
-                        <p class="heading-style">Add Task</p>
-                        <div class="bottom-line"></div>
-                        <div class="div-space-top"></div>
-                        <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
-                        <div class="form-group">
-                            <span id="taskname-error" class="error-message"></span>
-                            <input class="input-style" type="text" name="taskname" id="taskname"
-                                placeholder="Enter Task Name">
-                        </div>
-                        <div class="form-group">
-                            <label for="task_description">Description</label>
-                            <div class="textarea-style textarea-wrapper">
-                                <textarea type="text" maxlength="255" name="task_description"
-                                    id="task_description"></textarea>
-                                <span id="charCount">0 / 255 characters used</span>
-                                <span id="task_description-error" class="error-message"></span>
-                            </div>
-                        </div>
-                        <button type="submit" name="submit" class="btn-style">Submit</button>
-                    </form>
+                <div id="checkboxsButtons" style="display: none; gap: 5px;">
+                    <button id="confirmDelete" class="button-style">Delete Selected</button>
                 </div>
-            </div>
-            <div class="lst-of-tasks div-space-top">
-                <?php
 
-                function formatDateRange1($startDate, $endDate)
-                {
-                    if (!empty($startDate) && !empty($endDate)) {
-                        $start = new DateTime($startDate);
-                        $end = new DateTime($endDate);
-
-                        $startYear = $start->format('Y');
-                        $endYear = $end->format('Y');
-
-                        $formattedStart = $start->format('M j');
-                        $formattedEnd = $end->format('M j');
-
-                        if ($startYear === $endYear) {
-                            return "{$formattedStart} - {$formattedEnd}, {$startYear}";
-                        } else {
-                            return "{$formattedStart}, {$startYear} - {$formattedEnd}, {$endYear}";
-                        }
-                    }
-                    return "n/a";
-                }
-                // Check if the 'project_id' parameter is present in the URL
-                if (isset($_GET['project_id']) && is_numeric($_GET['project_id'])) {
-                    $project_id = $_GET['project_id'];
-
-                    // Prepare and execute the SQL query using a prepared statement
-                    $stmt = $connection->prepare("SELECT * FROM Tasks WHERE projectuser_id IN (SELECT projectuser_id FROM ProjectUsers WHERE project_id = ?)");
-                    $stmt->bind_param("i", $project_id);
-                    $stmt->execute();
-                    $result = $stmt->get_result();
-
-                    // Store tasks grouped by section
-                    $tasksBySection = array(
-                        "To Do" => array(),
-                        "Doing" => array(),
-                        "Done" => array()
-                    );
-
-                    if ($result->num_rows > 0) {
-                        while ($row = $result->fetch_assoc()) {
-                            $section = $row['section'];
-                            if (!isset($tasksBySection[$section])) {
-                                $tasksBySection[$section] = array();
-                            }
-                            $tasksBySection[$section][] = $row;
-                        }
-                    }
-                    $stmt->close();
-                }
-
-                ?>
-                <?php if (isset($tasksBySection)): ?>
-                    <?php if (!empty($tasksBySection)): ?>
-                        <?php foreach ($tasksBySection as $section => $tasks): ?>
-                            <div class="collapsible">
-                                <h2 class="section-topic">
-                                    <?php echo $section; ?>
-                                    <span class="section-task-count">
-                                        (
-                                        <?php echo countTasksBySectionAndProject($section, $project_id); ?>)
-                                    </span>
-                                </h2>
-                                <table class="sortable show" data-section="<?php echo $section; ?>">
-                                    <thead>
-                                        <tr>
-                                            <th id="task-th" class="checkbox-th"></th>
-                                            <th id="task-th">Task Name</th>
-                                            <th id="task-th">Task Description</th>
-                                            <th id="task-th">Assignee</th>
-                                            <th id="task-th">Due Date</th>
-                                            <th id="task-th">Status</th>
-                                            <th id="task-th">Priority</th>
-                                            <th id="task-th" class="task_creator-th">Task Creator</th>
-
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php foreach ($tasks as $task): ?>
-                                            <tr data-task-id="<?php echo $task['task_id']; ?>"
-                                                class="<?php echo $task['status'] === 'Done' ? 'completed' : 'incomplete'; ?>">
-                                                <td>
-                                                    <?php echo $task['task_name']; ?>
-                                                </td>
-                                                <td class="task_desc tooltip">
-                                                    <span>
-                                                        <?php echo $task['task_description']; ?>
-                                                    </span>
-                                                    <div class="task_desc tooltiptext">
-                                                        <?php echo $task['task_description']; ?>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <?php echo $task['assignee']; ?>
-                                                </td>
-                                                <td>
-                                                    <span class="due-date">
-                                                        <?php echo formatDateRange1($task['start_date'], $task['end_date']); ?>
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    <?php echo $task['status']; ?>
-                                                </td>
-                                                <td>
-                                                    <?php echo $task['priority']; ?>
-                                                </td>
-                                                <td>
-                                                    <?php echo $task['task_creator']; ?>
-                                                </td>
-                                            </tr>
-                                        <?php endforeach; ?>
-                                    </tbody>
-                                </table>
+                <div class="addtask-popup popup-style" id="addtask-popup">
+                    <div class="addtask-popup-content">
+                        <form action="partial/addtask.php" method="post" enctype="multipart/form-data"
+                            onsubmit="return task_validateForm()">
+                            <span class="addtask-popup-close" onclick="addtask_popup_toggle()">&times;</span>
+                            <p class="heading-style">Add Task</p>
+                            <div class="bottom-line"></div>
+                            <div class="div-space-top"></div>
+                            <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
+                            <div class="form-group">
+                                <span id="taskname-error" class="error-message"></span>
+                                <input class="input-style" type="text" name="taskname" id="taskname"
+                                    placeholder="Enter Task Name">
                             </div>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <p>No tasks assigned to this project.</p>
-                    <?php endif; ?>
-                <?php endif; ?>
-
-                <!-- Slide-in popup to display task description -->
-                <div class="task-popup" id="taskPopup">
-                    <div class="heading-content">
-                        <div class="heading-style">
-                            <p>Edit Task</p>
-                        </div>
-                        <div class="bottom-line"></div>
-                        <div class="div-space-top"></div>
-                        <button type="button" id="closeButton">Close</button>
-                        <button type="button" id="deleteButton">Delete Task</button>
-                        <div class="div-space-top"></div>
+                            <div class="form-group">
+                                <label for="task_description">Description</label>
+                                <div class="textarea-style textarea-wrapper">
+                                    <textarea type="text" maxlength="255" name="task_description"
+                                        id="task_description"></textarea>
+                                    <span id="charCount">0 / 255 characters used</span>
+                                    <span id="task_description-error" class="error-message"></span>
+                                </div>
+                            </div>
+                            <button type="submit" name="submit" class="btn-style">Submit</button>
+                        </form>
                     </div>
-                    <div class="bottom-line"></div>
-                    <div class="div-space-top"></div>
-                    <form id="editTaskForm">
-                        <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
-                        <input type="hidden" name="projectowner_id" value="<?php echo $project_owner['user_id']; ?>">
-                        <input type="hidden" id="editTaskId" name="task_id">
-                        <input class="input-style" type="text" id="editTaskName" name="task_name"
-                            placeholder="Task name">
-                        <span id="editTaskName-error" class="error-message"></span>
-                        <br>
-                        <div class="div-space-top"></div>
-                        <?php include 'partial/project_partial/populate_assignee.php';
-                        populateAssigneeOptions($project_id);
-                        ?>
-                        <span id="editAssignee-error" class="error-message"></span>
+                </div>
+                <div class="lst-of-tasks div-space-top">
+                    <?php
 
-                        <div class="div-space-top"></div>
-                        <div class="textarea-style">
-                            <textarea id="editTaskDescription" name="task_description"
-                                placeholder="Task Description"></textarea>
+                    function formatDateRange1($startDate, $endDate)
+                    {
+                        if (!empty($startDate) && !empty($endDate)) {
+                            $start = new DateTime($startDate);
+                            $end = new DateTime($endDate);
+
+                            $startYear = $start->format('Y');
+                            $endYear = $end->format('Y');
+
+                            $formattedStart = $start->format('M j');
+                            $formattedEnd = $end->format('M j');
+
+                            if ($startYear === $endYear) {
+                                return "{$formattedStart} - {$formattedEnd}, {$startYear}";
+                            } else {
+                                return "{$formattedStart}, {$startYear} - {$formattedEnd}, {$endYear}";
+                            }
+                        }
+                        return "n/a";
+                    }
+                    // Check if the 'project_id' parameter is present in the URL
+                    if (isset($_GET['project_id']) && is_numeric($_GET['project_id'])) {
+                        $project_id = $_GET['project_id'];
+
+                        // Prepare and execute the SQL query using a prepared statement
+                        $stmt = $connection->prepare("SELECT * FROM Tasks WHERE projectuser_id IN (SELECT projectuser_id FROM ProjectUsers WHERE project_id = ?)");
+                        $stmt->bind_param("i", $project_id);
+                        $stmt->execute();
+                        $result = $stmt->get_result();
+
+                        // Store tasks grouped by section
+                        $tasksBySection = array(
+                            "To Do" => array(),
+                            "Doing" => array(),
+                            "Done" => array()
+                        );
+
+                        if ($result->num_rows > 0) {
+                            while ($row = $result->fetch_assoc()) {
+                                $section = $row['section'];
+                                if (!isset($tasksBySection[$section])) {
+                                    $tasksBySection[$section] = array();
+                                }
+                                $tasksBySection[$section][] = $row;
+                            }
+                        }
+                        $stmt->close();
+                    }
+
+                    ?>
+                    <?php if (isset($tasksBySection)): ?>
+                        <?php if (!empty($tasksBySection)): ?>
+                            <?php foreach ($tasksBySection as $section => $tasks): ?>
+                                <div class="collapsible">
+                                    <h2 class="section-topic">
+                                        <?php echo $section; ?>
+                                        <span class="section-task-count">
+                                            (
+                                            <?php echo countTasksBySectionAndProject($section, $project_id); ?>)
+                                        </span>
+                                    </h2>
+                                    <table class="sortable show" data-section="<?php echo $section; ?>">
+                                        <thead>
+                                            <tr>
+                                                <th id="task-th" class="checkbox-th"></th>
+                                                <th id="task-th">Task Name</th>
+                                                <th id="task-th">Task Description</th>
+                                                <th id="task-th">Assignee</th>
+                                                <th id="task-th">Due Date</th>
+                                                <th id="task-th">Status</th>
+                                                <th id="task-th">Priority</th>
+                                                <th id="task-th" class="task_creator-th">Task Creator</th>
+
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($tasks as $task): ?>
+                                                <tr data-task-id="<?php echo $task['task_id']; ?>"
+                                                    class="<?php echo $task['status'] === 'Done' ? 'completed' : 'incomplete'; ?>">
+                                                    <td>
+                                                        <?php echo $task['task_name']; ?>
+                                                    </td>
+                                                    <td class="task_desc tooltip">
+                                                        <span>
+                                                            <?php echo $task['task_description']; ?>
+                                                        </span>
+                                                        <div class="task_desc tooltiptext">
+                                                            <?php echo $task['task_description']; ?>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <?php echo $task['assignee']; ?>
+                                                    </td>
+                                                    <td>
+                                                        <span class="due-date">
+                                                            <?php echo formatDateRange1($task['start_date'], $task['end_date']); ?>
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <?php echo $task['status']; ?>
+                                                    </td>
+                                                    <td>
+                                                        <?php echo $task['priority']; ?>
+                                                    </td>
+                                                    <td>
+                                                        <?php echo $task['task_creator']; ?>
+                                                    </td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <p>No tasks assigned to this project.</p>
+                        <?php endif; ?>
+                    <?php endif; ?>
+
+                    <!-- Slide-in popup to display task description -->
+                    <div class="task-popup" id="taskPopup">
+                        <div class="heading-content">
+                            <div class="heading-style">
+                                <p>Edit Task</p>
+                            </div>
+                            <div class="bottom-line"></div>
+                            <div class="div-space-top"></div>
+                            <button type="button" id="closeButton">Close</button>
+                            <button type="button" id="deleteButton">Delete Task</button>
+                            <div class="div-space-top"></div>
                         </div>
-                        <span id="editTaskDescription-error" class="error-message"></span>
-
+                        <div class="bottom-line"></div>
                         <div class="div-space-top"></div>
-                        <input class="input-style" type="text" id="editStartDate" name="start_date"
-                            onfocus="this.type='date'" onblur="if(!this.value)this.type='text';"
-                            placeholder="Start Date">
-                        <span id="editStartDate-error" class="error-message"></span>
-                        <br>
+                        <form id="editTaskForm">
+                            <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
+                            <input type="hidden" name="projectowner_id"
+                                value="<?php echo $project_owner['user_id']; ?>">
+                            <input type="hidden" id="editTaskId" name="task_id">
+                            <input class="input-style" type="text" id="editTaskName" name="task_name"
+                                placeholder="Task name">
+                            <span id="editTaskName-error" class="error-message"></span>
+                            <br>
+                            <div class="div-space-top"></div>
+                            <?php include 'partial/project_partial/populate_assignee.php';
+                            populateAssigneeOptions($project_id);
+                            ?>
+                            <span id="editAssignee-error" class="error-message"></span>
 
-                        <div class="div-space-top"></div>
-                        <input class="input-style" type="text" id="editEndDate" name="end_date"
-                            onfocus="(this.type='date')" onblur="if(!this.value)this.type='text';"
-                            placeholder="End Date">
-                        <span id="editEndDate-error" class="error-message"></span>
-                        <br>
+                            <div class="div-space-top"></div>
+                            <div class="textarea-style">
+                                <textarea id="editTaskDescription" name="task_description"
+                                    placeholder="Task Description"></textarea>
+                            </div>
+                            <span id="editTaskDescription-error" class="error-message"></span>
 
-                        <div class="div-space-top"></div>
-                        <select id="editStatus" name="status" class="select-style">
-                            <option value="" selected disabled hidden>Select a Number</option>
-                            <option value="At risk">At risk</option>
-                            <option value="Off Track">Off track</option>
-                            <option value="On Track">On track</option>
-                            <option value="On Hold">On Hold</option>
-                            <option value="Cancelled">Cancelled</option>
-                            <option value="Blocked">Blocked</option>
-                            <option value="Pending Approval">Pending Approval</option>
-                            <option value="In Review">In Review</option>
-                        </select>
-                        <br>
-                        <span id="editStatus-error" class="error-message"></span>
+                            <div class="div-space-top"></div>
+                            <input class="input-style" type="text" id="editStartDate" name="start_date"
+                                onfocus="this.type='date'" onblur="if(!this.value)this.type='text';"
+                                placeholder="Start Date">
+                            <span id="editStartDate-error" class="error-message"></span>
+                            <br>
 
-                        <div class="div-space-top"></div>
-                        <select id="editPriority" name="priority" class="select-style">
-                            <option value="Low">Low</option>
-                            <option value="Medium">Medium</option>
-                            <option value="High">High</option>
-                        </select>
-                        <span id="editPriority-error" class="error-message"></span>
-                        <br>
+                            <div class="div-space-top"></div>
+                            <input class="input-style" type="text" id="editEndDate" name="end_date"
+                                onfocus="(this.type='date')" onblur="if(!this.value)this.type='text';"
+                                placeholder="End Date">
+                            <span id="editEndDate-error" class="error-message"></span>
+                            <br>
 
-                        <div class="div-space-top"></div>
-                        <button type="submit" id="submitButton">Save Changes</button>
-                    </form>
+                            <div class="div-space-top"></div>
+                            <select id="editStatus" name="status" class="select-style">
+                                <option value="" selected disabled hidden>Select a Number</option>
+                                <option value="At risk">At risk</option>
+                                <option value="Off Track">Off track</option>
+                                <option value="On Track">On track</option>
+                                <option value="On Hold">On Hold</option>
+                                <option value="Cancelled">Cancelled</option>
+                                <option value="Blocked">Blocked</option>
+                                <option value="Pending Approval">Pending Approval</option>
+                                <option value="In Review">In Review</option>
+                            </select>
+                            <br>
+                            <span id="editStatus-error" class="error-message"></span>
+
+                            <div class="div-space-top"></div>
+                            <select id="editPriority" name="priority" class="select-style">
+                                <option value="Low">Low</option>
+                                <option value="Medium">Medium</option>
+                                <option value="High">High</option>
+                            </select>
+                            <span id="editPriority-error" class="error-message"></span>
+                            <br>
+
+                            <div class="div-space-top"></div>
+                            <button type="submit" id="submitButton">Save Changes</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tab-content div-space-top" id="tab3">
+            <div class="dashboard-section">
+                <div class="dashboard-item complete">
+                    <div class="complete-title">
+                        <p class="heading">Complete Tasks</p>
+                    </div>
+                    <div class="count">
+                        <span>
+                            <?php echo $completed_tasks ?>
+                        </span>
+                    </div>
+                </div>
+                <div class="dashboard-item incomplete">
+                    <div class="incomplete-title">
+                        <p class="heading">Incomplete Tasks</p>
+                    </div>
+                    <div class="count">
+                        <span>
+                            <?php echo $incomplete_tasks ?>
+                        </span>
+                    </div>
+                </div>
+                <div class="dashboard-item overdue-tasks">
+                    <div class="overdue-title">
+                        <p class="heading">Overdue Tasks</p>
+                    </div>
+                    <div class="count">
+                        <span>
+                            <?php echo $overdue_tasks ?>
+                        </span>
+                    </div>
+
+                </div>
+                <div class="dashboard-item total-tasks">
+                    <div class="total-title">
+                        <p class="heading">Total Tasks</p>
+                    </div>
+                    <div class="count">
+                        <span>
+                            <?php echo $total_tasks ?>
+                        </span>
+                    </div>
+
                 </div>
             </div>
         </div>
     </div>
-    <div class="tab-content div-space-top" id="tab3">
-        <div class="dashboard-section">
-            <div class="dashboard-item complete">
-                <div class="complete-title">
-                    <p class="heading">Complete Tasks</p>
-                </div>
-                <div class="count">
-                    <span>
-                        <?php echo $completed_tasks ?>
-                    </span>
-                </div>
-            </div>
-            <div class="dashboard-item incomplete">
-                <div class="incomplete-title">
-                    <p class="heading">Incomplete Tasks</p>
-                </div>
-                <div class="count">
-                    <span>
-                        <?php echo $incomplete_tasks ?>
-                    </span>
-                </div>
-            </div>
-            <div class="dashboard-item overdue-tasks">
-                <div class="overdue-title">
-                    <p class="heading">Overdue Tasks</p>
-                </div>
-                <div class="count">
-                    <span>
-                        <?php echo $overdue_tasks ?>
-                    </span>
-                </div>
-
-            </div>
-            <div class="dashboard-item total-tasks">
-                <div class="total-title">
-                    <p class="heading">Total Tasks</p>
-                </div>
-                <div class="count">
-                    <span>
-                        <?php echo $total_tasks ?>
-                    </span>
-                </div>
-
-            </div>
-        </div>
-    </div>
-</div>
 
 </div>
 <script>
@@ -805,6 +782,8 @@ session_start();
     // Initialize the date range picker when the document is ready
     $(document).ready(function () {
         initializeDateRangePicker('#editStartDate', '#editEndDate');
+
+        dynamic_duedate(<?php echo $project_id; ?>);
     });
 
     // Call the fetchTasks function on page load
@@ -1093,6 +1072,41 @@ session_start();
             });
         });
     });
+
+    function dynamic_duedate(projectId) {
+        $.ajax({
+            url: 'partial/fetch_project_data.php',
+            type: 'GET',
+            data: { project_id: projectId },
+            dataType: 'json',
+            success: function (data) {
+
+                var startDate = new Date(data.start_date);
+                var endDate = new Date(data.end_date);
+
+                // Check if the start and end dates have the same year as the current year
+                var currentYear = new Date().getFullYear();
+                var sameYear = startDate.getFullYear() === currentYear && endDate.getFullYear() === currentYear;
+
+                // Format the month to display as "M" (e.g., Oct)
+                var startMonth = startDate.toLocaleString('default', { month: 'short' });
+                var endMonth = endDate.toLocaleString('default', { month: 'short' });
+
+                // Display the date range
+                var dateRange = sameYear
+                    ? startMonth + ' ' + startDate.getDate() + ' - ' + endMonth + ' ' + endDate.getDate()
+                    : startDate.toISOString().split('T')[0] + ' - ' + endDate.toISOString().split('T')[0];
+
+                console.log('Updating project-duedate:', dateRange);
+                $('.project-duedate p').text(dateRange);
+            },
+            error: function (xhr, status, error) {
+                console.error('Error fetching project data:', error);
+            }
+        });
+    }
+
+
 
     // Function to fetch tasks from the server using AJAX
     function fetchTasks() {
@@ -2051,9 +2065,28 @@ session_start();
             return false;
         }
 
-        return true; // All validation passed
+        return true;
     }
 
+    function fetchProjectData(projectId) {
+        $.ajax({
+            url: 'partial/fetch_project_data.php',
+            type: 'GET', fetchProjectData,
+            data: { project_id: projectId },
+            dataType: 'json',
+            success: function (response) {
+                // Populate the description field with the fetched data
+                $('#project_name').val(response.project_name);
+                $('#description').val(response.description);
+                $('#projectStartDate').val(response.start_date);
+                $('#projectEndDate').val(response.end_date);
+                $('#project_priority').val(response.priority);
+            },
+            error: function (xhr, status, error) {
+                console.error('Error fetching project data:', error);
+            }
+        });
+    }
 
     function editproject_popup_toggle(projectId) {
         const popup = document.getElementById('editproject-popup');
@@ -2064,6 +2097,8 @@ session_start();
             document.getElementById('project_id').value = projectId;
 
             initializeCharacterCount();
+
+            initializeDateRangePicker('#projectStartDate', '#projectEndDate');
 
             // Fetch project data using AJAX
             fetchProjectData(projectId);
@@ -2095,8 +2130,35 @@ session_start();
             method: 'POST',
             data: formData,
             success: function (response) {
+                console.log(response);
                 if (response.status == 'success') {
-                    console.log(response.message);
+
+                    console.log(response.latest_project_details.status);
+                    console.log(response.latest_project_details.priority);
+
+                    $('#project-other-info .project-status p').text(response.latest_project_details.status);
+                    $('#project-other-info .project-priority p').text(response.latest_project_details.priority);
+
+                    var startDate = new Date(response.latest_project_details.start_date);
+                    var endDate = new Date(response.latest_project_details.end_date);
+
+                    // Check if the start and end dates have the same year as the current year
+                    var currentYear = new Date().getFullYear();
+                    var sameYear = startDate.getFullYear() === currentYear && endDate.getFullYear() === currentYear;
+
+                    // Format the month to display as "M" (e.g., Oct)
+                    var startMonth = startDate.toLocaleString('default', { month: 'short' });
+                    var endMonth = endDate.toLocaleString('default', { month: 'short' });
+
+                    // Display the date range
+                    var dateRange = sameYear
+                        ? startMonth + ' ' + startDate.getDate() + ' - ' + endMonth + ' ' + endDate.getDate()
+                        : startDate.toISOString().split('T')[0] + ' - ' + endDate.toISOString().split('T')[0];
+
+                    $('.project-duedate p').text(dateRange);
+                    $('#project-other-info.project-desc textarea').val(response.latest_project_details.description);
+
+
                     displayPopupMessage(response.message, 'success');
                 } else if (response.status === 'error') {
                     displayPopupMessage(response.message, 'error');
@@ -2112,10 +2174,7 @@ session_start();
                 console.error("Error fetching edit form:", error);
             }
         });
-    });
 
-    $(document).on("click", function (event) {
-        console.log("Clicked element:", event.target);
     });
 
 </script>
