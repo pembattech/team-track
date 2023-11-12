@@ -85,7 +85,7 @@ if ($project_id !== null) {
                         $response['message'] = "Invitation verified and marked as used.";
 
                         $activity_type = "User Join";
-                        $activity_description = "User '" . getUserName($loggedInUserId) . "' joined the project.";
+                        $activity_description = "User '" . getUserName($loggedInUserId) . "' joined the project which was invited by " . getUserName($invitation_sender_id) . ".";
 
                         $sql = "INSERT INTO RecentActivity (user_id, activity_type, activity_description, project_id) VALUES (?, ?, ?, ?)";
                         $stmt = $connection->prepare($sql);
