@@ -72,6 +72,18 @@ session_start();
         gap: 10px;
     }
 
+    .project-topic-grid {
+        display: grid;
+        grid-template-columns: auto 1fr;
+    }
+
+    .project-other-info {
+        font-size: 14px;
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+    }
+
     .recent-activities #activity-list {
         background-color: var(--color-background-weak-hover-deprecated);
         padding: 0 22px;
@@ -132,6 +144,23 @@ session_start();
         $result_project = mysqli_query($connection, $sql_project);
         $project = mysqli_fetch_assoc($result_project);
 
+
+        // Query to get the project owner's user_id
+        $sql = "SELECT user_id FROM ProjectUsers WHERE project_id = ? AND is_projectowner = 1";
+        $stmt = $connection->prepare($sql);
+        $stmt->bind_param("i", $project_id);
+
+        if ($stmt->execute()) {
+            $result = $stmt->get_result();
+            if ($result->num_rows > 0) {
+                // Fetch the user_id of the project owner
+                $row = $result->fetch_assoc();
+                $projectOwnerUserId = $row['user_id'];
+            } else {
+                echo "Invalid project.";
+            }
+        }
+
         // Query to fetch project owner's details from the 'Users' table
         $sql_owner = "SELECT Users.*, ProjectUsers.is_projectowner, ProjectUsers.user_role FROM Users INNER JOIN ProjectUsers ON Users.user_id = ProjectUsers.user_id WHERE ProjectUsers.project_id = $project_id AND ProjectUsers.is_projectowner = 1";
         $result_owner = mysqli_query($connection, $sql_owner);
@@ -177,30 +206,108 @@ session_start();
     ?>
     <div class='main-content'>
         <div class='heading-content sticky-heading'>
-            <div class='heading-style'>
-                <div class='project-link project-wrapper project_menu_toggle'>
-                    <?php
-                    echo '<div class="square project-wrapper" style="background-color:' . $project['background_color'] . '"></div>';
-                    echo "<p class='project-name'>" . capitalizeEachWord($project['project_name']) . "</p>";
-                    ?>
-                    <div class="project-dropdown">
-                        <div class="svg-img">
-                            <img src="static/image/arrow-down.svg" alt="">
+            <div class="project-topic-grid">
+                <div class='heading-style'>
+                    <div class='project-link project-wrapper project_menu_toggle'>
+                        <?php
+                        echo '<div class="square project-wrapper" style="background-color:' . $project['background_color'] . '"></div>';
+                        echo "<p class='project-name'>" . capitalizeEachWord($project['project_name']) . "</p>";
+                        ?>
+                        <div class="project-dropdown">
+                            <div class="svg-img">
+                                <img src="static/image/arrow-down.svg" alt="">
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="projectdropdown-popup popup-style">
-                        <div class="project-dropdown-menu-item indicate-danger">
+                        <div class="projectdropdown-popup popup-style">
+
                             <?php
-                            echo '<a href="partial/project_partial/leave_project.php?project_id=' . $project_id . '">';
+                            if ($user_id == $projectOwnerUserId) {
+                                ?>
+                                <div class="project-dropdown-menu-item indicate-danger">
+                                    <p class="edit-project-btn" data-project-id="<?php echo $project_id; ?>">Edit
+                                        Project
+                                    </p>
+
+                                </div>
+
+                                <?php
+                            }
                             ?>
-                            <p>Leave Project</p>
-                            </a>
+                            <div class="project-dropdown-menu-item indicate-danger">
+                                <?php
+                                echo '<a href="partial/project_partial/leave_project.php?project_id=' . $project_id . '">';
+                                ?>
+                                <p>Leave Project</p>
+                                </a>
+
+                            </div>
                         </div>
                     </div>
-
+                </div>
+                <div class="project-other-info">
+                    <div class="project-status">
+                        <p>
+                            <?php echo $project['status']; ?>
+                        </p>
+                    </div>
+                    <div class="project-priority">
+                        <p>
+                            <?php echo $project['priority']; ?>
+                        </p>
+                    </div>
                 </div>
             </div>
+
+            <div class="editproject-popup popup-style" id="editproject-popup">
+                <div class="editproject-popup-content">
+                    <div class="heading-content">
+                        <span class="editproject-popup-close" onclick="editproject_popup_toggle()">&times;
+                        </span>
+                        <p class="heading-style">Edit Project</p>
+                    </div>
+                    <div class="bottom-line"></div>
+                    <div class="div-space-top"></div>
+                    <form id="editProjectForm" enctype="multipart/form-data">
+                        <input type="hidden" name="project_id" id="project_id" value="<?php echo $project_id; ?>">
+                        <div class="form-group">
+                            <input class="input-style" type="text" name="project_name" id="project_name"
+                                value="<?php echo $project['project_name']; ?>">
+                            <span id="projectname-error" class="error-message"></span>
+                        </div>
+                        <div class="form-group textarea-style textarea-wrapper">
+                            <textarea id="description" name="description" maxlength="255"
+                                rows="4"><?php echo $project['description']; ?></textarea>
+                            <span id="charCount">0 / 255 characters used</span>
+                            <span id="projectdescription-error" class="error-message"></span>
+                        </div>
+                        <div class="form-group">
+                            <input class="input-style" type="text" id="projectStartDate" name="start_date"
+                                onfocus="this.type='date'" onblur="if(!this.value) { this.type='text'; }"
+                                placeholder="Start Date" value="<?php echo $project['start_date']; ?>">
+                            <span id="projectStartDate-error" class="error-message"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <input class="input-style" type="text" id="projectEndDate" name="end_date"
+                                onfocus="(this.type='date')" onblur="if(!this.value)this.type='text';"
+                                placeholder="End Date" value="<?php echo $project['end_date']; ?>">
+                            <span id="projectEndDate-error" class="error-message"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <?php include 'partial/project_partial/selectproject_priority.php';
+                            projectPrioritySelect($project_id);
+                            ?>
+                            <span id="projectPriority-error" class="error-message"></span>
+                        </div>
+
+                        <button type="submit" id="submitEditProject" class="button-style">Submit</button>
+                    </form>
+                </div>
+            </div>
+
+
             <div id="otpPopup" class="otp-popup" style="display:none;">
                 <div id="otpPopupContent" class="otp-popup-content">
                     <p class="heading-style">OTP Verification '
@@ -215,13 +322,41 @@ session_start();
                         <button type="submit" class="button-style" id="verifyOtpButton">Verify OTP</button>
                     </form>
                 </div>
+
             </div>
             <div class="tab-btns">
                 <!-- Tab Buttons -->
-                <div class="heading-nav between-verticle-line tab-btn active" onclick="openTab(event, 'tab1')">Overview
+                <div class="heading-nav between-verticle-line tab-btn active" onclick="openTab(event, 'tab1')">
+                    Overview
                 </div>
                 <div class="heading-nav between-verticle-line tab-btn" onclick="openTab(event, 'tab2')">List</div>
-                <div class="heading-nav between-verticle-line tab-btn" onclick="openTab(event, 'tab3')">Dashboard</div>
+                <div class="heading-nav between-verticle-line tab-btn" onclick="openTab(event, 'tab3')">Dashboard
+                </div>
+                <div class="project-duedate" style="margin-left: auto;">
+                    <p>
+                        <?php
+                        $startDate = new DateTime($project['start_date']);
+                        $endDate = new DateTime($project['end_date']);
+
+                        // Check if the start and end dates have the same year as the current year
+                        $currentYear = date('Y');
+                        $sameYear = $startDate->format('Y') == $currentYear && $endDate->format('Y') == $currentYear;
+
+                        // Format the month to display as "M" (e.g., Oct)
+                        $startMonth = $startDate->format('M');
+                        $endMonth = $endDate->format('M');
+
+                        // Display the date range
+                        if ($sameYear) {
+                            echo $startMonth . ' ' . $startDate->format('d') . ' - ' . $endMonth . ' ' . $endDate->format('d');
+                        } else {
+                            echo $startDate->format('Y-m-d') . ' - ' . $endDate->format('Y-m-d');
+                        }
+                        ?>
+
+
+                    </p>
+                </div>
             </div>
         </div>
         <div class="bottom-line"></div>
@@ -231,7 +366,7 @@ session_start();
                 <div class="project-desc_and_project-activities">
                     <div class="project-desc">
                         <div class="heading-style">
-                            <p>Project description</p>
+                            <p>Project Description</p>
                         </div>
 
 
@@ -244,6 +379,7 @@ session_start();
                             ?></textarea>
                         </div>
                     </div>
+
                     <div class="recent-activities">
                         <div class="heading-style">
                             <p>Recent Activities</p>
@@ -252,395 +388,399 @@ session_start();
                             <!-- Recent activities will be displayed here -->
                         </ul>
                     </div>
+
                 </div>
                 <div class="div-space-top"></div>
 
 
                 <div class="project-role-container">
-                    <div class="heading-style">
-                        <p>Project roles</p>
-                    </div>
-                    <div class='user-role-container'>
-                        <div class='user-content add-member' onclick='addmember_popup_toggle()'>
-                            <p><span class='border-around-plus'>+</span> Add member</p>
+                    <div class="user-role-heading">
+                        <div class="heading-style">
+                            <p>Project roles</p>
                         </div>
-                        <?php
-                        echo '<div class="members-list">';
-                        while ($row = mysqli_fetch_assoc($result_users)) {
-                            $userId = $row['user_id'];
-                            $username = $row['username'];
-                            $isProjectOwner = $row['is_projectowner'];
-                            $userRole = $row['user_role'];
+                        <div class='user-role-container'>
+                            <div class='user-content add-member' onclick='addmember_popup_toggle()'>
+                                <p><span class='border-around-plus'>+</span> Add member</p>
+                            </div>
+                            <?php
+                            echo '<div class="members-list">';
+                            while ($row = mysqli_fetch_assoc($result_users)) {
+                                $userId = $row['user_id'];
+                                $username = $row['username'];
+                                $isProjectOwner = $row['is_projectowner'];
+                                $userRole = $row['user_role'];
 
-                            echo '<div class="member user-content" data-project-id="' . $project_id . '">';
-                            display_profile_picture($userId);
-                            echo '<div class="user-role-flex">';
-                            echo '<span class="username" data-user-id="' . $userId . '">' . $username . '</span>';
-                            if ($isProjectOwner) {
-                                echo '';
+                                echo '<div class="member user-content" data-project-id="' . $project_id . '">';
+                                display_profile_picture($userId);
+                                echo '<div class="user-role-flex">';
+                                echo '<span class="username" data-user-id="' . $userId . '">' . $username . '</span>';
+                                if ($isProjectOwner) {
+                                    echo '';
+                                }
+                                if ($userRole) {
+                                    $user_role = $userRole;
+                                    echo "<p class='user-role'>$user_role</p>";
+                                } elseif ($isProjectOwner) {
+                                    echo "<p class='user-role'>Project Owner</p>";
+                                } elseif ($project_owner['user_id'] == $user_id) {
+                                    echo "<p class='user-role'>+ Add role</p>";
+                                }
+
+                                echo '</div>';
+                                // }
+                                echo '</div>';
                             }
-                            if ($userRole) {
-                                $user_role = $userRole;
-                                echo "<p class='user-role'>$user_role</p>";
-                            } elseif ($isProjectOwner) {
-                                echo "<p class='user-role'>Project Owner</p>";
-                            } elseif ($project_owner['user_id'] == $user_id) {
-                                echo "<p class='user-role'>+ Add role</p>";
-                            }
-
                             echo '</div>';
-                            // }
-                            echo '</div>';
-                        }
-                        echo '</div>';
-                        ?>
+                            ?>
 
-                        <div class="userrole-popup-container popup-style" id="userRolePopup">
-                            <span class="userole-close-popup" id="closeUserRolePopup">&times;</span>
-                            <div class="userrole-popup-content">
-                                <ul>
-                                    <li>
-                                        <form id="userRoleForm" method="post" class="update_userrole">
-                                            <div id="error-message" class="error-message"></div>
-                                            <div class="input-container">
+                            <div class="userrole-popup-container popup-style" id="userRolePopup">
+                                <span class="userole-close-popup" id="closeUserRolePopup">&times;</span>
+                                <div class="userrole-popup-content">
+                                    <ul>
+                                        <li>
+                                            <form id="userRoleForm" method="post" class="update_userrole">
+                                                <div id="error-message" class="error-message"></div>
+                                                <div class="input-container">
+                                                    <input type="hidden" name="project_id"
+                                                        value="<?php echo $project_id; ?>">
+                                                    <input type="hidden" name="user_id" value="">
+                                                    <input type="text" name="user-role" class="input-style"
+                                                        id="userRoleInput" placeholder="Enter role">
+                                                </div>
+                                            </form>
+                                        <li>
+                                            <form id="removeUserForm" class="remove-user-from-proj">
                                                 <input type="hidden" name="project_id"
                                                     value="<?php echo $project_id; ?>">
                                                 <input type="hidden" name="user_id" value="">
-                                                <input type="text" name="user-role" class="input-style"
-                                                    id="userRoleInput" placeholder="Enter role">
-                                            </div>
-                                        </form>
-                                    <li>
-                                        <form id="removeUserForm" class="remove-user-from-proj">
-                                            <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
-                                            <input type="hidden" name="user_id" value="">
-                                            <button type="submit" class="indicate-danger" name="remove_user">Remove
-                                                User</button>
-                                        </form>
-                                    </li>
-                                </ul>
+                                                <button type="submit" class="indicate-danger" name="remove_user">Remove
+                                                    User</button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="invite-popup popup-style" id="invite-popup">
-                            <div class="invite-popup-content">
-                                <span class="invite-popup-close" onclick="addmember_popup_toggle()">&times;</span>
-                                <p class="heading-style">Share '
-                                    <?php echo $project['project_name'] ?>'
-                                </p>
-                                <div class="bottom-line"></div>
-                                <div class="div-space-top"></div>
-                                <form id="invite-form" novalidate>
+                            <div class="invite-popup popup-style" id="invite-popup">
+                                <div class="invite-popup-content">
+                                    <span class="invite-popup-close" onclick="addmember_popup_toggle()">&times;</span>
+                                    <p class="heading-style">Share '
+                                        <?php echo $project['project_name'] ?>'
+                                    </p>
+                                    <div class="bottom-line"></div>
+                                    <div class="div-space-top"></div>
+                                    <form id="invite-form" novalidate>
 
-                                    <p>Invite with email</p>
-                                    <input type="email" class="input-style" id="email" name="email"
-                                        placeholder="Add members by email.">
-                                    <p id="email-exists-message" class="indicate-danger"></p>
+                                        <p>Invite with email</p>
+                                        <input type="email" class="input-style" id="email" name="email"
+                                            placeholder="Add members by email.">
+                                        <p id="email-exists-message" class="indicate-danger"></p>
 
-                                    <div class="form-group">
-                                        <label for="message">Message <p
-                                                style="display:inline; color: var(--color-text-weak); font-size: 14px;">
-                                                (optional)</p>
-                                        </label>
-                                        <div class="textarea-style">
-                                            <textarea id="message" name="message" rows="4"
-                                                placeholder="Add a message"></textarea>
+                                        <div class="form-group">
+                                            <label for="message">Message <p
+                                                    style="display:inline; color: var(--color-text-weak); font-size: 14px;">
+                                                    (optional)</p>
+                                            </label>
+                                            <div class="textarea-style">
+                                                <textarea id="message" name="message" rows="4"
+                                                    placeholder="Add a message"></textarea>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <button type="submit" class="button-style">Send Invite</button>
-                                </form>
+                                        <button type="submit" class="button-style">Send Invite</button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="tab-content div-space-top" id="tab2">
-            <div class="tasks-section">
-                <button class="button-style" onclick="addtask_popup_toggle()">+ Add Task</button>
-                <button id="toggleSelect" class="button-style selectall">Select All</button>
-                <button id="cancelselect-btn" class="button-style" style="display: none;">Cancel Select</button>
+    
+    <div class="tab-content div-space-top" id="tab2">
+        <div class="tasks-section">
+            <button class="button-style" onclick="addtask_popup_toggle()">+ Add Task</button>
+            <button id="toggleSelect" class="button-style selectall">Select All</button>
+            <button id="cancelselect-btn" class="button-style" style="display: none;">Cancel Select</button>
 
-                <div id="checkboxsButtons" style="display: none; gap: 5px;">
-                    <button id="confirmDelete" class="button-style">Delete Selected</button>
-                </div>
+            <div id="checkboxsButtons" style="display: none; gap: 5px;">
+                <button id="confirmDelete" class="button-style">Delete Selected</button>
+            </div>
 
-                <div class="addtask-popup popup-style" id="addtask-popup">
-                    <div class="addtask-popup-content">
-                        <form action="partial/addtask.php" method="post" enctype="multipart/form-data"
-                            onsubmit="return task_validateForm()">
-                            <span class="addtask-popup-close" onclick="addtask_popup_toggle()">&times;</span>
-                            <p class="heading-style">Add Task</p>
-                            <div class="bottom-line"></div>
-                            <div class="div-space-top"></div>
-                            <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
-                            <div class="form-group">
-                                <span id="taskname-error" class="error-message"></span>
-                                <input class="input-style" type="text" name="taskname" id="taskname"
-                                    placeholder="Enter Task Name">
+            <div class="addtask-popup popup-style" id="addtask-popup">
+                <div class="addtask-popup-content">
+                    <form action="partial/addtask.php" method="post" enctype="multipart/form-data"
+                        onsubmit="return task_validateForm()">
+                        <span class="addtask-popup-close" onclick="addtask_popup_toggle()">&times;</span>
+                        <p class="heading-style">Add Task</p>
+                        <div class="bottom-line"></div>
+                        <div class="div-space-top"></div>
+                        <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
+                        <div class="form-group">
+                            <span id="taskname-error" class="error-message"></span>
+                            <input class="input-style" type="text" name="taskname" id="taskname"
+                                placeholder="Enter Task Name">
+                        </div>
+                        <div class="form-group">
+                            <label for="task_description">Description</label>
+                            <div class="textarea-style textarea-wrapper">
+                                <textarea type="text" maxlength="255" name="task_description"
+                                    id="task_description"></textarea>
+                                <span id="charCount">0 / 255 characters used</span>
+                                <span id="task_description-error" class="error-message"></span>
                             </div>
-                            <div class="form-group">
-                                <label for="task_description">Description</label>
-                                <div class="textarea-style textarea-wrapper">
-                                    <textarea type="text" maxlength="255" name="task_description"
-                                        id="task_description"></textarea>
-                                    <span id="charCount">0 / 255 characters used</span>
-                                    <span id="task_description-error" class="error-message"></span>
-                                </div>
-                            </div>
-                            <button type="submit" name="submit" class="btn-style">Submit</button>
-                        </form>
-                    </div>
+                        </div>
+                        <button type="submit" name="submit" class="btn-style">Submit</button>
+                    </form>
                 </div>
-                <div class="lst-of-tasks div-space-top">
-                    <?php
+            </div>
+            <div class="lst-of-tasks div-space-top">
+                <?php
 
-                    function formatDateRange1($startDate, $endDate)
-                    {
-                        if (!empty($startDate) && !empty($endDate)) {
-                            $start = new DateTime($startDate);
-                            $end = new DateTime($endDate);
+                function formatDateRange1($startDate, $endDate)
+                {
+                    if (!empty($startDate) && !empty($endDate)) {
+                        $start = new DateTime($startDate);
+                        $end = new DateTime($endDate);
 
-                            $startYear = $start->format('Y');
-                            $endYear = $end->format('Y');
+                        $startYear = $start->format('Y');
+                        $endYear = $end->format('Y');
 
-                            $formattedStart = $start->format('M j');
-                            $formattedEnd = $end->format('M j');
+                        $formattedStart = $start->format('M j');
+                        $formattedEnd = $end->format('M j');
 
-                            if ($startYear === $endYear) {
-                                return "{$formattedStart} - {$formattedEnd}, {$startYear}";
-                            } else {
-                                return "{$formattedStart}, {$startYear} - {$formattedEnd}, {$endYear}";
-                            }
+                        if ($startYear === $endYear) {
+                            return "{$formattedStart} - {$formattedEnd}, {$startYear}";
+                        } else {
+                            return "{$formattedStart}, {$startYear} - {$formattedEnd}, {$endYear}";
                         }
-                        return "n/a";
                     }
-                    // Check if the 'project_id' parameter is present in the URL
-                    if (isset($_GET['project_id']) && is_numeric($_GET['project_id'])) {
-                        $project_id = $_GET['project_id'];
+                    return "n/a";
+                }
+                // Check if the 'project_id' parameter is present in the URL
+                if (isset($_GET['project_id']) && is_numeric($_GET['project_id'])) {
+                    $project_id = $_GET['project_id'];
 
-                        // Prepare and execute the SQL query using a prepared statement
-                        $stmt = $connection->prepare("SELECT * FROM Tasks WHERE projectuser_id IN (SELECT projectuser_id FROM ProjectUsers WHERE project_id = ?)");
-                        $stmt->bind_param("i", $project_id);
-                        $stmt->execute();
-                        $result = $stmt->get_result();
+                    // Prepare and execute the SQL query using a prepared statement
+                    $stmt = $connection->prepare("SELECT * FROM Tasks WHERE projectuser_id IN (SELECT projectuser_id FROM ProjectUsers WHERE project_id = ?)");
+                    $stmt->bind_param("i", $project_id);
+                    $stmt->execute();
+                    $result = $stmt->get_result();
 
-                        // Store tasks grouped by section
-                        $tasksBySection = array(
-                            "To Do" => array(),
-                            "Doing" => array(),
-                            "Done" => array()
-                        );
+                    // Store tasks grouped by section
+                    $tasksBySection = array(
+                        "To Do" => array(),
+                        "Doing" => array(),
+                        "Done" => array()
+                    );
 
-                        if ($result->num_rows > 0) {
-                            while ($row = $result->fetch_assoc()) {
-                                $section = $row['section'];
-                                if (!isset($tasksBySection[$section])) {
-                                    $tasksBySection[$section] = array();
-                                }
-                                $tasksBySection[$section][] = $row;
+                    if ($result->num_rows > 0) {
+                        while ($row = $result->fetch_assoc()) {
+                            $section = $row['section'];
+                            if (!isset($tasksBySection[$section])) {
+                                $tasksBySection[$section] = array();
                             }
+                            $tasksBySection[$section][] = $row;
                         }
-                        $stmt->close();
                     }
+                    $stmt->close();
+                }
 
-                    ?>
-                    <?php if (isset($tasksBySection)): ?>
-                        <?php if (!empty($tasksBySection)): ?>
-                            <?php foreach ($tasksBySection as $section => $tasks): ?>
-                                <div class="collapsible">
-                                    <h2 class="section-topic">
-                                        <?php echo $section; ?>
-                                        <span class="section-task-count">
-                                            (
-                                            <?php echo countTasksBySectionAndProject($section, $project_id); ?>)
-                                        </span>
-                                    </h2>
-                                    <table class="sortable show" data-section="<?php echo $section; ?>">
-                                        <thead>
-                                            <tr>
-                                                <th id="task-th" class="checkbox-th"></th>
-                                                <th id="task-th">Task Name</th>
-                                                <th id="task-th">Task Description</th>
-                                                <th id="task-th">Assignee</th>
-                                                <th id="task-th">Due Date</th>
-                                                <th id="task-th">Status</th>
-                                                <th id="task-th">Priority</th>
-                                                <th id="task-th" class="task_creator-th">Task Creator</th>
+                ?>
+                <?php if (isset($tasksBySection)): ?>
+                    <?php if (!empty($tasksBySection)): ?>
+                        <?php foreach ($tasksBySection as $section => $tasks): ?>
+                            <div class="collapsible">
+                                <h2 class="section-topic">
+                                    <?php echo $section; ?>
+                                    <span class="section-task-count">
+                                        (
+                                        <?php echo countTasksBySectionAndProject($section, $project_id); ?>)
+                                    </span>
+                                </h2>
+                                <table class="sortable show" data-section="<?php echo $section; ?>">
+                                    <thead>
+                                        <tr>
+                                            <th id="task-th" class="checkbox-th"></th>
+                                            <th id="task-th">Task Name</th>
+                                            <th id="task-th">Task Description</th>
+                                            <th id="task-th">Assignee</th>
+                                            <th id="task-th">Due Date</th>
+                                            <th id="task-th">Status</th>
+                                            <th id="task-th">Priority</th>
+                                            <th id="task-th" class="task_creator-th">Task Creator</th>
 
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($tasks as $task): ?>
+                                            <tr data-task-id="<?php echo $task['task_id']; ?>"
+                                                class="<?php echo $task['status'] === 'Done' ? 'completed' : 'incomplete'; ?>">
+                                                <td>
+                                                    <?php echo $task['task_name']; ?>
+                                                </td>
+                                                <td class="task_desc tooltip">
+                                                    <span>
+                                                        <?php echo $task['task_description']; ?>
+                                                    </span>
+                                                    <div class="task_desc tooltiptext">
+                                                        <?php echo $task['task_description']; ?>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <?php echo $task['assignee']; ?>
+                                                </td>
+                                                <td>
+                                                    <span class="due-date">
+                                                        <?php echo formatDateRange1($task['start_date'], $task['end_date']); ?>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <?php echo $task['status']; ?>
+                                                </td>
+                                                <td>
+                                                    <?php echo $task['priority']; ?>
+                                                </td>
+                                                <td>
+                                                    <?php echo $task['task_creator']; ?>
+                                                </td>
                                             </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php foreach ($tasks as $task): ?>
-                                                <tr data-task-id="<?php echo $task['task_id']; ?>"
-                                                    class="<?php echo $task['status'] === 'Done' ? 'completed' : 'incomplete'; ?>">
-                                                    <td>
-                                                        <?php echo $task['task_name']; ?>
-                                                    </td>
-                                                    <td class="task_desc tooltip">
-                                                        <span>
-                                                            <?php echo $task['task_description']; ?>
-                                                        </span>
-                                                        <div class="task_desc tooltiptext">
-                                                            <?php echo $task['task_description']; ?>
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        <?php echo $task['assignee']; ?>
-                                                    </td>
-                                                    <td>
-                                                        <span class="due-date">
-                                                            <?php echo formatDateRange1($task['start_date'], $task['end_date']); ?>
-                                                        </span>
-                                                    </td>
-                                                    <td>
-                                                        <?php echo $task['status']; ?>
-                                                    </td>
-                                                    <td>
-                                                        <?php echo $task['priority']; ?>
-                                                    </td>
-                                                    <td>
-                                                        <?php echo $task['task_creator']; ?>
-                                                    </td>
-                                                </tr>
-                                            <?php endforeach; ?>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <p>No tasks assigned to this project.</p>
-                        <?php endif; ?>
-                    <?php endif; ?>
-
-                    <!-- Slide-in popup to display task description -->
-                    <div class="task-popup" id="taskPopup">
-                        <div class="heading-content">
-                            <div class="heading-style">
-                                <p>Edit Task</p>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
                             </div>
-                            <div class="bottom-line"></div>
-                            <div class="div-space-top"></div>
-                            <button type="button" id="closeButton">Close</button>
-                            <button type="button" id="deleteButton">Delete Task</button>
-                            <div class="div-space-top"></div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <p>No tasks assigned to this project.</p>
+                    <?php endif; ?>
+                <?php endif; ?>
+
+                <!-- Slide-in popup to display task description -->
+                <div class="task-popup" id="taskPopup">
+                    <div class="heading-content">
+                        <div class="heading-style">
+                            <p>Edit Task</p>
                         </div>
                         <div class="bottom-line"></div>
                         <div class="div-space-top"></div>
-                        <form id="editTaskForm">
-                            <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
-                            <input type="hidden" name="projectowner_id"
-                                value="<?php echo $project_owner['user_id']; ?>">
-                            <input type="hidden" id="editTaskId" name="task_id">
-                            <input class="input-style" type="text" id="editTaskName" name="task_name"
-                                placeholder="Task name">
-                            <span id="editTaskName-error" class="error-message"></span>
-                            <br>
-                            <div class="div-space-top"></div>
-                            <?php include 'partial/project_partial/populate_assignee.php';
-                            populateAssigneeOptions($project_id);
-                            ?>
-                            <span id="editAssignee-error" class="error-message"></span>
+                        <button type="button" id="closeButton">Close</button>
+                        <button type="button" id="deleteButton">Delete Task</button>
+                        <div class="div-space-top"></div>
+                    </div>
+                    <div class="bottom-line"></div>
+                    <div class="div-space-top"></div>
+                    <form id="editTaskForm">
+                        <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
+                        <input type="hidden" name="projectowner_id" value="<?php echo $project_owner['user_id']; ?>">
+                        <input type="hidden" id="editTaskId" name="task_id">
+                        <input class="input-style" type="text" id="editTaskName" name="task_name"
+                            placeholder="Task name">
+                        <span id="editTaskName-error" class="error-message"></span>
+                        <br>
+                        <div class="div-space-top"></div>
+                        <?php include 'partial/project_partial/populate_assignee.php';
+                        populateAssigneeOptions($project_id);
+                        ?>
+                        <span id="editAssignee-error" class="error-message"></span>
 
-                            <div class="div-space-top"></div>
-                            <div class="textarea-style">
-                                <textarea id="editTaskDescription" name="task_description"
-                                    placeholder="Task Description"></textarea>
-                            </div>
-                            <span id="editTaskDescription-error" class="error-message"></span>
+                        <div class="div-space-top"></div>
+                        <div class="textarea-style">
+                            <textarea id="editTaskDescription" name="task_description"
+                                placeholder="Task Description"></textarea>
+                        </div>
+                        <span id="editTaskDescription-error" class="error-message"></span>
 
-                            <div class="div-space-top"></div>
-                            <input class="input-style" type="text" id="editStartDate" name="start_date"
-                                onfocus="this.type='date'" onblur="if(!this.value)this.type='text';"
-                                placeholder="Start Date">
-                            <span id="editStartDate-error" class="error-message"></span>
-                            <br>
+                        <div class="div-space-top"></div>
+                        <input class="input-style" type="text" id="editStartDate" name="start_date"
+                            onfocus="this.type='date'" onblur="if(!this.value)this.type='text';"
+                            placeholder="Start Date">
+                        <span id="editStartDate-error" class="error-message"></span>
+                        <br>
 
-                            <div class="div-space-top"></div>
-                            <input class="input-style" type="text" id="editEndDate" name="end_date"
-                                onfocus="(this.type='date')" onblur="if(!this.value)this.type='text';"
-                                placeholder="End Date">
-                            <span id="editEndDate-error" class="error-message"></span>
-                            <br>
+                        <div class="div-space-top"></div>
+                        <input class="input-style" type="text" id="editEndDate" name="end_date"
+                            onfocus="(this.type='date')" onblur="if(!this.value)this.type='text';"
+                            placeholder="End Date">
+                        <span id="editEndDate-error" class="error-message"></span>
+                        <br>
 
-                            <div class="div-space-top"></div>
-                            <select id="editStatus" name="status" class="select-style">
-                                <option value="" selected disabled hidden>Select a Number</option>
-                                <option value="At risk">At risk</option>
-                                <option value="Off Track">Off track</option>
-                                <option value="On Track">On track</option>
-                                <option value="On Hold">On Hold</option>
-                                <option value="Cancelled">Cancelled</option>
-                                <option value="Blocked">Blocked</option>
-                                <option value="Pending Approval">Pending Approval</option>
-                                <option value="In Review">In Review</option>
-                            </select>
-                            <br>
-                            <span id="editStatus-error" class="error-message"></span>
+                        <div class="div-space-top"></div>
+                        <select id="editStatus" name="status" class="select-style">
+                            <option value="" selected disabled hidden>Select a Number</option>
+                            <option value="At risk">At risk</option>
+                            <option value="Off Track">Off track</option>
+                            <option value="On Track">On track</option>
+                            <option value="On Hold">On Hold</option>
+                            <option value="Cancelled">Cancelled</option>
+                            <option value="Blocked">Blocked</option>
+                            <option value="Pending Approval">Pending Approval</option>
+                            <option value="In Review">In Review</option>
+                        </select>
+                        <br>
+                        <span id="editStatus-error" class="error-message"></span>
 
-                            <div class="div-space-top"></div>
-                            <select id="editPriority" name="priority" class="select-style">
-                                <option value="Low">Low</option>
-                                <option value="Medium">Medium</option>
-                                <option value="High">High</option>
-                            </select>
-                            <span id="editPriority-error" class="error-message"></span>
-                            <br>
+                        <div class="div-space-top"></div>
+                        <select id="editPriority" name="priority" class="select-style">
+                            <option value="Low">Low</option>
+                            <option value="Medium">Medium</option>
+                            <option value="High">High</option>
+                        </select>
+                        <span id="editPriority-error" class="error-message"></span>
+                        <br>
 
-                            <div class="div-space-top"></div>
-                            <button type="submit" id="submitButton">Save Changes</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="tab-content div-space-top" id="tab3">
-            <div class="dashboard-section">
-                <div class="dashboard-item complete">
-                    <div class="complete-title">
-                        <p class="heading">Complete Tasks</p>
-                    </div>
-                    <div class="count">
-                        <span>
-                            <?php echo $completed_tasks ?>
-                        </span>
-                    </div>
-                </div>
-                <div class="dashboard-item incomplete">
-                    <div class="incomplete-title">
-                        <p class="heading">Incomplete Tasks</p>
-                    </div>
-                    <div class="count">
-                        <span>
-                            <?php echo $incomplete_tasks ?>
-                        </span>
-                    </div>
-                </div>
-                <div class="dashboard-item overdue-tasks">
-                    <div class="overdue-title">
-                        <p class="heading">Overdue Tasks</p>
-                    </div>
-                    <div class="count">
-                        <span>
-                            <?php echo $overdue_tasks ?>
-                        </span>
-                    </div>
-
-                </div>
-                <div class="dashboard-item total-tasks">
-                    <div class="total-title">
-                        <p class="heading">Total Tasks</p>
-                    </div>
-                    <div class="count">
-                        <span>
-                            <?php echo $total_tasks ?>
-                        </span>
-                    </div>
-
+                        <div class="div-space-top"></div>
+                        <button type="submit" id="submitButton">Save Changes</button>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
+    <div class="tab-content div-space-top" id="tab3">
+        <div class="dashboard-section">
+            <div class="dashboard-item complete">
+                <div class="complete-title">
+                    <p class="heading">Complete Tasks</p>
+                </div>
+                <div class="count">
+                    <span>
+                        <?php echo $completed_tasks ?>
+                    </span>
+                </div>
+            </div>
+            <div class="dashboard-item incomplete">
+                <div class="incomplete-title">
+                    <p class="heading">Incomplete Tasks</p>
+                </div>
+                <div class="count">
+                    <span>
+                        <?php echo $incomplete_tasks ?>
+                    </span>
+                </div>
+            </div>
+            <div class="dashboard-item overdue-tasks">
+                <div class="overdue-title">
+                    <p class="heading">Overdue Tasks</p>
+                </div>
+                <div class="count">
+                    <span>
+                        <?php echo $overdue_tasks ?>
+                    </span>
+                </div>
+
+            </div>
+            <div class="dashboard-item total-tasks">
+                <div class="total-title">
+                    <p class="heading">Total Tasks</p>
+                </div>
+                <div class="count">
+                    <span>
+                        <?php echo $total_tasks ?>
+                    </span>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
 
 </div>
 <script>
@@ -1833,7 +1973,7 @@ session_start();
         $.ajax({
             type: 'POST',
             url: 'partial/project_partial/get_recent_activities.php',
-            data: {project_id: <?php echo $project_id; ?>},
+            data: { project_id: <?php echo $project_id; ?> },
             dataType: 'json',
             success: function (response) {
                 console.log(response);
@@ -1860,4 +2000,122 @@ session_start();
     $(document).ready(function () {
         fetchRecentActivities();
     });
+</script>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+
+    // Event handler for clicking the "Edit" button
+    $('.edit-project-btn').on('click', function () {
+        var projectId = $(this).data("project-id");
+
+        $(".projectdropdown-popup").hide();
+
+        editproject_popup_toggle(projectId)
+    });
+
+    function projectEditFormValidation() {
+        // Clear previous error messages
+        $('.error-message').text('');
+
+        // Perform validation for each input field
+        const projectName = $('#project_name').val();
+        const projectDescription = $('#description').val();
+        const startDate = $('#projectStartDate').val();
+        const endDate = $('#projectEndDate').val();
+        const priority = $('#project_priority').val();
+
+        // Add your validation rules here
+        if (projectName.trim() === '') {
+            $("#projectname-error").text("Project name is required.");
+            return false;
+        }
+
+        if (projectDescription.trim() === '') {
+            $("#projectdescription-error").text("Project description is required.");
+            return false;
+        }
+
+        if (startDate === '') {
+            $("#projectStartDate-error").text("Project start date is required.");
+            return false;
+        }
+
+        if (endDate === '') {
+            $("#projectEndDate-error").text("Project end date is required.");
+            return false;
+        }
+
+        if (priority === null || priority == 0) {
+            $("#projectPriority-error").text("Project priority is required.");
+            return false;
+        }
+
+        return true; // All validation passed
+    }
+
+
+    function editproject_popup_toggle(projectId) {
+        const popup = document.getElementById('editproject-popup');
+        popup.style.display = (popup.style.display === 'block') ? 'none' : 'block';
+
+        if (popup.style.display === 'block') {
+            // If the popup is being displayed, set the value of the hidden input field to the project ID
+            document.getElementById('project_id').value = projectId;
+
+            initializeCharacterCount();
+
+            // Fetch project data using AJAX
+            fetchProjectData(projectId);
+        }
+    }
+
+    $('#editProjectForm').on("submit", function (event) {
+        event.preventDefault();
+
+        // Perform validation before submitting
+        if (!projectEditFormValidation()) {
+            return; // Stop form submission if validation fails
+        }
+
+        // Get the form data
+        const formData = $(this).serialize();
+
+        // Parse the formData string into an object
+        const formDataObject = {};
+        formData.split('&').forEach(function (pair) {
+            const keyValue = pair.split('=');
+            formDataObject[keyValue[0]] = decodeURIComponent(keyValue[1] || '');
+        });
+
+
+        // Use AJAX to fetch and display the edit form content
+        $.ajax({
+            url: "partial/project_partial/edit_project.php",
+            method: 'POST',
+            data: formData,
+            success: function (response) {
+                if (response.status == 'success') {
+                    console.log(response.message);
+                    displayPopupMessage(response.message, 'success');
+                } else if (response.status === 'error') {
+                    displayPopupMessage(response.message, 'error');
+                }
+
+                // Get the project_id from formDataObject
+                const project_id = formDataObject['project_id'];
+
+                // Closing the editproject popup
+                editproject_popup_toggle(project_id);
+            },
+            error: function (xhr, status, error) {
+                console.error("Error fetching edit form:", error);
+            }
+        });
+    });
+
+    $(document).on("click", function (event) {
+        console.log("Clicked element:", event.target);
+    });
+
 </script>
