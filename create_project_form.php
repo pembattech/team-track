@@ -74,6 +74,18 @@
 
                         <div class="div-space-top"></div>
                         <div class="form-group">
+                            <select class="input-style" name="status" id="createstatus">
+                                <option value="0" selected hidden>Select status</option>
+                                <option value="active">Active</option>
+                                <option value="canceled">Canceled</option>
+                                <option value="complete">Complete</option>
+                            </select>
+                            <br>
+                            <span class="error-message" id="statusError"></span>
+                        </div>
+
+                        <div class="div-space-top"></div>
+                        <div class="form-group">
                             <input type="submit" class="button-style" value="Submit">
                         </div>
 
@@ -103,8 +115,7 @@
                                 <div class="bottom-line"></div>
                                 <div class="div-space-top"></div>
                                 <form id="editProjectForm" enctype="multipart/form-data">
-                                    <input type="hidden" name="project_id" id="project_id"
-                                        value="<?php echo $project_id; ?>">
+                                    <input type="hidden" name="project_id" id="project_id" value="">
                                     <div class="form-group">
                                         <input class="input-style" type="text" name="project_name" id="project_name">
                                         <span id="projectname-error" class="error-message"></span>
@@ -134,6 +145,13 @@
                                         projectPrioritySelect($project_id);
                                         ?>
                                         <span id="projectPriority-error" class="error-message"></span>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <?php include 'partial/project_partial/selectproject_status.php';
+                                        projectStatusSelect($project_id);
+                                        ?>
+                                        <span id="projectStatus-error" class="error-message"></span>
                                     </div>
 
                                     <button type="submit" id="submitEditProject" class="button-style">Submit</button>
@@ -207,6 +225,11 @@
 
                 if ($("#createpriority").val() === "" || $("#createpriority").val() == null || $("#createpriority").val() == "0") {
                     $("#priorityError").text("Priority is required.");
+                    isValid = false;
+                }
+
+                if ($("#createstatus").val() === "" || $("#createstatus").val() == null || $("#createstatus").val() == "0") {
+                    $("#statusError").text("Status is required.");
                     isValid = false;
                 }
 
@@ -312,6 +335,7 @@
         $(document).on("click", ".edit-project-btn", function () {
             console.log("edit button clicked!");
             var projectId = $(this).data("project-id");
+            console.log(projectId);
 
             editproject_popup_toggle(projectId)
         });
@@ -326,6 +350,7 @@
             const startDate = $('#projectStartDate').val();
             const endDate = $('#projectEndDate').val();
             const priority = $('#project_priority').val();
+            const status = $('#project_status').val();
 
             // Add your validation rules here
             if (projectName.trim() === '') {
@@ -353,6 +378,11 @@
                 return false;
             }
 
+            if (status === null || status == 0) {
+                $("#projectStatus-error").text("Project status is required.");
+                return false;
+            }
+
             return true; // All validation passed
         }
 
@@ -369,6 +399,7 @@
 
             // Get the form data
             const formData = $(this).serialize();
+            console.log(formData);
 
             // Parse the formData string into an object
             const formDataObject = {};
@@ -554,11 +585,14 @@
                 dataType: 'json',
                 success: function (data) {
                     // Populate the description field with the fetched data
+                    $('#project_id').val(data.project_id);
+                    $('#project_name').val(data.project_name);
                     $('#project_name').val(data.project_name);
                     $('#description').val(data.description);
                     $('#projectStartDate').val(data.start_date);
                     $('#projectEndDate').val(data.end_date);
                     $('#project_priority').val(data.priority);
+                    $('#project_status').val(data.status);
                 },
                 error: function (xhr, status, error) {
                     console.error('Error fetching project data:', error);

@@ -1,12 +1,12 @@
 <?php
 require_once '../../config/connect.php';
-
 include '../utils.php';
 
 // Display all errors
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+$response = array(); // Initialize an array to store the response
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $projectId = $_POST['project_id'];
@@ -26,22 +26,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->bind_param("isss", $userId, $activity_type, $activity_description, $projectId);
 
             if ($stmt->execute()) {
-                echo '';
+                $response['status'] = 'success';
+                $response['message'] = 'User removed from the project successfully.';
             } else {
-                echo '';
+                $response['status'] = 'error';
+                $response['message'] = 'Error executing database query.';
             }
         } else {
-            echo '';
+            $response['status'] = 'error';
+            $response['message'] = 'error preparing database statement.';
         }
-
-        echo 'Success';
-        $_SESSION['notification_message'] = "User removed from the project successfully.";
-
-
-
     } else {
-        echo "Error removing user from the project: " . mysqli_error($connection);
-        $_SESSION['notification_message'] = "Error removing user from the project.";
+        $response['status'] = 'error';
+        $response['message'] = 'error removing user from the project: ' . mysqli_error($connection);
     }
+
+    header('Content-Type: application/json');
+    echo json_encode($response);
 }
 ?>

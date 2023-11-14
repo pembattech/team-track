@@ -294,8 +294,7 @@
                                         <div class="bottom-line"></div>
                                         <div class="div-space-top"></div>
                                         <form id="editProjectForm" enctype="multipart/form-data">
-                                            <input type="hidden" name="project_id" id="project_id"
-                                                value="<?php echo $project_id; ?>">
+                                            <input type="hidden" name="project_id" id="project_id" value="">
                                             <div class="form-group">
                                                 <input class="input-style" type="text" name="project_name"
                                                     id="project_name">
@@ -328,6 +327,14 @@
                                                 ?>
                                                 <span id="projectPriority-error" class="error-message"></span>
                                             </div>
+
+                                            <div class="form-group">
+                                                <?php include 'partial/project_partial/selectproject_status.php';
+                                                projectStatusSelect($project_id);
+                                                ?>
+                                                <span id="projectStatus-error" class="error-message"></span>
+                                            </div>
+
 
                                             <button type="submit" id="submitEditProject"
                                                 class="button-style">Submit</button>
@@ -397,6 +404,8 @@
         const startDate = $('#projectStartDate').val();
         const endDate = $('#projectEndDate').val();
         const priority = $('#project_priority').val();
+        const status = $('#project_status').val();
+
 
         // Add your validation rules here
         if (projectName.trim() === '') {
@@ -423,6 +432,11 @@
             $("#projectPriority-error").text("Project priority is required.");
             return false;
         }
+
+        if (status === null || status == 0) {
+                $("#projectStatus-error").text("Project status is required.");
+                return false;
+            }
 
         return true; // All validation passed
     }
@@ -558,11 +572,14 @@
             dataType: 'json',
             success: function (data) {
                 // Populate the description field with the fetched data
+                $('#project_id').val(data.project_id);
                 $('#project_name').val(data.project_name);
                 $('#description').val(data.description);
                 $('#projectStartDate').val(data.start_date);
                 $('#projectEndDate').val(data.end_date);
                 $('#project_priority').val(data.priority);
+                $('#project_status').val(data.status);
+
             },
             error: function (xhr, status, error) {
                 console.error('Error fetching project data:', error);
@@ -654,7 +671,7 @@
                 } else if (response.status === "error") {
                     // Handle error, e.g., display an error message
                     console.error(response.message);
-                    
+
                     document.getElementById("profilepic-error").textContent = response.message;
                 }
             },

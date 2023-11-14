@@ -32,8 +32,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $start_date = sanitize_input($_POST['start_date']);
     $end_date = sanitize_input($_POST['end_date']);
     $priority = sanitize_input($_POST['priority']);
+    $status = sanitize_input($_POST['status']);
 
-    if (empty($project_name) || empty($description) || empty($start_date) || empty($end_date) || empty($priority)) {
+
+    if (empty($project_name) || empty($description) || empty($start_date) || empty($end_date) || empty($priority) || empty($status)) {
         $errors[] = "All fields are required.";
     }
 
@@ -50,8 +52,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $user_id = $_SESSION['user_id'];
 
     // Insert project into the Projects table
-    $insert_project_query = "INSERT INTO Projects (project_name, description, start_date, end_date, priority, background_color)
-                           VALUES ('$project_name', '$description', '$start_date', '$end_date', '$priority', '$background_color')";
+    $insert_project_query = "INSERT INTO Projects (project_name, description, start_date, end_date, priority, background_color, status)
+                           VALUES ('$project_name', '$description', '$start_date', '$end_date', '$priority', '$background_color', '$status')";
 
     if ($connection->query($insert_project_query)) {
         $project_id = $connection->insert_id;

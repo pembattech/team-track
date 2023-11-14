@@ -12,6 +12,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $start_date = $_POST['start_date'];
     $end_date = $_POST['end_date'];
     $project_priority = $_POST["project_priority"];
+    $project_status = $_POST["project_status"];
 
     // Define an array to store validation errors
     $errors = [];
@@ -43,6 +44,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Validate the "project_priority" field
     if (empty($project_priority)) {
         $errors["project_priority"] = "Project Priority is required.";
+    }
+
+    if (empty($project_status)) {
+        $errors["project_status"] = "Project status is required.";
     }
 
 
@@ -79,6 +84,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $detailedChanges[] = 'Project Priority changed from "' . $row['priority'] . '" to "' . $project_priority . '"';
             }
 
+            if ($project_status !== $row['status']) {
+                $detailedChanges[] = 'Project status changed from "' . $row['status'] . '" to "' . $project_status . '"';
+            }
+
 
             // Update project in the Projects table
             $edit_project_query = "UPDATE Projects SET
@@ -86,7 +95,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     description = '$description',
                     start_date = '$start_date',
                     end_date = '$end_date',
-                    priority = '$project_priority'
+                    priority = '$project_priority',
+                    status = '$project_status'
                  WHERE project_id = $project_id";
 
             if ($connection->query($edit_project_query)) {

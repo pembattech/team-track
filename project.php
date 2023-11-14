@@ -269,7 +269,7 @@ session_start();
                     <div class="bottom-line"></div>
                     <div class="div-space-top"></div>
                     <form id="editProjectForm" enctype="multipart/form-data">
-                        <input type="hidden" name="project_id" id="project_id" value="<?php echo $project_id; ?>">
+                        <input type="hidden" name="project_id" id="project_id" value="">
                         <div class="form-group">
                             <input class="input-style" type="text" name="project_name" id="project_name"
                                 value="<?php echo $project['project_name']; ?>">
@@ -300,6 +300,13 @@ session_start();
                             projectPrioritySelect($project_id);
                             ?>
                             <span id="projectPriority-error" class="error-message"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <?php include 'partial/project_partial/selectproject_status.php';
+                            projectStatusSelect($project_id);
+                            ?>
+                            <span id="projectStatus-error" class="error-message"></span>
                         </div>
 
                         <button type="submit" id="submitEditProject" class="button-style">Submit</button>
@@ -1739,35 +1746,44 @@ session_start();
 </script>
 
 <script>
-    // Add an event listener to the form submission
-    document.getElementById('removeUserForm').addEventListener('submit', function (event) {
-        event.preventDefault();
+    $(document).ready(function () {
+        $('#removeUserForm').on('submit', function (event) {
+            event.preventDefault();
 
-        const userId = document.querySelector('.username.active').getAttribute('data-user-id'); // Assuming you have a class 'active' for the selected member
-        const projectId = document.querySelector('.member').getAttribute('data-project-id'); // Get the project ID from the clicked member
+            const userId = $('.username.active').data('user-id'); // Assuming you have a class 'active' for the selected member
+            const projectId = $('.member').data('project-id'); // Get the project ID from the clicked member
 
-        fetch('partial/project_partial/remove_user_from_project.php', {
-            method: 'POST',
-            body: new URLSearchParams({ project_id: projectId, user_id: userId }),
+            $.ajax({
+                url: 'partial/project_partial/remove_user_from_project.php',
+                method: 'POST',
+                data: { project_id: projectId, user_id: userId },
+                dataType: 'json',
+                success: function (response) {
+                    if (response.status == 'success') {
+                        console.log(response.message);
+                        displayPopupMessage(response.message, 'success');
 
-        })
-            .then(response => response.text())
-            .then(result => {
-                if (result === 'Success') {
-                    console.log('User removed successfully!');
-                    // You can perform any additional actions here after successful removal
-                } else {
-                    console.log('Error removing user.');
+                        // closing the user role popup
+                        closePopup()
+
+                        // Find the user element and remove it
+                        const activeUserElement = $('.username.active').closest('.member');
+                        activeUserElement.remove();
+
+                        // Updating the list of recent activity in the overview section of the project page.
+                        fetchRecentActivities();
+
+                    } else if (response.status === 'error') {
+                        displayPopupMessage(response.message, 'error');
+                    }
+
+                },
+                error: function (error) {
+                    console.log('An error occurred while removing user.');
                 }
-
-                // Updating the list of recent activity in the overview section of the project page.
-                fetchRecentActivities();
-
-            })
-            .catch(error => {
-                console.log('An error occurred while removing user.');
             });
-        location.reload(); // Reload the page after successful update
+
+        });
     });
 </script>
 
@@ -2038,6 +2054,7 @@ session_start();
         const startDate = $('#projectStartDate').val();
         const endDate = $('#projectEndDate').val();
         const priority = $('#project_priority').val();
+        const status = $('#project_status').val();
 
         // Add your validation rules here
         if (projectName.trim() === '') {
@@ -2065,6 +2082,11 @@ session_start();
             return false;
         }
 
+        if (status === null || status == 0) {
+            $("#projectStatus-error").text("Project status is required.");
+            return false;
+        }
+
         return true;
     }
 
@@ -2076,11 +2098,14 @@ session_start();
             dataType: 'json',
             success: function (response) {
                 // Populate the description field with the fetched data
+                $('#project_id').val(data.project_id);
                 $('#project_name').val(response.project_name);
                 $('#description').val(response.description);
                 $('#projectStartDate').val(response.start_date);
                 $('#projectEndDate').val(response.end_date);
                 $('#project_priority').val(response.priority);
+                $('#project_status').val(data.status);
+
             },
             error: function (xhr, status, error) {
                 console.error('Error fetching project data:', error);
