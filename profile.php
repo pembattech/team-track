@@ -260,11 +260,11 @@
                                             $background_color = $row['background_color'];
 
                                             // Output each project listing using HTML templates
-                                            echo '<div class="project-lst" style="margin-bottom:8px;">';
+                                            echo '<div class="project-lst" style="margin-bottom:8px;" data-project-id="' . $project_id . '">';
                                             echo '<div class="project-lst-name" style="display: inline-block;">';
                                             echo '<a href="project.php?project_id=' . $project_id . '" class="project-link">';
                                             echo '<div class="square" style="background-color:' . $background_color . '"></div>';
-                                            echo '<p class="project-title">' . add_ellipsis($project_name, 25) . '</p>';
+                                            echo '<p class="project-title">' . add_ellipsis($project_name, 20) . '</p>';
                                             echo '</a>';
                                             echo '</div>';
                                             if (get_project_owner_id($project_id) == $_SESSION['user_id']) {
@@ -434,9 +434,9 @@
         }
 
         if (status === null || status == 0) {
-                $("#projectStatus-error").text("Project status is required.");
-                return false;
-            }
+            $("#projectStatus-error").text("Project status is required.");
+            return false;
+        }
 
         return true; // All validation passed
     }
@@ -470,6 +470,11 @@
                 if (response.status == 'success') {
                     console.log(response.message);
                     displayPopupMessage(response.message, 'success');
+
+                    var latest_project_name = addEllipsis(response.latest_project_details.project_name, 20)
+                    $('.project-lst[data-project-id="' + response.latest_project_details.project_id + '"] p').text(latest_project_name);
+
+
                 } else if (response.status === 'error') {
                     displayPopupMessage(response.message, 'error');
                 }

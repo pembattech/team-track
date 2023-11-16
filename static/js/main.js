@@ -8,6 +8,13 @@ $(document).ready(function () {
     });
 });
 
+function capitalizeEachWord(str) {
+    return str.replace(/\b\w/g, function (char) {
+        return char.toUpperCase();
+    });
+}
+
+
 function capitalizeFirstLetter(inputString) {
     return inputString.charAt(0).toUpperCase() + inputString.slice(1);
 }

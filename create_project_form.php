@@ -281,7 +281,7 @@
                                     var projectLink = '<div class="project-lst">';
                                     projectLink += '<a href="project.php?project_id=' + project.id + '" class="project-link" id="link">';
                                     projectLink += '    <div class="square" style="background-color:' + project.color + '"></div>';
-                                    projectLink += '    <p class="project-title">' + truncateText(project.name, 23) + '</p>';
+                                    projectLink += '    <p class="project-title">' + truncateText(project.name, 20) + '</p>';
                                     projectLink += '</a>';
                                     projectLink += '</div>';
                                     $("#projectListContainer").append(projectLink);
@@ -450,7 +450,7 @@
                                 var projectLink = '<div class="project-lst">';
                                 projectLink += '<a href="project.php?project_id=' + project.id + '" class="project-link" id="link">';
                                 projectLink += '    <div class="square" style="background-color:' + project.color + '"></div>';
-                                projectLink += '    <p class="project-title">' + truncateText(project.name, 23) + '</p>';
+                                projectLink += '    <p class="project-title">' + truncateText(project.name, 20) + '</p>';
                                 projectLink += '</a>';
                                 projectLink += '</div>';
                                 $("#projectListContainer").append(projectLink);
@@ -526,20 +526,12 @@
                                 // Clear the existing project list
                                 $("#projectListContainer").empty();
 
-                                // JavaScript function to truncate text
-                                function truncateText(text, maxLength) {
-                                    if (text.length > maxLength) {
-                                        return text.substring(0, maxLength) + '...';
-                                    }
-                                    return text;
-                                }
-
                                 // Inside your success callback for fetching projects
                                 $.each(projects, function (index, project) {
                                     var projectLink = '<div class="project-lst">';
                                     projectLink += '<a href="project.php?project_id=' + project.id + '" class="project-link" id="link">';
                                     projectLink += '    <div class="square" style="background-color:' + project.color + '"></div>';
-                                    projectLink += '    <p class="project-title">' + truncateText(project.name, 23) + '</p>';
+                                    projectLink += '    <p class="project-title">' + addEllipsis(project.name, 20) + '</p>';
                                     projectLink += '</a>';
                                     projectLink += '</div>';
                                     $("#projectListContainer").append(projectLink);

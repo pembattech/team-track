@@ -141,10 +141,10 @@
                                 $project_id = $row['project_id'];
                                 $project_name = $row['project_name'];
                                 $background_color = $row['background_color'];
-                                echo '<div class="project-lst">';
+                                echo '<div class="project-lst" data-project-id=' . $project_id . '>';
                                 echo '<a href="project.php?project_id=' . $project_id . '" class="project-link" id="link">';
                                 echo '    <div class="square" style="background-color:' . $background_color . '"></div>';
-                                echo '    <p class="project-title">' . add_ellipsis($project_name, 23) . '</p>';
+                                echo '    <p class="project-title">' . add_ellipsis($project_name, 20) . '</p>';
                                 echo '</a>';
                                 echo '</div>';
                             }

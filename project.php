@@ -2098,13 +2098,13 @@ session_start();
             dataType: 'json',
             success: function (response) {
                 // Populate the description field with the fetched data
-                $('#project_id').val(data.project_id);
+                $('#project_id').val(response.project_id);
                 $('#project_name').val(response.project_name);
                 $('#description').val(response.description);
                 $('#projectStartDate').val(response.start_date);
                 $('#projectEndDate').val(response.end_date);
                 $('#project_priority').val(response.priority);
-                $('#project_status').val(data.status);
+                $('#project_status').val(response.status);
 
             },
             error: function (xhr, status, error) {
@@ -2182,6 +2182,11 @@ session_start();
 
                     $('.project-duedate p').text(dateRange);
                     $('#project-other-info.project-desc textarea').val(response.latest_project_details.description);
+                    $('.project-wrapper .project-name').text(capitalizeEachWord(response.latest_project_details.project_name));
+
+                    var latest_project_name = addEllipsis(response.latest_project_details.project_name, 20)
+                    $('.project-lst[data-project-id="' + response.latest_project_details.project_id + '"] p').text(latest_project_name);
+                    
 
 
                     displayPopupMessage(response.message, 'success');
