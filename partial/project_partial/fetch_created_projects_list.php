@@ -30,6 +30,7 @@ if ($result->num_rows > 0) {
         echo '<a href="project.php?project_id=' . $project_id . '" class="project-link">';
         echo '<div class="square" style="background-color:' . $background_color . '"></div>';
         echo '<p class="project-title">' . add_ellipsis($project_name, 65) . '</p>';
+        echo '<span class="project_status" style="font-size: 12px; font-weight="300px";>&nbsp;(' . get_project_data($project_id)['status'] . ')</span>';
         echo '</a>';
         echo '</div>';
         if (get_project_owner_id($project_id) == $_SESSION['user_id']) {

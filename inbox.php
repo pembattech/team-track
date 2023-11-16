@@ -87,6 +87,11 @@
     .options-btn-inbox {
         display: flex;
     }
+
+    .options-btn-inbox .filter-btns .active {
+        font-weight: 900;
+        color: var(--color-text);
+    }
 </style>
 
 <?php include 'partial/navbar.php'; ?>
@@ -104,8 +109,6 @@
                 <div class="heading-nav between-verticle-line tab-btn active" onclick="openTab_inbox(event, 'tab1')">
                     Activity
                 </div>
-                <!-- <div class="heading-nav between-verticle-line tab-btn" onclick="openTab_inbox(event, 'tab2')">
-                    Message I've sent</div> -->
             </div>
         </div>
         <div class="bottom-line"></div>
@@ -113,14 +116,8 @@
         <div class="tab-content active" id="tab1">
             <div class="div-space-top"></div>
             <div class="options-btn-inbox">
-                <!-- <div class="send-msg-content">
-                    <div class="send-message-btn button-style related-btn-img overlay-border">
-                        <img src="./static/image/sms.svg" alt="">
-                        Send message
-                    </div>
-                </div> -->
                 <div class="filter-btns">
-                    <button class="filter-button button-style" data-filter="all">All</button>
+                    <button class="filter-button button-style active" data-filter="all">All</button>
                     <button class="filter-button button-style" data-filter="unread">Unread</button>
                 </div>
             </div>
@@ -153,6 +150,18 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
+
+    $(document).ready(function () {
+        // Add click event to filter buttons
+        $('.filter-button').on('click', function () {
+            // Remove "active" class from all buttons
+            $('.filter-button').removeClass('active');
+
+            // Add "active" class to the clicked button
+            $(this).addClass('active');
+        });
+    });
+
     let currentOpenMessageId = null; // Initialize a variable to store the current open message ID
     // Initial filter setting
     let currentFilter = 'all'; // Default filter: All messages
@@ -208,7 +217,7 @@
             method: 'GET',
             data: { filter: currentFilter }, // Send the filter value to the server
             success: function (response) {
-                
+
                 const messageList = $('.message-list tbody');
                 messageList.empty();
 
@@ -311,7 +320,7 @@
             method: 'POST',
             data: { message_id: messageId },
             success: function (response) {
-                
+
                 console.log('Marked read!');
                 console.log(response.unreadCount);
 

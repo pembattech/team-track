@@ -601,6 +601,7 @@
                 url: "partial/project_partial/fetch_created_projects_list.php",
                 dataType: "html",
                 success: function (html) {
+                    console.log(html)
                     // Replace the content of the project list container with the updated list
                     $("#created_projects").html(html);
                 },
