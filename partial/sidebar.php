@@ -131,7 +131,7 @@
                         $sql = "SELECT P.project_id, P.project_name, P.background_color 
                         FROM Projects P
                         INNER JOIN ProjectUsers PU ON P.project_id = PU.project_id
-                        WHERE PU.user_id = $user_id";
+                        WHERE PU.user_id = $user_id AND P.status = 'active'";
 
                         $result = $connection->query($sql);
 

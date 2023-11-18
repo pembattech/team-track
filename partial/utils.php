@@ -211,7 +211,25 @@ function addRecentActivity($user_id, $activity_type, $activity_description, $pro
     }
 }
 
+function isTaskCreatorOrProjectOwner($taskId, $loggedInUserId) {
+    global $connection;
+    
+    // Query to check if the user is the task creator or project owner
+    $sql = "SELECT COUNT(*) as count
+            FROM Tasks T
+            JOIN ProjectUsers PU ON T.projectuser_id = PU.projectuser_id
+            WHERE (T.task_creator_id = $loggedInUserId OR PU.is_projectowner = 1)
+            AND T.task_id = $taskId";
 
+    $result = $connection->query($sql);
+
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        return $row['count'] > 0;
+    }
+
+    return false;
+}
 
 
 ?>

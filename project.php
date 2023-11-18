@@ -129,7 +129,7 @@ session_start();
             if ($_GET['verify'] == 'false' && !$userAssociated && $userAssociated == 0 && $_GET['invite'] == 'true') { ?>
                 <script>
                     $(document).ready(function () {
-                        openOtpPopup(); // Opens the OTP verification popup$user_id = $_SESSION['user_id'];
+                        openOtpPopup();
                     });
                 </script>
 
@@ -646,7 +646,11 @@ session_start();
                             <div class="bottom-line"></div>
                             <div class="div-space-top"></div>
                             <button type="button" id="closeButton">Close</button>
-                            <button type="button" id="deleteButton">Delete Task</button>
+                            <?php if ($project_owner['user_id'] == $user_id) {
+                                ?>
+                                <button type="button" id="deleteButton">Delete Task</button>
+                                <?php
+                            } ?>
                             <div class="div-space-top"></div>
                         </div>
                         <div class="bottom-line"></div>
@@ -782,14 +786,13 @@ session_start();
         popup.style.display = (popup.style.display === 'block') ? 'none' : 'block';
     }
 </script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script>
 
     // Initialize the date range picker when the document is ready
     $(document).ready(function () {
         initializeDateRangePicker('#editStartDate', '#editEndDate');
-
         dynamic_duedate(<?php echo $project_id; ?>);
     });
 
@@ -2032,7 +2035,6 @@ session_start();
     });
 </script>
 
-<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script>
 
     // Event handler for clicking the "Edit" button
@@ -2186,7 +2188,7 @@ session_start();
 
                     var latest_project_name = addEllipsis(response.latest_project_details.project_name, 20)
                     $('.project-lst[data-project-id="' + response.latest_project_details.project_id + '"] p').text(latest_project_name);
-                    
+
 
 
                     displayPopupMessage(response.message, 'success');
