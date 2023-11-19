@@ -2189,6 +2189,7 @@ session_start();
                     var latest_project_name = addEllipsis(response.latest_project_details.project_name, 20)
                     $('.project-lst[data-project-id="' + response.latest_project_details.project_id + '"] p').text(latest_project_name);
 
+                    updateProjectListContainer()
 
 
                     displayPopupMessage(response.message, 'success');
@@ -2209,4 +2210,22 @@ session_start();
 
     });
 
+</script>
+<script>
+    // Function to update the project list container on the sidebar dynamically
+    function updateProjectListContainer() {
+        var projectListContainer = $("#projectListContainer");
+
+        // Reload the content of projectListContainer using AJAX
+        $.ajax({
+            type: "GET",
+            url: "partial/project_partial/update_project_list.php",
+            success: function (newContent) {
+                projectListContainer.html(newContent);
+            },
+            error: function () {
+                console.log("An error occurred while updating the project list.");
+            }
+        });
+    }
 </script>
