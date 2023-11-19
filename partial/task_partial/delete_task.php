@@ -1,4 +1,9 @@
 <?php
+// Enable error reporting
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+
 require_once '../../config/connect.php';
 require_once '../utils.php'; // Include the utils.php file
 
@@ -13,6 +18,8 @@ if (isset($_POST['task_id']) && is_numeric($_POST['task_id'])) {
 
     $task_name = getTaskInfo($task_id)['task_name'];
 
+
+    $task_details = getTaskDetails($task_id);
 
     $loggedInUserId = $_SESSION['user_id'];
 
@@ -30,7 +37,7 @@ if (isset($_POST['task_id']) && is_numeric($_POST['task_id'])) {
             $taskCreatorId = $taskCreatorData['task_creator_id'];
         }
 
-        $taskCreatorStmt->close();
+        // $taskCreatorStmt->close();
     }
 
     // Check if the user is the project owner or the task creator
@@ -43,7 +50,7 @@ if (isset($_POST['task_id']) && is_numeric($_POST['task_id'])) {
         if ($delete_messages_stmt) {
             $delete_messages_stmt->bind_param("i", $task_id);
             $delete_messages_stmt->execute();
-            $delete_messages_stmt->close();
+            // $delete_messages_stmt->close();
 
             // Delete the task
             $delete_task_query = "DELETE FROM Tasks WHERE task_id = ?";
@@ -54,6 +61,18 @@ if (isset($_POST['task_id']) && is_numeric($_POST['task_id'])) {
 
                 if ($delete_task_stmt->execute()) {
                     // Task deleted successfully
+
+                    if ($projectowner_id != $taskCreatorId) {
+
+                        $messageText = 'The task ' . $task_name . ' you created has been deleted by the project owner.';
+                        $insert_message_query = "INSERT INTO Messages (recipient_id, text, project_id, is_task_msg) VALUES ($taskCreatorId, '$messageText', $project_id, 1)";
+
+                        if ($connection->query($insert_message_query)) {
+                            echo '';
+                        } else {
+                            echo '';
+                        }
+                    }
 
                     // Get the user's name using the getUserName function from utils.py
                     $userName = getUserName($loggedInUserId);
