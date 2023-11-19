@@ -95,9 +95,9 @@
             </a>
         </li>
         <li class="related-btn-img">
-            <a href="inbox.php" class="full-width">
+            <a href="notification.php" class="full-width">
                 <img src="./static/image/bell.svg" alt="">
-                Inbox
+                Notification
                 <?php
                 // Query to count unread messages for the user
                 $sql = "SELECT COUNT(message_id) AS unread_count FROM Messages

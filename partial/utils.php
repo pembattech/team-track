@@ -1,4 +1,7 @@
 <?php
+    // // Enable error reporting
+    // error_reporting(E_ALL);
+    // ini_set('display_errors', 1);
 
 // Function to get user data from the database
 function get_user_data($user_id)
@@ -211,9 +214,10 @@ function addRecentActivity($user_id, $activity_type, $activity_description, $pro
     }
 }
 
-function isTaskCreatorOrProjectOwner($taskId, $loggedInUserId) {
+function isTaskCreatorOrProjectOwner($taskId, $loggedInUserId)
+{
     global $connection;
-    
+
     // Query to check if the user is the task creator or project owner
     $sql = "SELECT COUNT(*) as count
             FROM Tasks T
@@ -230,6 +234,48 @@ function isTaskCreatorOrProjectOwner($taskId, $loggedInUserId) {
 
     return false;
 }
+
+function getTasksOfAssignedUser($user_id, $project_id, $is_left_project, $msg)
+{
+    global $connection;
+
+    $sql = "SELECT Tasks.* FROM Tasks
+    JOIN ProjectUsers ON Tasks.projectuser_id = ProjectUsers.projectuser_id
+    JOIN Users ON Tasks.assignee = Users.user_id
+    WHERE Tasks.assignee = $user_id AND ProjectUsers.project_id = $project_id";
+
+    $result = $connection->query($sql);
+    $tasks = "";
+    $totalTasks = 0;
+
+    if ($result->num_rows > 0) {
+        $totalTasks = $result->num_rows;
+        if ($is_left_project != '') {
+            $user_name = getUserName($user_id);
+
+            $tasks .= $user_name . " " . $msg . ".<br>";
+        }
+
+        $tasks .= "Total Tasks Assigned to $user_name: " . $totalTasks . ".<br>Here are the list of task assigned to this user<br><hr>";
+
+        // Fetch data and append to the $tasks variable
+        while ($row = $result->fetch_assoc()) {
+            $tasks .= "Task Name: " . ($row["task_name"] ? $row["task_name"] : "N/A") . "<br>";
+            $tasks .= "Description: " . ($row["task_description"] ? $row["task_description"] : "N/A") . "<br>";
+            $tasks .= "Start Date: " . ($row["start_date"] ? $row["start_date"] : "N/A") . "<br>";
+            $tasks .= "End Date: " . ($row["end_date"] ? $row["end_date"] : "N/A") . "<br>";
+            $tasks .= "Status: " . ($row["status"] ? $row["status"] : "N/A") . "<br>";
+            $tasks .= "Priority: " . ($row["priority"] ? $row["priority"] : "N/A") . "<br>";
+            $tasks .= "Section: " . ($row["section"] ? $row["section"] : "N/A") . "<br>";
+
+            $tasks .= "<hr>";
+        }
+    }
+
+    return $tasks;
+}
+
+
 
 
 ?>
