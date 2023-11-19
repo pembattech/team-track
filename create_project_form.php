@@ -74,18 +74,6 @@
 
                         <div class="div-space-top"></div>
                         <div class="form-group">
-                            <select class="input-style" name="status" id="createstatus">
-                                <option value="0" selected hidden>Select status</option>
-                                <option value="active">Active</option>
-                                <option value="canceled">Canceled</option>
-                                <option value="complete">Complete</option>
-                            </select>
-                            <br>
-                            <span class="error-message" id="statusError"></span>
-                        </div>
-
-                        <div class="div-space-top"></div>
-                        <div class="form-group">
                             <input type="submit" class="button-style" value="Submit">
                         </div>
 
@@ -228,11 +216,6 @@
                     isValid = false;
                 }
 
-                if ($("#createstatus").val() === "" || $("#createstatus").val() == null || $("#createstatus").val() == "0") {
-                    $("#statusError").text("Status is required.");
-                    isValid = false;
-                }
-
                 if (!isValid) {
                     return;
                 }
@@ -255,6 +238,9 @@
 
                         // Clear the form inputs on success
                         $("#projectForm")[0].reset();
+                        // Change the type attribute of createprojectStartDate back to text
+                        $("#createprojectStartDate").attr("type", "text");
+                        $("#createprojectEndDate").attr("type", "text");
 
                         // After successfully creating the project, update the project list
                         $.ajax({
@@ -422,6 +408,9 @@
                         displayPopupMessage(response.message, 'error');
                     }
 
+                    // Call the function to populate the project list on the sidebar.
+                    updateProjectListContainer()
+
                     // Get the project_id from formDataObject
                     const project_id = formDataObject['project_id'];
 
@@ -431,8 +420,13 @@
                         url: "partial/project_partial/fetch_projects.php", // URL to fetch the updated project list
                         dataType: "json",
                         success: function (projects) {
+
                             // Call the function to populate the project list on the right side of create project form
                             updateProjectList();
+
+                            // Call the function to populate the project list on the sidebar.
+                            updateProjectListContainer()
+
 
                             // Clear the existing project list
                             $("#projectListContainer").empty();
@@ -513,6 +507,9 @@
                         } else if (response.status === 'error') {
                             displayPopupMessage(response.message, 'error');
                         }
+
+                        // Call the function to populate the project list on the sidebar.
+                        updateProjectListContainer()
 
                         // After successfully creating the project, update the project list
                         $.ajax({
@@ -607,6 +604,24 @@
                 },
                 error: function () {
                     console.log("An error occurred while fetching the updated project list.");
+                }
+            });
+        }
+    </script>
+    <script>
+        // Function to update the project list container on the sidebar dynamically
+        function updateProjectListContainer() {
+            var projectListContainer = $("#projectListContainer");
+
+            // Reload the content of projectListContainer using AJAX
+            $.ajax({
+                type: "GET",
+                url: "partial/project_partial/update_project_list.php",
+                success: function (newContent) {
+                    projectListContainer.html(newContent);
+                },
+                error: function () {
+                    console.log("An error occurred while updating the project list.");
                 }
             });
         }

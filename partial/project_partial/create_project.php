@@ -32,7 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $start_date = sanitize_input($_POST['start_date']);
     $end_date = sanitize_input($_POST['end_date']);
     $priority = sanitize_input($_POST['priority']);
-    $status = sanitize_input($_POST['status']);
+    $status = "active";
 
 
     if (empty($project_name) || empty($description) || empty($start_date) || empty($end_date) || empty($priority) || empty($status)) {

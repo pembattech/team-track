@@ -472,6 +472,9 @@
                     console.log(response.message);
                     displayPopupMessage(response.message, 'success');
 
+                    // Call the function to populate the project list on the sidebar.
+                    updateProjectListContainer();
+
                     var latest_project_name = addEllipsis(response.latest_project_details.project_name, 20)
                     $('.project-lst[data-project-id="' + response.latest_project_details.project_id + '"] p').text(latest_project_name);
 
@@ -510,7 +513,6 @@
     }
 
     function deleteproject_popup_options(projectId, deleteButton) {
-
         // Unbind any previously bound click event for #confirmDeleteProject
         $("#confirmDeleteProject").off("click");
 
@@ -529,6 +531,9 @@
 
                     // Handle the response from the server
                     if (response.status == 'success') {
+                        // Call the function to populate the project list on the sidebar.
+                        updateProjectListContainer();
+
                         // Optionally, remove the deleted project listing from the DOM
                         deleteButton.closest(".project-lst").remove();
 
@@ -807,5 +812,23 @@
         const initialText1 = textArea1.value;
         const initialLength1 = initialText1.length;
         charCount1.textContent = `${initialLength1} / 255 characters used`;
+    }
+</script>
+<script>
+    // Function to update the project list container on the sidebar dynamically
+    function updateProjectListContainer() {
+        var projectListContainer = $("#projectListContainer");
+
+        // Reload the content of projectListContainer using AJAX
+        $.ajax({
+            type: "GET",
+            url: "partial/project_partial/update_project_list.php",
+            success: function (newContent) {
+                projectListContainer.html(newContent);
+            },
+            error: function () {
+                console.log("An error occurred while updating the project list.");
+            }
+        });
     }
 </script>
