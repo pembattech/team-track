@@ -203,11 +203,67 @@
         popup.slideDown(300);
 
         setTimeout(function () {
-        popup.slideUp(300, function () {
-            popupNotification.style.display = "none"; // Hide the popup completely
-        });
-    }, 5000);
+            popup.slideUp(300, function () {
+                popupNotification.style.display = "none"; // Hide the popup completely
+            });
+        }, 5000);
     }
 
+    // Initialize the date range picker when the document is ready
+    $(document).ready(function () {
+        project_deadline_check();
+    });
+
+    function updateSidebarUnreadCount() {
+        // Ajax request to fetch unread message count
+        $.ajax({
+            url: 'partial/inbox_partial/count_unread.php',
+            type: 'GET',
+            dataType: 'json',
+            success: function (response) {
+                if (response.error) {
+                    console.error('Error fetching unread count:', response.error);
+                } else {
+                    // Update the content inside the #notification element
+                    const notification = $('#notification');
+                    let badge = notification.find('.unread-badge');
+
+                    if (badge.length == 0) {
+                        // If .unread-badge is not found, create and append it
+                        badge = $('<span class="unread-badge"></span>');
+                        notification.append(badge);
+                    }
+
+                    if (response.unreadCount == 0) {
+                        badge.css('backgroundColor', 'transparent');
+                        badge.text('');
+                    } else {
+                        badge.text(response.unreadCount);
+                    }
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('AJAX request failed:', status, error);
+            }
+        });
+    }
+
+    function project_deadline_check() {
+        var userId = <?php echo $user_id; ?>;
+        // Make AJAX request to fetch project end dates
+        $.ajax({
+            type: 'GET',
+            url: 'partial/project_partial/project_deadline_alert.php',
+            data: userId,
+            dataType: 'json',
+            success: function (response) {
+
+                updateSidebarUnreadCount();
+            },
+            error: function (xhr, status, error) {
+                console.error('AJAX Error: ' + status, error);
+            }
+        });
+    }
 
 </script>

@@ -1122,6 +1122,8 @@ session_start();
 
     // Function to fetch tasks from the server using AJAX
     function fetchTasks() {
+        task_deadline_check();
+
 
         // Updating the list of recent activity in the overview section of the project page.
         fetchRecentActivities();
@@ -2237,7 +2239,7 @@ session_start();
     function updateSidebarUnreadCount() {
         // Ajax request to fetch unread message count
         $.ajax({
-            url: 'test3.php',
+            url: 'partial/inbox_partial/count_unread.php',
             type: 'GET',
             dataType: 'json',
             success: function (response) {
@@ -2248,13 +2250,7 @@ session_start();
                     const notification = $('#notification');
                     let badge = notification.find('.unread-badge');
 
-                    if (badge.length == 0) {
-                        // If .unread-badge is not found, create and append it
-                        badge = $('<span class="unread-badge"></span>');
-                        notification.append(badge);
-                    }
-
-                    if (response.unreadCount === 0) {
+                    if (response.unreadCount == 0) {
                         badge.css('backgroundColor', 'transparent');
                         badge.text('');
                     } else {
@@ -2277,6 +2273,7 @@ session_start();
             data: userId,
             dataType: 'json',
             success: function (response) {
+
                 updateSidebarUnreadCount();
             },
             error: function (xhr, status, error) {
@@ -2285,5 +2282,23 @@ session_start();
         });
     }
 
+    
+    function task_deadline_check() {
+        var userId = <?php echo $user_id; ?>;
+        // Make AJAX request to fetch project end dates
+        $.ajax({
+            type: 'GET',
+            url: 'partial/task_partial/task_deadline_alert.php',
+            data: userId,
+            dataType: 'json',
+            success: function (response) {
+                updateSidebarUnreadCount();
+            },
+            error: function (xhr, status, error) {
+                console.error('AJAX Error: ' + status, error);
+            }
+        });
+    }
 
+    
 </script>

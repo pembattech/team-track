@@ -1,7 +1,7 @@
 <?php
-    // // Enable error reporting
-    // error_reporting(E_ALL);
-    // ini_set('display_errors', 1);
+// // Enable error reporting
+// error_reporting(E_ALL);
+// ini_set('display_errors', 1);
 
 // Function to get user data from the database
 function get_user_data($user_id)
@@ -193,6 +193,54 @@ function getTaskInfo($task_id)
     return $taskInfo;
 }
 
+function getProjectIdByTaskId($taskId)
+{
+    global $connection;
+
+    // Prepare a SQL statement to select the project ID based on the task ID
+    $sql = "SELECT P.project_id
+                FROM Projects P
+                INNER JOIN ProjectUsers PU ON P.project_id = PU.project_id
+                INNER JOIN Tasks T ON PU.projectuser_id = T.projectuser_id
+                WHERE T.task_id = ?";
+
+    // Prepare the SQL statement
+    $stmt = $connection->prepare($sql);
+
+    if ($stmt) {
+        // Bind the task ID parameter
+        $stmt->bind_param("i", $taskId);
+
+        // Execute the query
+        $stmt->execute();
+
+        // Get the result set
+        $result = $stmt->get_result();
+
+        // Check if there are rows in the result set
+        if ($result->num_rows > 0) {
+            // Fetch the project ID
+            $row = $result->fetch_assoc();
+            $projectId = $row['project_id'];
+
+            // Close the statement
+            $stmt->close();
+
+            // Return the project ID
+            return $projectId;
+        } else {
+            // If no rows are found, return null or handle accordingly
+            $stmt->close();
+            return null;
+        }
+    } else {
+        // If the statement preparation fails, handle the error (e.g., log or echo the error)
+        echo "Error preparing SQL statement: " . $connection->error;
+        return null;
+    }
+}
+
+
 // Function to add recent activity
 function addRecentActivity($user_id, $activity_type, $activity_description, $project_id, $task_id)
 {
@@ -276,31 +324,126 @@ function getTasksOfAssignedUser($user_id, $project_id, $is_left_project, $msg)
 }
 
 // Function to send a message to the project owner
-function sendMessageAboutDeadline($projectId, $is_project_deadline = NULL) {
+function sendMessageAboutDeadlineProject($projectId, $msg = NULL)
+{
     global $connection;
 
-    // Get the project owner's user ID
-    $ownerQuery = "SELECT user_id FROM ProjectUsers WHERE project_id = $projectId AND is_projectowner = 1";
-    $ownerResult = $connection->query($ownerQuery);
+    // Check if the project has not already sent a deadline message
+    $checkIsSendQuery = "SELECT is_send_deadline_msg FROM Projects WHERE project_id = $projectId";
+    $checkIsSendResult = $connection->query($checkIsSendQuery);
 
-    if ($ownerResult->num_rows > 0) {
-        $ownerRow = $ownerResult->fetch_assoc();
-        $ownerUserId = $ownerRow['user_id'];
+    if ($checkIsSendResult) {
+        $projectData = $checkIsSendResult->fetch_assoc();
+        $isSendDeadline = $projectData['is_send_deadline_msg'];
 
-        if ($is_project_deadline != NULL)
-        {
-            // Create a message
-            $messageText = "Project deadline is approaching! The project you own is ending in 5 days.";
-            // Insert the message into the Messages table
-            $insertMessageQuery = "INSERT INTO Messages (text, recipient_id, is_project_msg, project_id)
-                                   VALUES ('$messageText', $ownerUserId, 1, $projectId)";
-    
-            $connection->query($insertMessageQuery);
-        } 
-        // else {
+        if ($isSendDeadline == 0) {
+            // Get the project owner's user ID
+            $ownerQuery = "SELECT user_id FROM ProjectUsers WHERE project_id = $projectId AND is_projectowner = 1";
+            $ownerResult = $connection->query($ownerQuery);
 
-        // }
+            if ($ownerResult->num_rows > 0) {
+                $ownerRow = $ownerResult->fetch_assoc();
+                $ownerUserId = $ownerRow['user_id'];
 
+                // Create a message
+                $messageText = "The deadline for your project is approaching! Your project, which you oversee, is set to conclude in 5 days." . $msg;
+                // Insert the message into the Messages table
+                $insertMessageQuery = "INSERT INTO Messages (text, recipient_id, is_project_msg, project_id)
+                                       VALUES ('$messageText', $ownerUserId, 1, $projectId)";
+
+                if ($connection->query($insertMessageQuery)) {
+                    // If the message is inserted successfully, update is_send_deadline_msg to 1
+                    $updateIsSendQuery = "UPDATE Projects SET is_send_deadline_msg = 1 WHERE project_id = $projectId";
+                    $connection->query($updateIsSendQuery);
+                }
+            }
+        }
+    }
+}
+
+
+function sendMessageAboutDeadlineTask($taskId, $projectId)
+{
+    global $connection;
+
+    // Check if the task has not already sent a deadline message
+    $checkIsSendQuery = "SELECT is_send_deadline_msg FROM Tasks WHERE task_id = $taskId";
+    $checkIsSendResult = $connection->query($checkIsSendQuery);
+
+    if ($checkIsSendResult) {
+        $taskData = $checkIsSendResult->fetch_assoc();
+        $isSendDeadline = $taskData['is_send_deadline_msg'];
+
+        if ($isSendDeadline == 0) {
+            // Get the project owner's user ID
+            $ownerQuery = "SELECT user_id FROM ProjectUsers WHERE project_id = $projectId AND is_projectowner = 1";
+            $ownerResult = $connection->query($ownerQuery);
+
+            if ($ownerResult->num_rows > 0) {
+                $ownerRow = $ownerResult->fetch_assoc();
+                $ownerUserId = $ownerRow['user_id'];
+
+                // Define an array to store the task information
+                $taskInfo = array();
+
+                // Prepare a SQL statement to select the task information
+                $select_task_query = "SELECT * FROM Tasks WHERE task_id = ?";
+                $select_task_stmt = $connection->prepare($select_task_query);
+
+                if ($select_task_stmt) {
+                    $select_task_stmt->bind_param("i", $taskId);
+                    $select_task_stmt->execute();
+
+                    // Get the result set
+                    $result = $select_task_stmt->get_result();
+
+                    if ($result->num_rows > 0) {
+                        // Fetch the task information as an associative array
+                        $taskInfo = $result->fetch_assoc();
+
+                        // Assign variables to each key
+                        $task_id = $taskInfo['task_id'];
+                        $projectuser_id = $taskInfo['projectuser_id'];
+                        $task_creator_id = $taskInfo['task_creator_id'];
+                        $task_name = $taskInfo['task_name'];
+                        $assignee = $taskInfo['assignee'];
+                        $task_description = $taskInfo['task_description'];
+                        $start_date = $taskInfo['start_date'];
+                        $end_date = $taskInfo['end_date'];
+                        $status = $taskInfo['status'];
+                        $section = $taskInfo['section'];
+                        $priority = $taskInfo['priority'];
+                        $is_send_deadline_msg = $taskInfo['is_send_deadline_msg'];
+
+                    }
+
+                    $select_task_stmt->close();
+                }
+
+                // Create a message
+                $messageText = "The deadline for the task, " . $task_name . ", is approaching! The task you assigned is set to conclude in 5 days.";
+                // Insert the message into the Messages table
+                $insertMessageQuery_assignee = "INSERT INTO Messages (text, recipient_id, is_task_msg, task_id)
+                                        VALUES ('$messageText', $assignee, 1, $taskId)";
+
+                if ($connection->query($insertMessageQuery_assignee)) {
+
+                    if ($assignee != $ownerUserId) {
+                        // Insert the message into the Messages table
+                        $insertMessageQuery = "INSERT INTO Messages (text, recipient_id, is_task_msg, task_id)
+                                        VALUES ('$messageText', $ownerUserId, 1, $taskId)";
+
+                        $connection->query($insertMessageQuery);
+                    }
+
+
+                    // If the message is inserted successfully, update is_send_deadline_msg to 1
+                    $updateIsSendQuery = "UPDATE Tasks SET is_send_deadline_msg = 1 WHERE task_id = $task_id";
+                    $connection->query($updateIsSendQuery);
+                }
+
+            }
+        }
     }
 }
 

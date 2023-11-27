@@ -2,11 +2,14 @@
 include '../../config/connect.php';
 include '../utils.php';
 
+
+// Enable error reporting
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 session_start();
 $userId = $_SESSION['user_id'];
 
-// Calculate the date 5 days from today
-$fiveDaysFromNow = date('Y-m-d', strtotime('+5 days'));
 
 // Query to fetch end dates of projects created by the user, exactly 5 days from today
 $sql = "SELECT project_id, project_name, end_date FROM Projects 
@@ -28,7 +31,7 @@ if ($result->num_rows > 0) {
         $response[] = $project;
 
         // Send a message to the project owner
-        sendMessageAboutDeadline($row["project_id"], 'true');
+        sendMessageAboutDeadlineProject($row["project_id"], 'The deadline date is ' . $row["end_date"]);
     }
 } else {
     $response['message'] = "No projects found for the user ending exactly 5 days from today.";
