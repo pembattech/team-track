@@ -19,7 +19,7 @@ if (isset($_POST['task_id']) && is_numeric($_POST['task_id'])) {
     $task_name = getTaskInfo($task_id)['task_name'];
 
 
-    $task_details = getTaskDetails($task_id);
+    $task_details = getTaskInfo($task_id);
 
     $loggedInUserId = $_SESSION['user_id'];
 

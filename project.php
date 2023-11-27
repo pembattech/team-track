@@ -1226,7 +1226,7 @@ session_start();
     // Function to toggle task selection
     function toggleTaskSelection(taskId) {
         const index = selectedTasks.indexOf(taskId);
-        if (index === -1) {
+        if (index == -1) {
             selectedTasks.push(taskId);
         } else {
             selectedTasks.splice(index, 1);
@@ -1281,19 +1281,19 @@ session_start();
                 // Hide the delete button popup
                 $("#checkboxsButtons").hide();
 
-                if (response.status == 'success') {
-                    // Handle the success response here
-                    console.log('Selected tasks deleted successfully.');
+                // if (response.status == 'success') {
+                // Handle the success response here
+                console.log('Selected tasks deleted successfully.');
 
-                    // Uncheck all checkboxes
-                    $(".task-checkbox").prop("checked", false);
+                // Uncheck all checkboxes
+                $(".task-checkbox").prop("checked", false);
 
-                    fetchTasks();
+                fetchTasks();
 
-                    displayPopupMessage(response.message, 'success');
-                } else if (response.status === 'error') {
-                    displayPopupMessage(response.message, 'error');
-                }
+                displayPopupMessage("Selected tasks deleted successfully.", 'success');
+                // } else if (response.status === 'error') {
+                //     displayPopupMessage(response.message, 'error');
+                // }
             },
             error: function (xhr, status, error) {
                 // Handle the error if needed
@@ -1303,23 +1303,19 @@ session_start();
     });
 
     function toggleSelectAllCheckbox() {
-
         var toggleSelect = $("#toggleSelect");
-        // var currentClass = toggleSelect.attr("class");
-        // console.log("The class of toggleSelect is: " + currentClass);
-
 
         if (toggleSelect.hasClass("selectall")) {
             toggleSelect.removeClass("selectall");
             toggleSelect.text("Cancel Select");
             toggleSelect.addClass("cancelselect");
-
         } else {
             toggleSelect.removeClass("cancelselect");
             toggleSelect.text("Select All");
             toggleSelect.addClass("selectall");
         }
     }
+
 
     function check_toggleSelectclass() {
         var toggleSelect = $("#toggleSelect");
@@ -1356,7 +1352,7 @@ session_start();
         // Hide the delete button popup
         $("#checkboxsButtons").hide();
 
-        toggleSelectAllCheckbox();
+        $("#cancelselect-btn").hide()
     });
 
     $(document).on("click", ".selectall", function () {
@@ -2281,7 +2277,7 @@ session_start();
         });
     }
 
-    
+
     function task_deadline_check() {
         var userId = <?php echo $user_id; ?>;
         // Make AJAX request to fetch project end dates
@@ -2299,5 +2295,5 @@ session_start();
         });
     }
 
-    
+
 </script>
