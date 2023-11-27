@@ -1124,7 +1124,6 @@ session_start();
     function fetchTasks() {
         task_deadline_check();
 
-
         // Updating the list of recent activity in the overview section of the project page.
         fetchRecentActivities();
 

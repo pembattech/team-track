@@ -230,9 +230,6 @@
             data: { message_id: messageId },
             success: function (response) {
 
-                console.log('Marked read!');
-                console.log(response.unreadCount);
-
                 updateSidebarUnreadCount(response.unreadCount);
             },
             error: function (xhr, status, error) {
@@ -244,7 +241,6 @@
     // Function to update the sidebar unread badge
     function updateSidebarUnreadCount(count) {
         const badge = document.querySelector('.unread-badge');
-        console.log(count);
         if (badge) {
             if (count == 0) {
                 badge.style.backgroundColor = "transparent";
