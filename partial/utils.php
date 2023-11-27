@@ -275,6 +275,34 @@ function getTasksOfAssignedUser($user_id, $project_id, $is_left_project, $msg)
     return $tasks;
 }
 
+// Function to send a message to the project owner
+function sendMessageAboutDeadline($projectId, $is_project_deadline = NULL) {
+    global $connection;
+
+    // Get the project owner's user ID
+    $ownerQuery = "SELECT user_id FROM ProjectUsers WHERE project_id = $projectId AND is_projectowner = 1";
+    $ownerResult = $connection->query($ownerQuery);
+
+    if ($ownerResult->num_rows > 0) {
+        $ownerRow = $ownerResult->fetch_assoc();
+        $ownerUserId = $ownerRow['user_id'];
+
+        if ($is_project_deadline != NULL)
+        {
+            // Create a message
+            $messageText = "Project deadline is approaching! The project you own is ending in 5 days.";
+            // Insert the message into the Messages table
+            $insertMessageQuery = "INSERT INTO Messages (text, recipient_id, is_project_msg, project_id)
+                                   VALUES ('$messageText', $ownerUserId, 1, $projectId)";
+    
+            $connection->query($insertMessageQuery);
+        } 
+        // else {
+
+        // }
+
+    }
+}
 
 
 

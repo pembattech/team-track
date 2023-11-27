@@ -64,21 +64,6 @@
         padding-left: 5px;
     }
 
-    .unread-badge {
-        background-color: var(--danger-color);
-        color: white;
-        border-radius: 50%;
-        width: 24px;
-        height: 24px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 10px;
-        margin-left: 8px;
-        transition: background-color 0.3s ease;
-    }
-
-
 </style>
 <nav class="sidebar">
     <ul>
@@ -95,7 +80,7 @@
             </a>
         </li>
         <li class="related-btn-img">
-            <a href="notification.php" class="full-width">
+            <a href="notification.php" id="notification" class="full-width">
                 <img src="./static/image/bell.svg" alt="">
                 Notification
                 <?php

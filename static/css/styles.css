@@ -617,7 +617,7 @@ th.subhead-task {
     color: var(--color-text);
 }
 
-.project-desc-textarea  textarea {
+.project-desc-textarea textarea {
     border: 1px solid var(--color-border);
     width: 450px;
 }
@@ -1488,4 +1488,109 @@ input.d-none {
 .task-list-container td {
     font-size: 14px;
     width: 20%;
+}
+
+
+/* notification */
+.inbox-container {
+    display: flex;
+    gap: 10px;
+    border-radius: 5px;
+
+}
+
+.message-list {
+    width: 100%;
+    border: 0;
+    border-radius: 5px;
+}
+
+.message-list td {
+    padding: 10px;
+    border: 0;
+    border-radius: 5px;
+}
+
+.message-list tbody tr:hover {
+    background-color: var(--sidebar-bgcolor);
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.inbox-left-side {
+    max-height: 65vh;
+    overflow-y: auto;
+    background-color: var(--bg-color);
+    border-radius: 5px;
+    width: 100%;
+}
+
+.inbox-left-side::-webkit-scrollbar,
+.inbox-right-side::-webkit-scrollbar {
+    width: 5px;
+}
+
+.inbox-right-side {
+    height: 59vh;
+    width: 650px;
+    position: sticky;
+    top: 139;
+    right: 0;
+    bottom: 0;
+    overflow-y: auto;
+    border-radius: 5px;
+    padding: 20px;
+    background-color: var(--color-background-weak-hover-deprecated);
+    transition: background-color 0.3s ease;
+}
+
+.inbox-right-side h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.inbox-right-side p {
+    margin: 0;
+}
+
+.inbox-right-side p:last-child {
+    margin-bottom: 0;
+}
+
+.unread {
+    font-weight: bold;
+}
+
+.open-message {
+    font-style: italic;
+    font-weight: 100;
+    background-color: var(--color-background-weak-hover-deprecated);
+    transition: background-color 0.3s ease, font-style 0.3 ease;
+}
+
+.unread_message {
+    font-weight: 900;
+}
+
+.unread-badge {
+    background-color: var(--danger-color);
+    color: white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    margin-left: 8px;
+    transition: background-color 0.3s ease;
+}
+
+.options-btn-inbox {
+    display: flex;
+}
+
+.options-btn-inbox .filter-btns .active {
+    font-weight: 900;
+    color: var(--color-text);
 }

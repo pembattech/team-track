@@ -22,7 +22,8 @@ CREATE TABLE IF NOT EXISTS Projects (
     end_date DATE,
     priority VARCHAR(50),
     status VARCHAR(50),
-    background_color VARCHAR(7)
+    background_color VARCHAR(7),
+    is_send_deadline_msg TINYINT(1) DEFAULT 0;
 );
 
 CREATE TABLE IF NOT EXISTS ProjectUsers (
@@ -47,6 +48,7 @@ CREATE TABLE IF NOT EXISTS Tasks (
     status VARCHAR(50),
     section VARCHAR(50),
     priority VARCHAR(50),
+    is_send_deadline_msg TINYINT(1) DEFAULT 0;
     FOREIGN KEY (projectuser_id) REFERENCES ProjectUsers(projectuser_id) ON DELETE CASCADE,
     FOREIGN KEY (task_creator_id) REFERENCES Users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (assignee) REFERENCES Users(user_id) ON DELETE CASCADE
