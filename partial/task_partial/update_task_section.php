@@ -57,7 +57,8 @@ if (isset($_POST['task_id']) && isset($_POST['section']) && isset($_POST['projec
 
                 if ($projectowner_id != $loggedInUserId) {
 
-                    $messageText = "Task with ID $taskId has been marked as Done.";
+                    $task_name = getTaskInfo($taskId)['task_name'];
+                    $messageText = $task_name . " task has been marked as Done.";
 
                     $insertMessageSql = "INSERT INTO Messages (task_id, text, recipient_id, is_task_msg)
                 VALUES ('$taskId', '$messageText', '$projectowner_id', 1)";

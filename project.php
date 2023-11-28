@@ -695,13 +695,12 @@ session_start();
                             <select id="editStatus" name="status" class="select-style">
                                 <option value="" selected disabled hidden>Select a Number</option>
                                 <option value="At risk">At risk</option>
-                                <option value="Off Track">Off track</option>
-                                <option value="On Track">On track</option>
                                 <option value="On Hold">On Hold</option>
+                                <option value="On Track">On track</option>
                                 <option value="Cancelled">Cancelled</option>
-                                <option value="Blocked">Blocked</option>
                                 <option value="Pending Approval">Pending Approval</option>
                                 <option value="In Review">In Review</option>
+                                <option value="completed">Complete</option>
                             </select>
                             <br>
                             <span id="editStatus-error" class="error-message"></span>

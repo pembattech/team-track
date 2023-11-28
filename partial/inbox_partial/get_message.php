@@ -120,7 +120,7 @@ if (isset($_POST['message_id']) && is_numeric($_POST['message_id'])) {
                     ?>
 
                     <!-- <form action="partial/task_partial/update_task.php" method="post"> -->
-                    <form id = "editTaskForm">
+                    <form id="editTaskForm">
                         <input type="hidden" name="project_id" value="<?php echo $projectId; ?>">
                         <input type="hidden" name="projectowner_id" value="<?php echo $project_owner_id; ?>">
                         <input type="hidden" id="editTaskId" name="task_id">
@@ -180,13 +180,12 @@ if (isset($_POST['message_id']) && is_numeric($_POST['message_id'])) {
                         <select id="editStatus" name="status" class="select-style">
                             <option value="" selected disabled hidden>Select status</option>
                             <option value="At risk">At risk</option>
-                            <option value="Off Track">Off track</option>
-                            <option value="On Track">On track</option>
                             <option value="On Hold">On Hold</option>
+                            <option value="On Track">On track</option>
                             <option value="Cancelled">Cancelled</option>
-                            <option value="Blocked">Blocked</option>
                             <option value="Pending Approval">Pending Approval</option>
                             <option value="In Review">In Review</option>
+                            <option value="completed">Complete</option>
                         </select>
                         <br>
                         <span id="editStatus-error" class="error-message"></span>
